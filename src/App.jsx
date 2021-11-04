@@ -167,6 +167,7 @@ export default function App() {
   };
 
   console.log("*", chartData);
+  const loading = !_.some(chartData, c => c && c.country_iso_code === iso)
   return (
     <div>
       <select name="country" onChange={updateCountry}>
@@ -177,7 +178,7 @@ export default function App() {
         ))}
       </select>
       <br />
-      {chartData.map(getChart)}
+      {loading ? "loading..." : chartData.map(getChart)}
     </div>
   );
 }

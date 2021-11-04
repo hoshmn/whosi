@@ -170,7 +170,7 @@ async function getCharts(country_iso_code) {
   );
 }
 async function getChart(chartId, country_iso_code) {
-  // if (chartId !== "new_art") return;
+  // if (chartId !== "plhiv_art") return;
   // console.log("creating : ", chartId);
   // console.log(chartSettingsMap[chartId]);
   const chartConfig = chartConfigsMap[chartId];
@@ -215,6 +215,7 @@ async function getChart(chartId, country_iso_code) {
     data,
     chartId,
     elements,
+    country_iso_code,
   };
 
   return chart;
