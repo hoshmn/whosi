@@ -1,6 +1,9 @@
 import { csv } from "d3-fetch";
 import _ from "lodash";
 
+// data headers: country_iso_code
+// year_range
+
 const getUrl = (gid) =>
   `https://docs.google.com/spreadsheets/d/e/2PACX-1vSAEOXOt5aHDcb35lpCsSO5AvHTZPplXHrHGaIXTJjCtW_B96D0MOItWZLGv1j4lagTxnuVClms6M0X/pub?gid=${gid}&single=true&output=csv`;
 // these are set in the home sheet for version controlability
@@ -27,6 +30,10 @@ const chartNames = [
   "policy_compliance"
 ];
 
+const chartIdCol = "chartId";
+const elementCol = "element";
+const nonDataColumnNames = [chartIdCol, elementCol];
+
 // const urlData1 = "https://docs.google.com/spreadsheets/d/13kvd68Vjh35_7LL35D1tVM8vUy3_sxKkj_b3ZhzDw48/export?gid=0&format=csv"
 // const urlData1 =
 //   "https://docs.google.com/spreadsheets/d/e/2PACX-1vSAEOXOt5aHDcb35lpCsSO5AvHTZPplXHrHGaIXTJjCtW_B96D0MOItWZLGv1j4lagTxnuVClms6M0X/pub?gid=0&single=true&output=csv";
@@ -34,26 +41,31 @@ const chartNames = [
 // "https://docs.google.com/spreadsheets/d/e/2PACX-1vSAEOXOt5aHDcb35lpCsSO5AvHTZPplXHrHGaIXTJjCtW_B96D0MOItWZLGv1j4lagTxnuVClms6M0X/pub?gid=1186908045&single=true&output=csv";
 
 const configParser = (row) => {
-  if (!row.chart) return;
+  if (!row.chartId) return;
   delete row[""];
-  row.chart = row.chart.replace(/\s+/g, "_");
+  // row.chart = row.chart.replace(/\s+/g, "_");
 
-  const keys = Object.keys(row);
-  const constraintKeys = keys.filter((k) => k.match(/c\d+k/));
-  // console.log(constraintKeys)
-  row.constraints = [];
-  constraintKeys.forEach((k) => {
-    const key = row[k].toLowerCase();
-    const v = k.slice(0, -1) + "v";
-    let value = row[v];
-    value = !value || value === "null" ? null : value.toLowerCase();
-
-    delete row[k];
-    delete row[v];
-    if (!key) return;
-    // console.log(key, value)
-    row.constraints.push({ key, value });
+  _.each(row, (value, key) => {
+    // console.log(value, key)
+    if (value === "") delete row[key];
+    else row[key] = value === "null" ? null : value;
   });
+  // console.log(row)
+  // const constraintKeys = keys.filter((k) => k.match(/c\d+k/));
+  // console.log(constraintKeys)
+  // row.constraints = [];
+  // constraintKeys.forEach((k) => {
+  //   const key = row[k].toLowerCase();
+  //   const v = k.slice(0, -1) + "v";
+  //   let value = row[v];
+  //   value = !value || value === "null" ? null : value.toLowerCase();
+
+  //   delete row[k];
+  //   delete row[v];
+  //   if (!key) return;
+  //   // console.log(key, value)
+  //   row.constraints.push({ key, value });
+  // });
   // const output = {}
   // console.log(constraints)
   return row;
@@ -69,25 +81,19 @@ async function setConfigGids() {
 
 async function getChartConfigs() {
   const baseConfigs = await csv(getUrl(gids.configs), configParser);
-  const shaped = _.groupBy(baseConfigs, "chart");
+  const shaped = _.groupBy(baseConfigs, chartIdCol);
+  // console.log(shaped)
   const chartConfigs = _.mapValues(shaped, (configParams, name) => {
     // console.log(name);
     // wise?
     if (name === "all") return configParams;
-    return _.groupBy(configParams, "element");
+    return _.groupBy(configParams, elementCol);
   });
-
-  // console.log("CC");
-  // console.log(chartConfigs);
 
   _.each(chartConfigs, (configParams, name) => {
     if (name === "all") return;
-    // console.log(name);
-    // console.log(configParams);
-
     _.each(configParams, (elemDetails, elementName) => {
       if (elementName === "all") return;
-      // console.log(elemDetails, elementName);
     });
   });
   // console.log(data);
@@ -118,6 +124,12 @@ async function getChart(name, iso_code) {
   const elements = Object.keys(chartConfig).filter((k) => k !== "all");
   console.log(elements);
   // getchartdata per element
+  _.map(["2015", "2016", "2017"], (year) => {
+    const row = _.find(allData, (r) => {
+      return r["country_iso_code"] === iso_code && r["year"] === year;
+    });
+    console.log(row);
+  });
   return allData;
 }
 
