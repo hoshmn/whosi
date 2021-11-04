@@ -11,6 +11,7 @@ import {
   Line,
 } from "recharts";
 import getData from "./getData";
+import _ from "lodash";
 
 const countries = [
   "CIV",
