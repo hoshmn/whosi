@@ -6,9 +6,24 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip
+  Tooltip,
+  LineChart,
+  Line,
 } from "recharts";
 import getData from "./getData";
+
+const countries = [
+  "CIV",
+  "CMR",
+  "GHA",
+  "GIN",
+  "IDN",
+  "MOZ",
+  "NGA",
+  "PHL",
+  "TZA",
+  "ZMB",
+]
 
 // const data = [
 //   {
@@ -56,61 +71,113 @@ import getData from "./getData";
 //   ]
 
 export default function App() {
-  const [chartData, setChartData] = React.useState([])
+  const [chartData, setChartData] = React.useState([]);
+  const [iso, setIso] = React.useState(countries[0]);
 
-  // React.useEffect(() => {
-  //   getData().then((data) => {
-  //     console.log("FIN_");
-  //     console.log(data);
-  //     setChartData(data)
-  //   });
-  // })
-  
-  const colors = [
-    "#8884d8",
-    "#82ca9d",
-    "#ffc658",
-  ]
-  const getAreaChart = ({data}) => {
-    console.log("DATA: ", data)
+  React.useEffect(() => {
+    getData(iso).then((data) => {
+      // alert(1)
+      console.log("FIN_");
+      console.log(data);
+      setChartData(data);
+    });
+  }, [iso]);
+
+  const colors = ["#8884d8", "#82ca9d", "#ffc658"];
+
+  const getLineChart = (chart) => {
+    const { data, elements } = chart;
+    console.log("DATA: ", data);
+    console.log("elements: ", elements);
     return (
-     <AreaChart
-      width={500}
-      height={400}
-      data={data}
-      margin={{
-        top: 10,
-        right: 30,
-        left: 0,
-        bottom: 0
-      }}
-    >
-      <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="name" />
-      <YAxis />
-      <Tooltip />
-      {data.map((d, i) => (
-        <Area
-          type="monotone"
-          dataKey={d.name}
-          stackId={i+1}
-          stroke={colors[i]}
-          fill={colors[i]}
-        />
-      ))}
-    </AreaChart>
-    )
-  }
-  const getChart= (chart) => {
-    console.log("GC: ", chart)
+      <>
+        <>{chart.chartId}</>
+        <LineChart
+          width={500}
+          height={400}
+          data={data}
+          margin={{
+            top: 10,
+            right: 30,
+            left: 0,
+            bottom: 0,
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" />
+          <YAxis />
+          <Tooltip />
+          {elements.map((elem, i) => (
+            <Line
+              type="monotone"
+              dataKey={elem}
+              stackId={i + 1}
+              stroke={colors[i]}
+              fill={colors[i]}
+            />
+          ))}
+        </LineChart>
+      </>
+    );
+  };
+  const getAreaChart = (chart) => {
+    const { data, elements } = chart;
+    console.log("DATA: ", data);
+    console.log("elements: ", elements);
+    return (
+      <>
+        <>{chart.chartId}</>
+        <AreaChart
+          width={500}
+          height={400}
+          data={data}
+          margin={{
+            top: 10,
+            right: 30,
+            left: 0,
+            bottom: 0,
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" />
+          <YAxis />
+          <Tooltip />
+          {elements.map((elem, i) => (
+            <Area
+              type="monotone"
+              dataKey={elem}
+              stackId={i + 1}
+              stroke={colors[i]}
+              fill={colors[i]}
+            />
+          ))}
+        </AreaChart>
+      </>
+    );
+  };
+  const getChart = (chart) => {
+    // console.log("GC: ", chart);
     if (!chart) return null;
-    return getAreaChart(chart)
-  }
-  console.log(chartData)
+    if (chart.type === "area") return getAreaChart(chart);
+    return getLineChart(chart);
+  };
+
+  const updateCountry = (e) => {
+    setIso(e.target.value);
+  };
+
+  console.log("*", chartData);
   return (
     <div>
-      welcome"!!
-      {chartData.map(chart => getChart)}
-      </div>
+      <select name="country" onChange={updateCountry}>
+        {countries.map((c) => (
+          <option id={c} key={c} value={c}>
+            {c}
+          </option>
+        ))}
+      </select>
+      <br />
+      {chartData.map(getChart)}
+    </div>
   );
 }

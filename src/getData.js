@@ -2,7 +2,7 @@ import { csv } from "d3-fetch";
 import _ from "lodash";
 
 // CONSTS
-const DISABLED = true;
+const DISABLED = false;
 
 // these are set in the home sheet for version controlability
 const configurableGidNames = ["configs", "dictionary", "settings"];
@@ -11,7 +11,7 @@ const gids = {
   // configs: null,
   // dictionary: null,
   // settings: null,
-  data: {}
+  data: {},
 };
 let chartSettingsMap = {};
 let chartConfigsMap = {};
@@ -25,7 +25,7 @@ const chartIds = [
   "plhiv_suppressed",
   "testing_coverage",
   "key_populations",
-  "policy_compliance"
+  "policy_compliance",
 ];
 
 const chartIdCol = "chartId";
@@ -66,7 +66,7 @@ const getFilter = ({
   element,
   year,
   country_iso_code,
-  chartConfigsMap
+  chartConfigsMap,
 }) => {
   // filter applied to all charts
   const allChartsFilter = _.get(chartConfigsMap, "all[0]", {});
@@ -88,7 +88,7 @@ const getFilter = ({
     ...allElementsFilter,
     ...elementFilter,
     year,
-    country_iso_code
+    country_iso_code,
   };
   return filter;
 };
@@ -101,6 +101,7 @@ const getRow = ({ filter, chartSourceData }) => {
       if (nonDataColumnNames.includes(key)) return true;
       // if no/null row value, matches if we're looking for null value
       if (!row[key]) return !val;
+      // console.log(row[key], val, row[key] === val);
       return row[key].toLowerCase() === val.toLowerCase();
     });
   });
@@ -114,7 +115,7 @@ const getDataPoint = ({
   year,
   country_iso_code,
   chartConfigsMap,
-  chartSourceData
+  chartSourceData,
 }) => {
   const filter = getFilter({
     chartId,
@@ -122,7 +123,7 @@ const getDataPoint = ({
     year,
     country_iso_code,
     chartConfigsMap,
-    chartSourceData
+    chartSourceData,
   });
   // console.log(filter);
   // console.log(chartSourceData);
@@ -169,25 +170,26 @@ async function getCharts(country_iso_code) {
   );
 }
 async function getChart(chartId, country_iso_code) {
-  if (chartId !== "late_hiv") return;
-  console.log("creating : ", chartId);
-  console.log(chartSettingsMap[chartId]);
+  // if (chartId !== "new_art") return;
+  // console.log("creating : ", chartId);
+  // console.log(chartSettingsMap[chartId]);
   const chartConfig = chartConfigsMap[chartId];
-  console.log(chartConfigsMap[chartId]);
+  // console.log(chartConfigsMap[chartId]);
   const chartSettings = chartSettingsMap[chartId];
 
+  if (!chartConfig || !chartSettings || !chartSettings.source_gid) return null;
   const chartSourceData = await csv(
     getUrl(chartSettings.source_gid),
     filterByCountryGenerator(country_iso_code)
   );
-  console.log(chartSourceData);
+  // console.log(chartSourceData);
 
   const elements = Object.keys(chartConfig).filter((k) => k !== "all");
-  console.log(elements);
+  // console.log(elements);
 
   const year_range = _.get(chartConfig, "all[0].year");
   const years_arr = transformYearRange(year_range);
-  console.log(years_arr);
+  // console.log(years_arr);
 
   // getchartdata per element
   const data = _.map(years_arr, (year) => {
@@ -201,17 +203,18 @@ async function getChart(chartId, country_iso_code) {
           year,
           country_iso_code,
           chartConfigsMap,
-          chartSourceData
+          chartSourceData,
         }))
     );
     dataPoints.name = year;
-    console.log(dataPoints);
+    // console.log(dataPoints);
     return dataPoints;
   });
 
   const chart = {
     data,
-    chartId
+    chartId,
+    elements,
   };
 
   return chart;
