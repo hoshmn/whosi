@@ -11,7 +11,8 @@ import {
 import getData from "./getData";
 
 const d = getData().then((data) => {
-  // console.log(data);
+  console.log("FIN_");
+  console.log(data);
 });
 
 const data = [
