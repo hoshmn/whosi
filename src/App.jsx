@@ -78,7 +78,7 @@ export default function App() {
   React.useEffect(() => {
     getData(iso).then((data) => {
       // alert(1)
-      console.log("FIN_");
+      console.log("@@@ ALL DATA: ");
       console.log(data);
       setChartData(data);
     });
@@ -86,12 +86,12 @@ export default function App() {
 
   const colors = ["#8884d8", "#82ca9d", "#ffc658"];
 
-  const getLineChart = (chart) => {
+  const getLineChart = (chart, i) => {
     const { data, elements } = chart;
-    console.log("DATA: ", data);
-    console.log("elements: ", elements);
+    // console.log("DATA: ", data);
+    // console.log("elements: ", elements);
     return (
-      <>
+      <div key={i}>
         <>{chart.chartId}</>
         <LineChart
           width={500}
@@ -118,15 +118,16 @@ export default function App() {
             />
           ))}
         </LineChart>
-      </>
+      </div>
     );
   };
-  const getAreaChart = (chart) => {
+
+  const getAreaChart = (chart, i) => {
     const { data, elements } = chart;
-    console.log("DATA: ", data);
-    console.log("elements: ", elements);
+    // console.log("DATA: ", data);
+    // console.log("elements: ", elements);
     return (
-      <>
+      <div key={i}>
         <>{chart.chartId}</>
         <AreaChart
           width={500}
@@ -153,32 +154,33 @@ export default function App() {
             />
           ))}
         </AreaChart>
-      </>
+      </div>
     );
   };
-  const getChart = (chart) => {
+  const getChart = (chart, i) => {
     // console.log("GC: ", chart);
     if (!chart) return null;
-    if (chart.type === "area") return getAreaChart(chart);
-    return getLineChart(chart);
+    if (chart.type === "area") return getAreaChart(chart, i);
+    return getLineChart(chart, i);
   };
 
   const updateCountry = (e) => {
     setIso(e.target.value);
   };
 
-  console.log("*", chartData);
+  // console.log("*", chartData);
   const loading = !_.some(chartData, c => c && c.country_iso_code === iso)
   return (
     <div>
       <select name="country" onChange={updateCountry}>
-        {countries.map((c) => (
+        {countries.map((c) => ( 
           <option id={c} key={c} value={c}>
             {c}
           </option>
         ))}
       </select>
       <br />
+        {/* todo add key */}
       {loading ? "loading..." : chartData.map(getChart)}
     </div>
   );

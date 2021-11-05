@@ -6,6 +6,7 @@ const DISABLED = false;
 
 // these are set in the home sheet for version controlability
 const configurableGidNames = ["configs", "dictionary", "settings"];
+// gids pointing to Sheet tabs
 const gids = {
   home: "1188341414",
   // configs: null,
@@ -16,6 +17,7 @@ const gids = {
 let chartSettingsMap = {};
 let chartConfigsMap = {};
 
+// TODO: populate dynamically
 const chartIds = [
   "p95",
   "plhiv_diagnosis",
@@ -28,16 +30,27 @@ const chartIds = [
   "policy_compliance",
 ];
 
-const chartIdCol = "chartId";
-const elementCol = "element";
-const nonDataColumnNames = [chartIdCol, elementCol];
+// map to spreadsheet column names
+const C = {
+  // DATA (/CONFIG) SHEETS
+  chartId: "chart_id",
+  element: "element",
+  iso: "country_iso_code",
+  sourceYear: "source_year",
+  value: "value",
+  year: "year",
+
+  // SETTINGS SHEET
+  sourceGid: "source_gid",
+}
+const nonDataColumnNames = [C.chartId, C.element];
 
 // HELPERS
 const getUrl = (gid) =>
   `https://docs.google.com/spreadsheets/d/e/2PACX-1vSAEOXOt5aHDcb35lpCsSO5AvHTZPplXHrHGaIXTJjCtW_B96D0MOItWZLGv1j4lagTxnuVClms6M0X/pub?gid=${gid}&single=true&output=csv`;
 
 const configParser = (row) => {
-  if (!row[chartIdCol]) return;
+  if (!row[C.chartId]) return;
   delete row[""];
 
   _.each(row, (value, key) => {
@@ -49,9 +62,10 @@ const configParser = (row) => {
 };
 
 const filterByCountryGenerator = (country_iso_code) => {
-  return (row) => (row["country_iso_code"] === country_iso_code ? row : null);
+  return (row) => (row[C.iso] === country_iso_code ? row : null);
 };
 
+// turn "[2018-2020]" into [2018, 2019, 2020]
 const transformYearRange = (range) => {
   const regex = /\[(\d+)-(\d+)\]/;
   const result = regex.exec(range);
@@ -61,6 +75,7 @@ const transformYearRange = (range) => {
   return _.range(y1, y2 + 1).map(String);
 };
 
+// derive a row filter of type { sex: "males", age: "15+" }
 const getFilter = ({
   chartId,
   element,
@@ -71,11 +86,9 @@ const getFilter = ({
   // filter applied to all charts
   const allChartsFilter = _.get(chartConfigsMap, "all[0]", {});
   // filter applied to all elements within this chart
-  const allElementsFilter = _.get(chartConfigsMap, `${chartId}.all[0]`, {});
-  // console.log(allChartsFilter)
-  // console.log(allElementsFilter)
+  const allElementsFilter = _.get(chartConfigsMap, [chartId, "all", 0], {});
   // filter applied to this element
-  // backupFilters may be used for source prioritization
+  // (backupFilters may be used for source prioritization)
   const [elementFilter, ...backupFilters] = _.get(
     chartConfigsMap,
     [chartId, element],
@@ -95,18 +108,17 @@ const getFilter = ({
 
 const getRow = ({ filter, chartSourceData }) => {
   const matchingRows = _.filter(chartSourceData, (row) => {
-    // console.log(row)
+
     return _.every(filter, (val, key) => {
       // don't filter by chartId, element
       if (nonDataColumnNames.includes(key)) return true;
       // if no/null row value, matches if we're looking for null value
       if (!row[key]) return !val;
-      // console.log(row[key], val, row[key] === val);
       return row[key].toLowerCase() === val.toLowerCase();
     });
   });
-  return _.maxBy(matchingRows, "source_year") || matchingRows[0];
-  // matchingRows.length && console.log("!!@!", dataPoint, matchingRows);
+  // todo: maxBy year if no year set?
+  return _.maxBy(matchingRows, C.sourceYear) || matchingRows[0];
 };
 
 const getDataPoint = ({
@@ -125,13 +137,11 @@ const getDataPoint = ({
     chartConfigsMap,
     chartSourceData,
   });
-  // console.log(filter);
-  // console.log(chartSourceData);
 
   const row = getRow({ filter, chartSourceData });
 
-  // todo: numeric values
-  return (row && row["value"] && parseFloat(row["value"])) || null;
+  // todo: all numeric values?
+  return (row && row[C.value] && parseFloat(row[C.value])) || null;
 };
 
 // ASYNC FETCHERS
@@ -139,19 +149,22 @@ async function setConfigGids() {
   const homeRows = await csv(getUrl(gids.home));
   configurableGidNames.forEach((name) => {
     const lastConfiguredRow = _.findLast(homeRows, (r) => !!r[name]);
+    if (!lastConfiguredRow) {
+      console.error("No Sheet GID found for: ", name)
+      return;
+    }
     gids[name] = lastConfiguredRow[name];
   });
 }
 
 async function getChartConfigs() {
   const baseConfigs = await csv(getUrl(gids.configs), configParser);
-  const shaped = _.groupBy(baseConfigs, chartIdCol);
-  // console.log(shaped)
+  const shaped = _.groupBy(baseConfigs, C.chartId);
+
   const chartConfigs = _.mapValues(shaped, (configParams, name) => {
-    // console.log(name);
     // wise?
     if (name === "all") return configParams;
-    return _.groupBy(configParams, elementCol);
+    return _.groupBy(configParams, C.element);
   });
 
   _.each(chartConfigs, (configParams, name) => {
@@ -160,7 +173,7 @@ async function getChartConfigs() {
       if (elementName === "all") return;
     });
   });
-  // console.log(data);
+
   return chartConfigs;
 }
 
@@ -172,14 +185,12 @@ async function getCharts(country_iso_code) {
 async function getChart(chartId, country_iso_code) {
   // if (chartId !== "plhiv_art") return;
   // console.log("creating : ", chartId);
-  // console.log(chartSettingsMap[chartId]);
   const chartConfig = chartConfigsMap[chartId];
-  // console.log(chartConfigsMap[chartId]);
   const chartSettings = chartSettingsMap[chartId];
 
-  if (!chartConfig || !chartSettings || !chartSettings.source_gid) return null;
+  if (!chartConfig || !chartSettings || !chartSettings[C.sourceGid]) return null;
   const chartSourceData = await csv(
-    getUrl(chartSettings.source_gid),
+    getUrl(chartSettings[C.sourceGid]),
     filterByCountryGenerator(country_iso_code)
   );
   // console.log(chartSourceData);
@@ -187,7 +198,7 @@ async function getChart(chartId, country_iso_code) {
   const elements = Object.keys(chartConfig).filter((k) => k !== "all");
   // console.log(elements);
 
-  const year_range = _.get(chartConfig, "all[0].year");
+  const year_range = _.get(chartConfig, ["all", 0, C.year]);
   const years_arr = transformYearRange(year_range);
   // console.log(years_arr);
 
@@ -222,17 +233,20 @@ async function getChart(chartId, country_iso_code) {
 }
 
 // MAIN FUNCTION
-async function getData(country_iso_code = "MOZ") {
+async function getData(country_iso_code) {
   if (DISABLED) return [];
   // CONFIGURE GIDS MAP
   await setConfigGids();
 
   // GRAB SETTINGS
   const settingsRows = await csv(getUrl(gids.settings));
-  chartSettingsMap = _.keyBy(settingsRows, "id");
+  chartSettingsMap = _.keyBy(settingsRows, C.chartId);
+  console.log("@@@ ALL SETTINGS: ");
+  console.log(chartSettingsMap);
 
   // GRAB CONFIGS
   chartConfigsMap = await getChartConfigs();
+  console.log("@@@ ALL CONFIGS: ");
   console.log(chartConfigsMap);
 
   // CREATE CHARTS
