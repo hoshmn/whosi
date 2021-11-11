@@ -19,8 +19,8 @@ let chartConfigsMap = {};
 
 // TODO: populate dynamically
 const chartIds = [
-  "p95",
   "plhiv_diagnosis",
+  "p95",
   "late_hiv",
   "plhiv_art",
   "new_art",
@@ -30,20 +30,49 @@ const chartIds = [
   "policy_compliance",
 ];
 
-// map to spreadsheet column names
+// MAPS TO SPREADSHEET COLUMN NAMES:
+// CONFIG SHEET - identifier fields (ie non-data fields)
 const C = {
-  // DATA (/CONFIG) SHEETS
   chartId: "chart_id",
   element: "element",
-  iso: "country_iso_code",
+  formula: "formula",
+  hidden: "hidden",
+};
+
+// DATA SHEETS - data fields (fields that configs can filter by)
+const D = {
+  country_iso_code: "country_iso_code",
   sourceYear: "source_year",
   value: "value",
   year: "year",
+  indicator: "indicator",
+  indicator_description: "indicator_description",
+  sex: "sex",
+  age: "age",
+  population_segment: "population_segment",
+  population_sub_group: "population_sub_group",
+  country_name: "country_name",
+  area_name: "area_name",
+  geographic_scope: "geographic_scope",
+  value_upper: "value_upper",
+  value_lower: "value_lower",
+  value_comment: "value_comment",
+  unit_format: "unit_format",
+  source_organization: "source_organization",
+  source_database: "source_database",
+  notes: "notes",
+  modality: "modality",
+  modality_category: "modality_category",
+  import_file: "import_file",
+  import_timestamp: "import_timestamp",
+  row_id: "row_id",
+  suppressed: "suppressed",
+};
 
-  // SETTINGS SHEET
+// SETTINGS SHEET
+const S = {
   sourceGid: "source_gid",
-}
-const nonDataColumnNames = [C.chartId, C.element];
+};
 
 // HELPERS
 const getUrl = (gid) =>
@@ -62,8 +91,14 @@ const configParser = (row) => {
 };
 
 const filterByCountryGenerator = (country_iso_code) => {
-  return (row) => (row[C.iso] === country_iso_code ? row : null);
+  return (row) => (row[D.country_iso_code] === country_iso_code ? row : null);
 };
+
+const getFormula = ({ element, chartConfig }) =>
+  _.get(chartConfig, [element, 0, C.formula]);
+
+const getIsHidden = ({ element, chartConfig }) =>
+  !!_.get(chartConfig, [element, 0, C.hidden]);
 
 // turn "[2018-2020]" into [2018, 2019, 2020]
 const transformYearRange = (range) => {
@@ -108,17 +143,16 @@ const getFilter = ({
 
 const getRow = ({ filter, chartSourceData }) => {
   const matchingRows = _.filter(chartSourceData, (row) => {
-
     return _.every(filter, (val, key) => {
-      // don't filter by chartId, element
-      if (nonDataColumnNames.includes(key)) return true;
+      // only filter by data sheet fields
+      if (!D[key]) return true;
       // if no/null row value, matches if we're looking for null value
       if (!row[key]) return !val;
       return row[key].toLowerCase() === val.toLowerCase();
     });
   });
   // todo: maxBy year if no year set?
-  return _.maxBy(matchingRows, C.sourceYear) || matchingRows[0];
+  return _.maxBy(matchingRows, D.sourceYear) || matchingRows[0];
 };
 
 const getDataPoint = ({
@@ -141,7 +175,32 @@ const getDataPoint = ({
   const row = getRow({ filter, chartSourceData });
 
   // todo: all numeric values?
-  return (row && row[C.value] && parseFloat(row[C.value])) || null;
+  return (row && row[D.value] && parseFloat(row[D.value])) || null;
+};
+
+const getCalculatedDataPoint = ({ chartConfig, element, dataPoints }) => {
+  const rawFormula = getFormula({ element, chartConfig });
+  let convertedFormula = rawFormula;
+  _.each(dataPoints, (value, key) => {
+    convertedFormula = convertedFormula.replace(key, value);
+  });
+
+  let result = null;
+  try {
+    result = eval(convertedFormula);
+  } catch (error) {
+    console.warn(`cannot evaluate ${rawFormula} (${convertedFormula})`);
+    return null;
+  }
+
+  // only allow numbers & arith operators (otherwise eg null will evaluate to 0)
+  if (!/^[\d-+*\/]+$/.test(convertedFormula) || !_.isNumber(result)) {
+    console.log(`missing values for ${rawFormula} (${convertedFormula})`);
+    return null;
+  }
+
+  // console.log(result);
+  return result;
 };
 
 // ASYNC FETCHERS
@@ -150,7 +209,7 @@ async function setConfigGids() {
   configurableGidNames.forEach((name) => {
     const lastConfiguredRow = _.findLast(homeRows, (r) => !!r[name]);
     if (!lastConfiguredRow) {
-      console.error("No Sheet GID found for: ", name)
+      console.error("No Sheet GID found for: ", name);
       return;
     }
     gids[name] = lastConfiguredRow[name];
@@ -188,9 +247,12 @@ async function getChart(chartId, country_iso_code) {
   const chartConfig = chartConfigsMap[chartId];
   const chartSettings = chartSettingsMap[chartId];
 
-  if (!chartConfig || !chartSettings || !chartSettings[C.sourceGid]) return null;
+  if (!chartConfig || !chartSettings || !chartSettings[S.sourceGid]) {
+    console.warn("skipping chart: ", chartId);
+    return null;
+  }
   const chartSourceData = await csv(
-    getUrl(chartSettings[C.sourceGid]),
+    getUrl(chartSettings[S.sourceGid]),
     filterByCountryGenerator(country_iso_code)
   );
   // console.log(chartSourceData);
@@ -198,25 +260,41 @@ async function getChart(chartId, country_iso_code) {
   const elements = Object.keys(chartConfig).filter((k) => k !== "all");
   // console.log(elements);
 
-  const year_range = _.get(chartConfig, ["all", 0, C.year]);
+  const year_range = _.get(chartConfig, ["all", 0, D.year]);
   const years_arr = transformYearRange(year_range);
   // console.log(years_arr);
 
   // getchartdata per element
   const data = _.map(years_arr, (year) => {
     const dataPoints = {};
-    _.each(
-      elements,
-      (element) =>
-        (dataPoints[element] = getDataPoint({
-          chartId,
-          element,
-          year,
-          country_iso_code,
-          chartConfigsMap,
-          chartSourceData,
-        }))
-    );
+    // add non-calculated points
+    _.each(elements, (element) => {
+      if (!!getFormula({ element, chartConfig })) return null;
+      dataPoints[element] = getDataPoint({
+        chartId,
+        element,
+        year,
+        country_iso_code,
+        chartConfigsMap,
+        chartSourceData,
+      });
+    });
+    // add calculated points
+    _.each(elements, (element) => {
+      if (!getFormula({ element, chartConfig })) return null;
+      dataPoints[element] = getCalculatedDataPoint({
+        element,
+        chartConfig,
+        dataPoints,
+      });
+    });
+    // delete elements used only for calculations
+    _.each(elements, (element) => {
+      if (getIsHidden({ element, chartConfig })) {
+        console.log("deleting: ", element);
+        delete dataPoints[element];
+      }
+    });
     dataPoints.name = year;
     // console.log(dataPoints);
     return dataPoints;
@@ -225,8 +303,10 @@ async function getChart(chartId, country_iso_code) {
   const chart = {
     data,
     chartId,
-    elements,
     country_iso_code,
+    elements: elements.filter(
+      (element) => !getIsHidden({ element, chartConfig })
+    ),
   };
 
   return chart;
