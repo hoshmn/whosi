@@ -9,6 +9,7 @@ import {
   Tooltip,
   LineChart,
   Line,
+  ResponsiveContainer,
 } from "recharts";
 import getData from "./getData";
 import _ from "lodash";
@@ -24,7 +25,7 @@ const countries = [
   "PHL",
   "TZA",
   "ZMB",
-]
+];
 
 // const data = [
 //   {
@@ -39,36 +40,6 @@ const countries = [
 //     pv: 1398,
 //     amt: 2210
 //   },
-//   {
-//     name: "Page C",
-//     uv: 2000,
-//     pv: 9800,
-//     amt: 2290
-//   },
-//   {
-//     name: "Page D",
-//     uv: 2780,
-//     pv: 3908,
-//     amt: 2000
-//   },
-//   {
-//     name: "Page E",
-//     uv: 1890,
-//     pv: 4800,
-//     amt: 2181
-//   },
-//   {
-//     name: "Page F",
-//     uv: 2390,
-//     pv: 3800,
-//     amt: 2500
-//   },
-//   {
-//     name: "Page G",
-//     uv: 3490,
-//     pv: 4300,
-//     amt: 5150
-//   }
 //   ]
 
 export default function App() {
@@ -77,7 +48,6 @@ export default function App() {
 
   React.useEffect(() => {
     getData(iso).then((data) => {
-      // alert(1)
       console.log("@@@ ALL DATA: ");
       console.log(data);
       setChartData(data);
@@ -88,11 +58,11 @@ export default function App() {
 
   const getLineChart = (chart, i) => {
     const { data, elements } = chart;
-    // console.log("DATA: ", data);
-    // console.log("elements: ", elements);
+
     return (
       <div key={i}>
         <>{chart.chartId}</>
+        {/* <ResponsiveContainer width="100%" height="100%"> */}
         <LineChart
           width={500}
           height={400}
@@ -118,14 +88,14 @@ export default function App() {
             />
           ))}
         </LineChart>
+        {/* </ResponsiveContainer> */}
       </div>
     );
   };
 
   const getAreaChart = (chart, i) => {
     const { data, elements } = chart;
-    // console.log("DATA: ", data);
-    // console.log("elements: ", elements);
+
     return (
       <div key={i}>
         <>{chart.chartId}</>
@@ -148,7 +118,7 @@ export default function App() {
             <Area
               type="monotone"
               dataKey={elem}
-              stackId={i + 1}
+              stackId="1"
               stroke={colors[i]}
               fill={colors[i]}
             />
@@ -157,10 +127,46 @@ export default function App() {
       </div>
     );
   };
+
+  const getTable = (chart, i) => {
+    const { data } = chart;
+
+    const headers = data[0]["values"].map(({ column }) => (
+      <th scope="col" key={column}>
+        {column}
+      </th>
+    ));
+
+    const rows = data.map(({ row, values }) => (
+      <tr key={row}>
+        <th scope="row">{row}</th>
+        {values.map(({ value, column }) => (
+          <td>{value && value["DISPLAY_VALUE"]}</td>
+        ))}
+      </tr>
+    ));
+
+    return (
+      <div key={i}>
+        <>{chart.chartId}</>
+        <table className="table-striped">
+          <thead>
+            <tr>
+              <th scope="col"></th>
+              {headers}
+            </tr>
+          </thead>
+          <tbody>{rows}</tbody>
+        </table>
+      </div>
+    );
+  };
+
   const getChart = (chart, i) => {
     // console.log("GC: ", chart);
     if (!chart) return null;
     if (chart.type === "area") return getAreaChart(chart, i);
+    if (chart.type === "table") return getTable(chart, i);
     return getLineChart(chart, i);
   };
 
@@ -169,18 +175,18 @@ export default function App() {
   };
 
   // console.log("*", chartData);
-  const loading = !_.some(chartData, c => c && c.country_iso_code === iso)
+  const loading = !_.some(chartData, (c) => c && c.country_iso_code === iso);
   return (
     <div>
       <select name="country" onChange={updateCountry}>
-        {countries.map((c) => ( 
+        {countries.map((c) => (
           <option id={c} key={c} value={c}>
             {c}
           </option>
         ))}
       </select>
       <br />
-        {/* todo add key */}
+      {/* todo add key */}
       {loading ? "loading..." : chartData.map(getChart)}
     </div>
   );
