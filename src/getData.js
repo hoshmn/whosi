@@ -72,6 +72,7 @@ const D = {
 // SETTINGS SHEET
 const S = {
   sourceGid: "source_gid",
+  chartType: "chart_type",
 };
 
 // HELPERS
@@ -291,7 +292,7 @@ async function getChart(chartId, country_iso_code) {
     // delete elements used only for calculations
     _.each(elements, (element) => {
       if (getIsHidden({ element, chartConfig })) {
-        console.log("deleting: ", element);
+        // console.log("deleting: ", element);
         delete dataPoints[element];
       }
     });
@@ -307,6 +308,7 @@ async function getChart(chartId, country_iso_code) {
     elements: elements.filter(
       (element) => !getIsHidden({ element, chartConfig })
     ),
+    type: _.get(chartSettings, S.chartType),
   };
 
   return chart;
