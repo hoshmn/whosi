@@ -6,15 +6,15 @@ const DISABLED = false;
 const tableDelin = "__";
 
 // these are set in the home sheet for version controlability
-const configurableGidNames = ["configs", "dictionary", "settings"];
+const configurableGidNames = ["configs", "dictionary"];
 // gids pointing to Sheet tabs
 const gids = {
-  home: "1188341414",
+  home: "0",
   // configs: null,
   // dictionary: null,
-  // settings: null,
+  // // settings: null,
 };
-let chartSettingsMap = {};
+// let chartSettingsMap = {};
 let chartConfigsMap = {};
 
 // TODO: populate dynamically
@@ -34,7 +34,11 @@ const chartIds = [
 // CONFIG SHEET - identifier fields (ie non-data fields)
 const C = {
   chartId: "chart_id",
+  sourceGid: "source_gid",
   element: "element",
+  displayName: "display_name",
+  chartType: "chart_type",
+  modelled: "modelled",
   formula: "formula",
   hidden: "hidden",
   valueField: "value_field",
@@ -42,6 +46,7 @@ const C = {
 
 // DATA SHEETS - data fields (fields that configs can filter by)
 const D = {
+  // we preserve snake_case as a reminder that these are essentially database fields
   country_iso_code: "country_iso_code",
   sourceYear: "source_year",
   value: "value",
@@ -78,6 +83,7 @@ const S = {
 
 // GENERATED FIELDS - fields we add for the app
 const G = {
+  // we use UPPER_CASE to distinguish from actual "database" fields from the Sheet
   DISPLAY_VALUE: "DISPLAY_VALUE",
 };
 
@@ -220,7 +226,6 @@ const getCalculatedDataPoint = ({ chartConfig, element, dataPoints }) => {
 async function setConfigGids() {
   // return if already configured
   if (configurableGidNames.every((name) => !!gids[name])) return;
-  console.log("CONF&&&&&&&");
   const homeRows = await csv(getUrl(gids.home));
   configurableGidNames.forEach((name) => {
     const lastConfiguredRow = _.findLast(homeRows, (r) => !!r[name]);
@@ -262,7 +267,9 @@ async function getChartOrTable(chartId, country_iso_code) {
   // if (chartId !== "plhiv_art") return;
   // console.log("creating : ", chartId);
   const chartConfig = chartConfigsMap[chartId];
-  const chartSettings = chartSettingsMap[chartId];
+  // const chartSettings = chartSettingsMap[chartId];
+  // the chart settings are the values on the chart config where element === "all"
+  const chartSettings = _.get(chartConfig, "all[0]");
 
   if (!chartConfig || !chartSettings || !chartSettings[S.sourceGid]) {
     console.warn("skipping chart: ", chartId);
@@ -406,13 +413,13 @@ async function getData(country_iso_code) {
   // CONFIGURE GIDS MAP
   await setConfigGids();
 
-  // GRAB SETTINGS (unless already loaded)
-  if (_.isEmpty(chartSettingsMap)) {
-    const settingsRows = await csv(getUrl(gids.settings));
-    chartSettingsMap = _.keyBy(settingsRows, C.chartId);
-    console.log("@@@ ALL SETTINGS: ");
-    console.log(chartSettingsMap);
-  }
+  // // GRAB SETTINGS (unless already loaded)
+  // if (_.isEmpty(chartSettingsMap)) {
+  //   const settingsRows = await csv(getUrl(gids.settings));
+  //   chartSettingsMap = _.keyBy(settingsRows, C.chartId);
+  //   console.log("@@@ ALL SETTINGS: ");
+  //   console.log(chartSettingsMap);
+  // }
 
   // GRAB CONFIGS (unless already loaded)
   if (_.isEmpty(chartConfigsMap)) {
