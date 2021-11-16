@@ -14,7 +14,6 @@ const gids = {
   // dictionary: null,
   // // settings: null,
 };
-// let chartSettingsMap = {};
 let chartConfigsMap = {};
 
 // TODO: populate dynamically
@@ -75,12 +74,6 @@ const D = {
   suppressed: "suppressed",
 };
 
-// SETTINGS SHEET
-const S = {
-  sourceGid: "source_gid",
-  chartType: "chart_type",
-};
-
 // GENERATED FIELDS - fields we add for the app
 const G = {
   // we use UPPER_CASE to distinguish from actual "database" fields from the Sheet
@@ -106,6 +99,9 @@ const configParser = (row) => {
 const filterByCountryGenerator = (country_iso_code) => {
   return (row) => (row[D.country_iso_code] === country_iso_code ? row : null);
 };
+
+const getElements = (chartConfig) =>
+  Object.keys(chartConfig).filter((k) => k !== "all" && !k.startsWith("_key_"));
 
 const getFormula = ({ element, chartConfig }) =>
   _.get(chartConfig, [element, 0, C.formula]);
@@ -187,7 +183,7 @@ const getDataPoint = ({
   });
 
   const row = getRow({ filter, chartSourceData });
-  if (row) debugger;
+
   // usually we care about "value", but sometimes "value_comment"
   const valueField = _.get(filter, C.valueField, D.value);
   const value = _.get(row, valueField);
@@ -267,20 +263,19 @@ async function getChartOrTable(chartId, country_iso_code) {
   // if (chartId !== "plhiv_art") return;
   // console.log("creating : ", chartId);
   const chartConfig = chartConfigsMap[chartId];
-  // const chartSettings = chartSettingsMap[chartId];
   // the chart settings are the values on the chart config where element === "all"
   const chartSettings = _.get(chartConfig, "all[0]");
 
-  if (!chartConfig || !chartSettings || !chartSettings[S.sourceGid]) {
+  if (!chartConfig || !chartSettings || !chartSettings[C.sourceGid]) {
     console.warn("skipping chart: ", chartId);
     return null;
   }
   const chartSourceData = await csv(
-    getUrl(chartSettings[S.sourceGid]),
+    getUrl(chartSettings[C.sourceGid]),
     filterByCountryGenerator(country_iso_code)
   );
 
-  const getter = chartSettings[S.chartType] === "table" ? getTable : getChart;
+  const getter = chartSettings[C.chartType] === "table" ? getTable : getChart;
 
   return getter({
     chartId,
@@ -301,7 +296,7 @@ function getTable({
 }) {
   const chartConfig = chartConfigsMap[chartId];
 
-  const elements = Object.keys(chartConfig).filter((k) => k !== "all");
+  const elements = getElements(chartConfig);
   const dataPoints = {};
   // add non-calculated points
   _.each(elements, (element) => {
@@ -321,9 +316,9 @@ function getTable({
   const colNames = _.uniq(elements.map((elem) => elem.split(tableDelin)[1]));
 
   const data = rowNames.map((rn) => ({
-    row: rn,
+    row: _.get(chartConfig, [`_key_${rn}`, 0, C.displayName], rn),
     values: colNames.map((cn) => ({
-      column: cn,
+      column: _.get(chartConfig, [`_key_${cn}`, 0, C.displayName], cn),
       value: _.get(dataPoints, `${rn}${tableDelin}${cn}`),
     })),
   }));
@@ -332,7 +327,8 @@ function getTable({
     chartId,
     country_iso_code,
     elements: elements,
-    type: _.get(chartSettings, S.chartType),
+    type: _.get(chartSettings, C.chartType),
+    name: _.get(chartSettings, C.displayName, chartId),
   };
 
   return chart;
@@ -347,7 +343,7 @@ function getChart({
 }) {
   const chartConfig = chartConfigsMap[chartId];
 
-  const elements = Object.keys(chartConfig).filter((k) => k !== "all");
+  const elements = getElements(chartConfig);
   // console.log(elements);
 
   // NOTE: currently all charts range over years
@@ -401,7 +397,8 @@ function getChart({
     elements: elements.filter(
       (element) => !getIsHidden({ element, chartConfig })
     ),
-    type: _.get(chartSettings, S.chartType),
+    type: _.get(chartSettings, C.chartType),
+    name: _.get(chartSettings, C.displayName, chartId),
   };
 
   return chart;
@@ -412,14 +409,6 @@ async function getData(country_iso_code) {
   if (DISABLED) return [];
   // CONFIGURE GIDS MAP
   await setConfigGids();
-
-  // // GRAB SETTINGS (unless already loaded)
-  // if (_.isEmpty(chartSettingsMap)) {
-  //   const settingsRows = await csv(getUrl(gids.settings));
-  //   chartSettingsMap = _.keyBy(settingsRows, C.chartId);
-  //   console.log("@@@ ALL SETTINGS: ");
-  //   console.log(chartSettingsMap);
-  // }
 
   // GRAB CONFIGS (unless already loaded)
   if (_.isEmpty(chartConfigsMap)) {

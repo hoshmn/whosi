@@ -10,9 +10,18 @@ import {
   LineChart,
   Line,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
 import getData from "./getData";
 import _ from "lodash";
+import { Box } from "@mui/system";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import { Typography } from "@mui/material";
 
 const countries = [
   "CIV",
@@ -56,118 +65,120 @@ export default function App() {
 
   const colors = ["#8884d8", "#82ca9d", "#ffc658"];
 
-  const getLineChart = (chart, i) => {
-    const { data, elements } = chart;
+  const getLineChart = (chart) => {
+    const { data, elements, type } = chart;
+    const isArea = type === "area";
+    const [ChartComponent, ElementComponent] = isArea
+      ? [AreaChart, Area]
+      : [LineChart, Line];
 
     return (
-      <div key={i}>
-        <>{chart.chartId}</>
-        {/* <ResponsiveContainer width="100%" height="100%"> */}
-        <LineChart
-          width={500}
-          height={400}
-          data={data}
-          margin={{
-            top: 10,
-            right: 30,
-            left: 0,
-            bottom: 0,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          {elements.map((elem, i) => (
-            <Line
-              type="monotone"
-              dataKey={elem}
-              stackId={i + 1}
-              stroke={colors[i]}
-              fill={colors[i]}
-            />
-          ))}
-        </LineChart>
-        {/* </ResponsiveContainer> */}
-      </div>
+      <ChartComponent
+        width={500}
+        height={400}
+        data={data}
+        margin={{
+          top: 10,
+          right: 30,
+          left: 0,
+          bottom: 0,
+        }}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="name" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        {elements.map((elem, i) => (
+          <ElementComponent
+            type="monotone"
+            dataKey={elem}
+            stackId={isArea ? 1 : i + 1}
+            stroke={colors[i]}
+            fill={colors[i]}
+          />
+        ))}
+      </ChartComponent>
     );
   };
 
-  const getAreaChart = (chart, i) => {
-    const { data, elements } = chart;
+  // const getAreaChart = (chart, i) => {
+  //   const { data, elements } = chart;
 
-    return (
-      <div key={i}>
-        <>{chart.chartId}</>
-        <AreaChart
-          width={500}
-          height={400}
-          data={data}
-          margin={{
-            top: 10,
-            right: 30,
-            left: 0,
-            bottom: 0,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          {elements.map((elem, i) => (
-            <Area
-              type="monotone"
-              dataKey={elem}
-              stackId="1"
-              stroke={colors[i]}
-              fill={colors[i]}
-            />
-          ))}
-        </AreaChart>
-      </div>
-    );
-  };
+  //   return (
+  //     <div key={i}>
+  //       <>{chart.name}</>
+  //       <AreaChart
+  //         width={500}
+  //         height={400}
+  //         data={data}
+  //         margin={{
+  //           top: 10,
+  //           right: 30,
+  //           left: 0,
+  //           bottom: 0,
+  //         }}
+  //       >
+  //         <CartesianGrid strokeDasharray="3 3" />
+  //         <XAxis dataKey="name" />
+  //         <YAxis />
+  //         <Tooltip />
+  //         <Legend />
+  //         {elements.map((elem, i) => (
+  //           <Area
+  //             type="monotone"
+  //             dataKey={elem}
+  //             stackId="1"
+  //             stroke={colors[i]}
+  //             fill={colors[i]}
+  //           />
+  //         ))}
+  //       </AreaChart>
+  //     </div>
+  //   );
+  // };
 
-  const getTable = (chart, i) => {
+  const getTable = (chart) => {
     const { data } = chart;
 
     const headers = data[0]["values"].map(({ column }) => (
-      <th scope="col" key={column}>
+      <TableCell scope="col" key={column}>
         {column}
-      </th>
+      </TableCell>
     ));
 
     const rows = data.map(({ row, values }) => (
-      <tr key={row}>
-        <th scope="row">{row}</th>
+      <TableRow key={row}>
+        <TableCell scope="row" component="th">
+          {row}
+        </TableCell>
         {values.map(({ value, column }) => (
-          <td>{value && value["DISPLAY_VALUE"]}</td>
+          <TableCell key={column}>{value && value["DISPLAY_VALUE"]}</TableCell>
         ))}
-      </tr>
+      </TableRow>
     ));
 
     return (
-      <div key={i}>
-        <>{chart.chartId}</>
-        <table className="table-striped">
-          <thead>
-            <tr>
-              <th scope="col"></th>
+      <TableContainer>
+        <Table className="Table-striped">
+          <TableHead>
+            <TableRow>
+              <TableCell scope="col"></TableCell>
               {headers}
-            </tr>
-          </thead>
-          <tbody>{rows}</tbody>
-        </table>
-      </div>
+            </TableRow>
+          </TableHead>
+          <TableBody>{rows}</TableBody>
+        </Table>
+      </TableContainer>
     );
   };
 
-  const getChart = (chart, i) => {
+  const getChart = (chart) => {
     // console.log("GC: ", chart);
     if (!chart) return null;
-    if (chart.type === "area") return getAreaChart(chart, i);
-    if (chart.type === "table") return getTable(chart, i);
-    return getLineChart(chart, i);
+    if (chart.type === "table") return getTable(chart);
+    // if (chart.type === "area") return getAreaChart(chart);
+    return getLineChart(chart);
   };
 
   const updateCountry = (e) => {
@@ -186,8 +197,18 @@ export default function App() {
         ))}
       </select>
       <br />
-      {/* todo add key */}
-      {loading ? "loading..." : chartData.map(getChart)}
+
+      {loading
+        ? "loading..."
+        : chartData.map(
+            (c) =>
+              c && (
+                <Box pt={6} pl={3} key={c.chartId}>
+                  <Typography>{c.name}</Typography>
+                  {getChart(c)}
+                </Box>
+              )
+          )}
     </div>
   );
 }
