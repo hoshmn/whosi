@@ -179,7 +179,7 @@ const getDataPoint = ({
   country_iso_code,
   chartConfigsMap,
   chartSourceData,
-  valueParser = parseFloat,
+  valueParser = parseInt,
 }) => {
   const filter = getFilter({
     chartId,
@@ -195,7 +195,7 @@ const getDataPoint = ({
   // usually we care about "value", but sometimes "value_comment"
   const valueField = _.get(filter, C.valueField, D.value);
   let value = _.get(row, valueField, null);
-  value = value && valueParser(value);
+  // value = value && valueParser(value);
   value && _.set(row, G.DISPLAY_VALUE, valueParser(value));
 
   // TODO return whole row

@@ -122,6 +122,29 @@ const alt2Colors = [sky, brown, violet, sand];
 const strokeIntensity = 10;
 const fillIntensity = 7;
 
+// TODO: CLEAN
+const CustomTooltip = ({ active, payload, label, isArea }) => {
+  if (active && payload && payload.length) {
+    // debugger
+    const ps = isArea ? payload : _.sortBy(payload, "value");
+    return (
+      <div style={{background: "white", padding: "10px"}} className="custom-tooltip">
+        <p className="label">{label}:</p>
+        {ps.reverse().map(p => {
+          if (p.name.includes("_bounds")) return;
+          const b = _.get(p.payload, p.name+"_bounds", null);
+          const v = _.get(p.payload, [p.name+"_row", "DISPLAY_VALUE"], p.value);
+          return (
+            <p><svg width="10" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50" fill={p.fill}></circle></svg>{p.name}: {v} {b&&"("+b.map(v => parseInt(v)).join(" - ")+")"}</p>
+          )
+        })}
+      </div>
+    );
+  }
+
+  else return null;
+};
+
 export default function App() {
   const [chartData, setChartData] = React.useState([]);
   const [iso, setIso] = React.useState(countries[0]);
@@ -135,16 +158,13 @@ export default function App() {
   }, [iso]);
 
   const getLineChart = (chart) => {
-    const { data, elements, type, chartId, } = chart;
+    const { data, elements, type, chartId } = chart;
     const isArea = type === "area";
-    const [, ElementComponent] = isArea
-      ? [AreaChart, Area]
-      : [LineChart, Line];
+    const [, ElementComponent] = isArea ? [AreaChart, Area] : [LineChart, Line];
 
     // todo: add to Sheet
     const colors =
-      chartId === "plhiv_diagnosis" ||
-      chartId === "testing_coverage"
+      chartId === "plhiv_diagnosis" || chartId === "testing_coverage"
         ? altColors
         : coreColors;
 
@@ -164,31 +184,37 @@ export default function App() {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis />
-          <Tooltip />
+          <Tooltip content={<CustomTooltip isArea={isArea} />} />
           <Legend />
+          {elements.map((elem, i) => {
+            const isBounded =
+              !isArea &&
+              _.some(data, (d) => _.get(d, [elem + "_bounds"], []).length);
+            if (!isBounded) return null;
+            return (
+              <Area
+                key={i + "_b"}
+                // type="step"
+                dataKey={elem + "_bounds"}
+                // stackId={i + 1}
+                legendType="none"
+                tooltipType="none"
+                stroke={getRC(colors[i], strokeIntensity - 3)}
+                fill={getRC(colors[i], fillIntensity - 3)}
+              />
+            );
+          })}
           {elements.map((elem, i) => (
             <ElementComponent
               key={i}
               // type="monotone"
+              // dataBounds={_.get(elem, [elem + "_bounds"], [])}
               dataKey={elem}
               stackId={isArea ? 1 : i + 1000}
               stroke={getRC(colors[i], strokeIntensity)}
               fill={getRC(colors[i], fillIntensity)}
             />
           ))}
-          {elements.map((elem, i) => {
-            const isBounded = !isArea && _.some(data, d => _.get(d, [elem+"_bounds"], []).length);
-            if (!isBounded) return null;
-            return (
-            <Area
-              key={i+"_b"}
-              // type="step"
-              dataKey={elem+"_bounds"}
-              // stackId={i + 1}
-              stroke={getRC(colors[i], strokeIntensity - 3)}
-              fill={getRC(colors[i], fillIntensity - 3)}
-            />
-          )})}
         </ComposedChart>
       </ResponsiveContainer>
     );
@@ -327,7 +353,10 @@ export default function App() {
   // console.log("*", chartData);
   const loading = !_.some(chartData, (c) => c && c.country_iso_code === iso);
   return (
-    <Paper elevation={0} style={{ background: "none", color: getRC(mauve, 11) }}>
+    <Paper
+      elevation={0}
+      style={{ background: "none", color: getRC(mauve, 11) }}
+    >
       <select name="country" onChange={updateCountry}>
         {countries.map((c) => (
           <option id={c} key={c} value={c}>
