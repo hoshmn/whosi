@@ -18,8 +18,8 @@ let chartConfigsMap = {};
 
 // TODO: populate dynamically
 const chartIds = [
-  "plhiv_diagnosis",
   "p95",
+  "plhiv_diagnosis",
   "late_hiv",
   "plhiv_art",
   "new_art",
@@ -275,7 +275,12 @@ async function getChartOrTable(chartId, country_iso_code) {
     filterByCountryGenerator(country_iso_code)
   );
 
-  const getter = chartSettings[C.chartType] === "table" ? getTable : getChart;
+  const getterMap = {
+    table: getTable,
+    // nested: getNested,
+  };
+
+  const getter = _.get(getterMap, chartSettings[C.chartType], getChart);
 
   return getter({
     chartId,
@@ -286,6 +291,25 @@ async function getChartOrTable(chartId, country_iso_code) {
   });
   // console.log(chartSourceData);
 }
+
+// function getNested({
+//   chartId,
+//   chartSettings,
+//   chartConfigsMap,
+//   chartSourceData,
+//   country_iso_code,
+// }) {
+//   const chart = {
+//     data,
+//     chartId,
+//     country_iso_code,
+//     elements: elements,
+//     type: _.get(chartSettings, C.chartType),
+//     name: _.get(chartSettings, C.displayName, chartId),
+//   };
+
+//   return chart;
+// };
 
 function getTable({
   chartId,
@@ -344,11 +368,15 @@ function getChart({
   const chartConfig = chartConfigsMap[chartId];
 
   const elements = getElements(chartConfig);
+  const visibleElements = elements.filter(
+    (element) => !getIsHidden({ element, chartConfig })
+  );
   // console.log(elements);
 
   // NOTE: currently all charts range over years
   const year_range = _.get(chartConfig, ["all", 0, D.year]);
-  const years_arr = transformYearRange(year_range);
+  const isTimeseries = year_range;
+  const years_arr = isTimeseries ? transformYearRange(year_range) : ["all"];
   // console.log(years_arr);
 
   // getchartdata per element
@@ -360,7 +388,7 @@ function getChart({
       const { row, value } = getDataPoint({
         chartId,
         element,
-        year,
+        year: isTimeseries ? year : null,
         country_iso_code,
         chartConfigsMap,
         chartSourceData,
@@ -391,12 +419,10 @@ function getChart({
   });
 
   const chart = {
-    data,
+    data: isTimeseries ? data : data[0],
     chartId,
     country_iso_code,
-    elements: elements.filter(
-      (element) => !getIsHidden({ element, chartConfig })
-    ),
+    elements: visibleElements,
     type: _.get(chartSettings, C.chartType),
     name: _.get(chartSettings, C.displayName, chartId),
   };
@@ -406,7 +432,7 @@ function getChart({
 
 // MAIN FUNCTION
 async function getData(country_iso_code) {
-  if (DISABLED) return [];
+  // if (DISABLED) return [];
   // CONFIGURE GIDS MAP
   await setConfigGids();
 

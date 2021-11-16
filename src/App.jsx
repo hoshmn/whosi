@@ -22,6 +22,17 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { Typography } from "@mui/material";
+import NestedBoxes from "./NestedBoxes";
+import {
+  gray,
+  blue,
+  red,
+  green,
+  grayDark,
+  blueDark,
+  redDark,
+  greenDark,
+} from '@radix-ui/colors';
 
 const countries = [
   "CIV",
@@ -73,6 +84,8 @@ export default function App() {
       : [LineChart, Line];
 
     return (
+      <ResponsiveContainer height={400}>
+        
       <ChartComponent
         width={500}
         height={400}
@@ -83,7 +96,7 @@ export default function App() {
           left: 0,
           bottom: 0,
         }}
-      >
+        >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="name" />
         <YAxis />
@@ -91,14 +104,15 @@ export default function App() {
         <Legend />
         {elements.map((elem, i) => (
           <ElementComponent
-            type="monotone"
-            dataKey={elem}
-            stackId={isArea ? 1 : i + 1}
-            stroke={colors[i]}
-            fill={colors[i]}
+          type="monotone"
+          dataKey={elem}
+          stackId={isArea ? 1 : i + 1}
+          stroke={colors[i]}
+          fill={colors[i]}
           />
-        ))}
+          ))}
       </ChartComponent>
+          </ResponsiveContainer>
     );
   };
 
@@ -159,8 +173,10 @@ export default function App() {
     ));
 
     return (
+      <ResponsiveContainer>
+
       <TableContainer>
-        <Table className="Table-striped">
+        <Table>
           <TableHead>
             <TableRow>
               <TableCell scope="col"></TableCell>
@@ -170,13 +186,61 @@ export default function App() {
           <TableBody>{rows}</TableBody>
         </Table>
       </TableContainer>
+      </ResponsiveContainer>
     );
   };
+
+  const getNested = (chart) => {
+    const xl = false
+    console.log(
+        gray,
+  blue,
+  red,
+  green,
+  grayDark,
+  blueDark,
+  redDark,
+  greenDark,
+    )
+    return (
+      <NestedBoxes
+          // circle={true}
+          classes={xl ? 'xl' : ''}
+          title={'title'}
+          bufferRatio={xl ? 0.8 : 0.2}
+          lineHeight={xl ? 1.4 : 1.1}
+          textBufferRatio={0.2}
+          firstSide={20}
+          horizontal={true}
+          ratios={[.7,.8,.4]}
+          colors={["yellow", "red", "blue", "orange"]}
+          content={[
+            {
+              // inner: status,
+              below: ['of people living with', 'HIV know their status'],
+            },
+            {
+              // inner: art,
+              below: [
+                'of people living with',
+                'HIV who know their status',
+                'are on treatment',
+              ],
+            },
+            {
+              // inner: suppression,
+              below: ['of people on treatment', 'are virally suppressed'],
+            },
+          ]}
+        />
+    )
+  }
 
   const getChart = (chart) => {
     // console.log("GC: ", chart);
     if (!chart) return null;
     if (chart.type === "table") return getTable(chart);
+    if (chart.type === "nested") return getNested(chart);
     // if (chart.type === "area") return getAreaChart(chart);
     return getLineChart(chart);
   };
