@@ -41,6 +41,7 @@ const C = {
   formula: "formula",
   hidden: "hidden",
   valueField: "value_field",
+  percentage: "percentage",
 };
 
 // DATA SHEETS - data fields (fields that configs can filter by)
@@ -106,8 +107,9 @@ const getElements = (chartConfig) =>
 const getFormula = ({ element, chartConfig }) =>
   _.get(chartConfig, [element, 0, C.formula]);
 
-const getIsHidden = ({ element, chartConfig }) =>
-  !!_.get(chartConfig, [element, 0, C.hidden]);
+// omit element to get chart-wide setting
+const getFieldBoolean = ({ element = "all", chartConfig, field }) =>
+  !!_.get(chartConfig, [element, 0, field]);
 
 // turn "[2018-2020]" into [2018, 2019, 2020]
 const transformYearRange = (range) => {
@@ -324,13 +326,18 @@ function getTable({
   const dataPoints = {};
   // add non-calculated points
   _.each(elements, (element) => {
+    const isPercentage = getFieldBoolean({
+      chartConfig,
+      field: C.percentage,
+    });
+    debugger;
     const { row, value } = getDataPoint({
       chartId,
       element,
       country_iso_code,
       chartConfigsMap,
       chartSourceData,
-      valueParser: _.identity,
+      valueParser: isPercentage ? (x) => parseFloat(x) + "%" : _.identity,
     });
     dataPoints[element] = row;
     // dataPoints[element + "_row"] = row;
@@ -369,7 +376,7 @@ function getChart({
 
   const elements = getElements(chartConfig);
   const visibleElements = elements.filter(
-    (element) => !getIsHidden({ element, chartConfig })
+    (element) => !getFieldBoolean({ element, chartConfig, field: C.hidden })
   );
   // console.log(elements);
 
@@ -408,7 +415,7 @@ function getChart({
     });
     // delete elements used only as constituents in calculations
     _.each(elements, (element) => {
-      if (getIsHidden({ element, chartConfig })) {
+      if (getFieldBoolean({ element, chartConfig, field: C.hidden })) {
         // console.log("deleting: ", element);
         delete dataPoints[element];
       }
