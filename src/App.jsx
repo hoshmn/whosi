@@ -3,6 +3,7 @@ import React from "react";
 import {
   AreaChart,
   Area,
+  ComposedChart,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -134,22 +135,22 @@ export default function App() {
   }, [iso]);
 
   const getLineChart = (chart) => {
-    const { data, elements, type } = chart;
+    const { data, elements, type, chartId, } = chart;
     const isArea = type === "area";
-    const [ChartComponent, ElementComponent] = isArea
+    const [, ElementComponent] = isArea
       ? [AreaChart, Area]
       : [LineChart, Line];
 
     // todo: add to Sheet
     const colors =
-      chart.chartId === "plhiv_diagnosis" ||
-      chart.chartId === "testing_coverage"
+      chartId === "plhiv_diagnosis" ||
+      chartId === "testing_coverage"
         ? altColors
         : coreColors;
 
     return (
       <ResponsiveContainer height={400}>
-        <ChartComponent
+        <ComposedChart
           width={500}
           height={400}
           data={data}
@@ -167,14 +168,28 @@ export default function App() {
           <Legend />
           {elements.map((elem, i) => (
             <ElementComponent
-              type="monotone"
+              key={i}
+              // type="monotone"
               dataKey={elem}
-              stackId={isArea ? 1 : i + 1}
+              stackId={isArea ? 1 : i + 1000}
               stroke={getRC(colors[i], strokeIntensity)}
               fill={getRC(colors[i], fillIntensity)}
             />
           ))}
-        </ChartComponent>
+          {elements.map((elem, i) => {
+            const isBounded = !isArea && _.some(data, d => _.get(d, [elem+"_bounds"], []).length);
+            if (!isBounded) return null;
+            return (
+            <Area
+              key={i+"_b"}
+              // type="step"
+              dataKey={elem+"_bounds"}
+              // stackId={i + 1}
+              stroke={getRC(colors[i], strokeIntensity - 3)}
+              fill={getRC(colors[i], fillIntensity - 3)}
+            />
+          )})}
+        </ComposedChart>
       </ResponsiveContainer>
     );
   };

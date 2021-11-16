@@ -111,6 +111,12 @@ const getFormula = ({ element, chartConfig }) =>
 const getFieldBoolean = ({ element = "all", chartConfig, field }) =>
   !!_.get(chartConfig, [element, 0, field]);
 
+const getBounds = (row = {}) => {
+  const { [D.value_lower]: vLower, [D.value_upper]: vUpper } = row;
+  if (!parseFloat(vLower) || !parseFloat(vUpper)) return;
+  return [parseFloat(vLower), parseFloat(vUpper)];
+};
+
 // turn "[2018-2020]" into [2018, 2019, 2020]
 const transformYearRange = (range) => {
   const regex = /\[(\d+)-(\d+)\]/;
@@ -188,7 +194,8 @@ const getDataPoint = ({
 
   // usually we care about "value", but sometimes "value_comment"
   const valueField = _.get(filter, C.valueField, D.value);
-  const value = _.get(row, valueField);
+  let value = _.get(row, valueField, null);
+  value = value && valueParser(value);
   value && _.set(row, G.DISPLAY_VALUE, valueParser(value));
 
   // TODO return whole row
@@ -330,7 +337,6 @@ function getTable({
       chartConfig,
       field: C.percentage,
     });
-    debugger;
     const { row, value } = getDataPoint({
       chartId,
       element,
@@ -401,6 +407,7 @@ function getChart({
         chartSourceData,
       });
       dataPoints[element] = value;
+      dataPoints[element + "_bounds"] = getBounds(row);
       dataPoints[element + "_row"] = row;
     });
     // add calculated points (now that non-calculated constituents have values)
