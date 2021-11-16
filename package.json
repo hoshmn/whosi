@@ -2,14 +2,16 @@
   "name": "whosi",
   "version": "1.0.0",
   "description": "",
-  "keywords": [],
   "main": "src/index.jsx",
   "dependencies": {
+    "@emotion/react": "^11.6.0",
+    "@emotion/styled": "^11.6.0",
+    "@mui/material": "^5.1.0",
     "d3-fetch": "3.0.1",
     "lodash": "4.17.21",
     "prettier": "^2.4.1",
-    "react": "17.0.1",
-    "react-dom": "17.0.1",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
     "react-scripts": "4.0.0",
     "recharts": "2.0.6"
   },
@@ -30,5 +32,10 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "author": "Josh Maas-Howard, <j.maas.howard@gmail.com>",
+  "homepage": "",
+  "license": "MIT",
+  "repository": "git@github.com:hoshmn/whosi.git",
+  "keywords": []
 }
