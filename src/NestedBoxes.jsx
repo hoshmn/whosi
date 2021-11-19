@@ -1,7 +1,6 @@
-import React, { Component } from "react";
+import React from "react";
 // import './styles.css'
 import _ from "lodash";
-// import { FEATURE_FLAGS } from '../../constants/flags'
 
 const BUFFER_RATIO = 0.2;
 const TEXT_BUFFER_RATIO = 0.1;
@@ -93,9 +92,9 @@ const NestedBoxes = ({
         >
           {innerText}
         </tspan>
-        {below.map((txt) => (
+        {below.map((txt, j) => (
           <tspan
-            key={txt}
+            key={i + j}
             className="description"
             x={resolveOrientation(textBufferDistance, y)}
             dy={fontSize * lineHeight}

@@ -88,6 +88,7 @@ const radColors = [
 
 const SHOW_COLORS = false;
 
+// TODO: add to sheet?
 const countries = [
   "CIV",
   "CMR",
@@ -116,9 +117,9 @@ const countries = [
 //   },
 //   ]
 
-const coreColors = [orange, grass, plum];
-const altColors = [tomato, indigo, gold];
-const alt2Colors = [sky, brown, violet, sand];
+// const coreColors = [orange, grass, plum];
+// const altColors = [tomato, indigo, gold];
+// const alt2Colors = [sky, brown, violet, sand];
 const strokeIntensity = 10;
 const fillIntensity = 7;
 
@@ -128,21 +129,36 @@ const CustomTooltip = ({ active, payload, label, isArea }) => {
     // debugger
     const ps = isArea ? payload : _.sortBy(payload, "value");
     return (
-      <div style={{background: "white", padding: "10px"}} className="custom-tooltip">
+      <div
+        style={{ background: "white", padding: "10px" }}
+        className="custom-tooltip"
+      >
         <p className="label">{label}:</p>
-        {ps.reverse().map(p => {
+        {ps.reverse().map((p) => {
           if (p.name.includes("_bounds")) return;
-          const b = _.get(p.payload, p.name+"_bounds", null);
-          const v = _.get(p.payload, [p.name+"_row", "DISPLAY_VALUE"], p.value);
+          const b = _.get(p.payload, p.name + "_bounds", null);
+          const v = _.get(
+            p.payload,
+            [p.name + "_row", "DISPLAY_VALUE"],
+            p.value
+          );
           return (
-            <p><svg width="10" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50" fill={p.fill}></circle></svg>{p.name}: {v} {b&&"("+b.map(v => parseInt(v)).join(" - ")+")"}</p>
-          )
+            <p key={p.name}>
+              <svg
+                width="10"
+                viewBox="0 0 100 100"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle cx="50" cy="50" r="50" fill={p.fill}></circle>
+              </svg>
+              {p.name}: {v}{" "}
+              {b && "(" + b.map((v) => parseInt(v)).join(" - ") + ")"}
+            </p>
+          );
         })}
       </div>
     );
-  }
-
-  else return null;
+  } else return null;
 };
 
 export default function App() {
@@ -158,15 +174,15 @@ export default function App() {
   }, [iso]);
 
   const getLineChart = (chart) => {
-    const { data, elements, type, chartId } = chart;
+    const { data, elements, type, chartId, colors } = chart;
     const isArea = type === "area";
     const [, ElementComponent] = isArea ? [AreaChart, Area] : [LineChart, Line];
 
     // todo: add to Sheet
-    const colors =
-      chartId === "plhiv_diagnosis" || chartId === "testing_coverage"
-        ? altColors
-        : coreColors;
+    // const colors =
+    //   chartId === "plhiv_diagnosis" || chartId === "testing_coverage"
+    //     ? altColors
+    //     : coreColors;
 
     return (
       <ResponsiveContainer height={400}>
@@ -220,42 +236,6 @@ export default function App() {
     );
   };
 
-  // const getAreaChart = (chart, i) => {
-  //   const { data, elements } = chart;
-
-  //   return (
-  //     <div key={i}>
-  //       <>{chart.name}</>
-  //       <AreaChart
-  //         width={500}
-  //         height={400}
-  //         data={data}
-  //         margin={{
-  //           top: 10,
-  //           right: 30,
-  //           left: 0,
-  //           bottom: 0,
-  //         }}
-  //       >
-  //         <CartesianGrid strokeDasharray="3 3" />
-  //         <XAxis dataKey="name" />
-  //         <YAxis />
-  //         <Tooltip />
-  //         <Legend />
-  //         {elements.map((elem, i) => (
-  //           <Area
-  //             type="monotone"
-  //             dataKey={elem}
-  //             stackId="1"
-  //             stroke={colors[i]}
-  //             fill={colors[i]}
-  //           />
-  //         ))}
-  //       </AreaChart>
-  //     </div>
-  //   );
-  // };
-
   const getTable = (chart) => {
     const { data } = chart;
 
@@ -294,7 +274,7 @@ export default function App() {
   };
 
   const getNested = (chart) => {
-    const { data, elements } = chart;
+    const { data, elements, colors } = chart;
     const xl = false;
     console.log(radColors);
     const ratios = elements.map((el) => {
@@ -313,8 +293,8 @@ export default function App() {
         firstSide={20}
         horizontal={true}
         ratios={ratios}
-        fillColors={alt2Colors.map((c) => getRC(c, 8))}
-        textColors={alt2Colors.map((c) => getRC(c, 9))}
+        fillColors={colors.map((c) => getRC(c, 8))}
+        textColors={colors.map((c) => getRC(c, 9))}
         content={[
           {
             // inner: status,
@@ -404,6 +384,8 @@ export default function App() {
 }
 
 function getRC(radColor, idx) {
+  // return custom colors as-is
+  if (typeof radColor === "string") return radColor;
   const c1 = Object.keys(radColor)[0];
   const c = c1.replace(/\d/, "") + idx;
   return radColor[c];

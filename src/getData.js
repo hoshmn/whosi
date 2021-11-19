@@ -1,5 +1,35 @@
 import { csv } from "d3-fetch";
 import _ from "lodash";
+import {
+  tomato,
+  // red,
+  // crimson,
+  // pink,
+  plum,
+  // purple,
+  violet,
+  indigo,
+  // blue,
+  // cyan,
+  // teal,
+  // green,
+  grass,
+  orange,
+  brown,
+  sky,
+  // mint,
+  // lime,
+  // yellow,
+  // amber,
+  // gray,
+  // mauve,
+  // slate,
+  // sage,
+  // olive,
+  sand,
+  gold,
+  // bronze,
+} from "@radix-ui/colors";
 
 // CONSTS
 const DISABLED = false;
@@ -16,18 +46,23 @@ const gids = {
 };
 let chartConfigsMap = {};
 
-// TODO: populate dynamically
-const chartIds = [
-  "p95",
-  "plhiv_diagnosis",
-  "late_hiv",
-  "plhiv_art",
-  "new_art",
-  "plhiv_suppressed",
-  "testing_coverage",
-  "key_populations",
-  "policy_compliance",
-];
+const coreColors = [orange, grass, plum];
+const altColors = [tomato, indigo, gold];
+const alt2Colors = [sky, brown, violet, sand];
+const colorGroups = [coreColors, altColors, alt2Colors];
+
+let chartIds = [];
+// const chartIds = [
+//   "p95",
+//   "plhiv_diagnosis",
+//   "late_hiv",
+//   "plhiv_art",
+//   "new_art",
+//   "plhiv_suppressed",
+//   "testing_coverage",
+//   "key_populations",
+//   "policy_compliance",
+// ];
 
 // MAPS TO SPREADSHEET COLUMN NAMES:
 // CONFIG SHEET - identifier fields (ie non-data fields)
@@ -36,6 +71,7 @@ const C = {
   sourceGid: "source_gid",
   element: "element",
   displayName: "display_name",
+  colorOverride: "color_override",
   chartType: "chart_type",
   modelled: "modelled",
   formula: "formula",
@@ -104,17 +140,42 @@ const filterByCountryGenerator = (country_iso_code) => {
 const getElements = (chartConfig) =>
   Object.keys(chartConfig).filter((k) => k !== "all" && !k.startsWith("_key_"));
 
-const getFormula = ({ element, chartConfig }) =>
-  _.get(chartConfig, [element, 0, C.formula]);
+// omit element to get chart-wide setting
+const getField = ({ element = "all", chartConfig, field }) =>
+  _.get(chartConfig, [element, 0, field]);
 
 // omit element to get chart-wide setting
 const getFieldBoolean = ({ element = "all", chartConfig, field }) =>
-  !!_.get(chartConfig, [element, 0, field]);
+  !!getField({ element, chartConfig, field });
+
+const getFormula = ({ element, chartConfig }) =>
+  getField({ element, chartConfig, field: C.formula });
 
 const getBounds = (row = {}) => {
   const { [D.value_lower]: vLower, [D.value_upper]: vUpper } = row;
   if (!parseFloat(vLower) || !parseFloat(vUpper)) return;
   return [parseFloat(vLower), parseFloat(vUpper)];
+};
+
+const getColors = ({
+  chartSettings,
+  chartConfig,
+  chartElements: visibleElements,
+}) => {
+  let groupIdx = parseInt(Math.abs(_.get(chartSettings, C.colorOverride)));
+  groupIdx = ((groupIdx || 1) - 1) % colorGroups.length;
+
+  const baseColors = colorGroups[groupIdx];
+  const colors = visibleElements.map((element, idx) => {
+    const override = getField({ chartConfig, element, field: C.colorOverride });
+    return override || baseColors[idx % baseColors.length];
+  });
+
+  const type = _.get(chartSettings, C.chartType);
+  if (type === "nested")
+    colors.push(baseColors[visibleElements.length % baseColors.length]);
+
+  return colors;
 };
 
 // turn "[2018-2020]" into [2018, 2019, 2020]
@@ -246,6 +307,10 @@ async function getChartConfigs() {
   const baseConfigs = await csv(getUrl(gids.configs), configParser);
   const shaped = _.groupBy(baseConfigs, C.chartId);
 
+  const orderedChartIds = _.uniqBy(baseConfigs, "chart_id").map(
+    (c) => c.chart_id
+  );
+
   const chartConfigs = _.mapValues(shaped, (configParams, name) => {
     // wise?
     if (name === "all") return configParams;
@@ -259,7 +324,7 @@ async function getChartConfigs() {
     });
   });
 
-  return chartConfigs;
+  return { chartConfigs, orderedChartIds };
 }
 
 async function getCharts(country_iso_code) {
@@ -432,11 +497,18 @@ function getChart({
     return dataPoints;
   });
 
+  const colors = getColors({
+    chartSettings,
+    chartConfig,
+    chartElements: visibleElements,
+  });
+
   const chart = {
     data: isTimeseries ? data : data[0],
     chartId,
     country_iso_code,
     elements: visibleElements,
+    colors,
     type: _.get(chartSettings, C.chartType),
     name: _.get(chartSettings, C.displayName, chartId),
   };
@@ -452,7 +524,9 @@ async function getData(country_iso_code) {
 
   // GRAB CONFIGS (unless already loaded)
   if (_.isEmpty(chartConfigsMap)) {
-    chartConfigsMap = await getChartConfigs();
+    const result = await getChartConfigs();
+    chartConfigsMap = result.chartConfigs;
+    chartIds = result.orderedChartIds;
     console.log("@@@ ALL CONFIGS: ");
     console.log(chartConfigsMap);
   }
