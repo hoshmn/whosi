@@ -1,11 +1,7 @@
 import { csv } from "d3-fetch";
 import _ from "lodash";
-import {
-  coreColors,
-  altColors,
-  alt2Colors,
-  colorGroups,
-} from "./consts/colors";
+import { colorGroups } from "./consts/colors";
+import { displayPercent } from "./consts/utlis";
 
 // TODO: split up this file
 
@@ -202,8 +198,16 @@ const getRow = ({ filter, chartSourceData }) => {
       return row[key].toLowerCase() === val.toLowerCase();
     });
   });
+
+  // || matchingRows[0];
   // todo: maxBy year if no year set?
-  return _.maxBy(matchingRows, D.sourceYear) || matchingRows[0];
+  return _.maxBy(matchingRows, (r) => {
+    const y = Number(_.get(r, D.year, 0));
+    const sy = Number(_.get(r, D.sourceYear, 0));
+    // look for the heighest year, but secondarily source year
+    // (to break ties)
+    return y + sy / 10000;
+  });
 };
 
 const getDataPoint = ({
@@ -232,7 +236,6 @@ const getDataPoint = ({
   // value = value && valueParser(value);
   value && _.set(row, G.DISPLAY_VALUE, valueParser(value));
 
-  // TODO return whole row
   return { row, value };
 };
 
@@ -315,7 +318,7 @@ async function getCharts(country_iso_code) {
 }
 
 async function getChartOrTable(chartId, country_iso_code) {
-  // if (chartId !== "plhiv_art") return;
+  // if (chartId !== "key_populations") return;
   // console.log("creating : ", chartId);
   const chartConfig = chartConfigsMap[chartId];
   // the chart settings are the values on the chart config where element === "all"
@@ -391,7 +394,7 @@ function getTable({
       country_iso_code,
       chartConfigsMap,
       chartSourceData,
-      valueParser: isPercentage ? (x) => parseFloat(x) + "%" : _.identity,
+      valueParser: isPercentage ? displayPercent : _.identity,
     });
     dataPoints[element] = row;
     // dataPoints[element + "_row"] = row;
