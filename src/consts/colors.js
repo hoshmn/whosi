@@ -31,6 +31,7 @@ import {
 
 // keep in sync with index.html
 export const backgroundColor = mauve;
+export const headerColor = sky;
 export const coreColors = [orange, grass, plum];
 export const altColors = [tomato, indigo, gold];
 export const alt2Colors = [sky, brown, violet, sand];

@@ -23,10 +23,6 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import NestedBoxes from "./NestedBoxes";
 import { getRC, strokeIntensity, fillIntensity } from "../consts/colors";
-// import Typography from '@mui/material/Typography';
-// import Button from '@mui/material/Button';
-// import IconButton from '@mui/material/IconButton';
-// import MenuIcon from '@mui/icons-material/Menu';
 
 // TODO: CLEAN
 const CustomTooltip = ({ active, payload, label, isArea }) => {
@@ -73,15 +69,15 @@ export const Charts = ({ selectedIso, chartData }) => {
     const [, ElementComponent] = isArea ? [AreaChart, Area] : [LineChart, Line];
 
     return (
-      <ResponsiveContainer height={400}>
+      <ResponsiveContainer height={400} width={500}>
         <ComposedChart
           width={500}
           height={400}
           data={data}
           margin={{
-            top: 10,
+            top: 30,
             right: 30,
-            left: 10,
+            left: 0,
             bottom: 0,
           }}
         >
@@ -171,62 +167,86 @@ export const Charts = ({ selectedIso, chartData }) => {
     });
     console.log(ratios);
     return (
-      <NestedBoxes
-        // circle={true}
-        classes={xl ? "xl" : ""}
-        title={"title"}
-        bufferRatio={xl ? 0.8 : 0.2}
-        lineHeight={xl ? 1.4 : 1.1}
-        textBufferRatio={0.2}
-        firstSide={20}
-        horizontal={true}
-        ratios={ratios}
-        fillColors={colors.map((c) => getRC(c, 8))}
-        textColors={colors.map((c) => getRC(c, 9))}
-        content={[
-          {
-            // inner: status,
-            below: ["of people living with", "HIV know their status"],
-          },
-          {
-            // inner: art,
-            below: [
-              "of people living with",
-              "HIV who know their status",
-              "are on treatment",
-            ],
-          },
-          {
-            // inner: suppression,
-            below: ["of people on treatment", "are virally suppressed"],
-          },
-        ]}
-      />
+      <>
+        <NestedBoxes
+          // circle={true}
+          classes={xl ? "xl" : ""}
+          title={"title"}
+          bufferRatio={xl ? 0.8 : 0.2}
+          lineHeight={xl ? 1.4 : 1.1}
+          textBufferRatio={0.2}
+          firstSide={20}
+          horizontal={true}
+          ratios={ratios}
+          fillColors={colors.map((c) => getRC(c, 8))}
+          textColors={colors.map((c) => getRC(c, 9))}
+          content={[
+            {
+              // inner: status,
+              below: ["of people living with", "HIV know their status"],
+            },
+            {
+              // inner: art,
+              below: [
+                "of people living with",
+                "HIV who know their status",
+                "are on treatment",
+              ],
+            },
+            {
+              // inner: suppression,
+              below: ["of people on treatment", "are virally suppressed"],
+            },
+          ]}
+        />
+        <br />
+      </>
     );
   };
 
   const getChart = (chart) => {
-    // console.log("GC: ", chart);
+    // TODO: simplify
     if (!chart) return null;
-    if (chart.type === "table") return getTable(chart);
-    if (chart.type === "nested") return getNested(chart);
+    const { type, chartId, name } = chart;
+
+    if (type === "table") {
+      return (
+        <Box sx={{ flexBasis: "100%", maxWidth: 1000, p: 3 }} key={chartId}>
+          <Typography variant="h5" component="h3">
+            {name}
+          </Typography>
+          {getTable(chart)}
+        </Box>
+      );
+    }
+
+    if (type === "nested") {
+      return (
+        <>
+          <Box sx={{ flexBasis: "100%", maxWidth: 800, p: 3 }} key={chartId}>
+            <Typography pb={3} variant="h5" component="h3">
+              {name}
+            </Typography>
+            {getNested(chart)}
+          </Box>
+          <Box sx={{ flexBasis: "100%", height: 0 }} />
+        </>
+      );
+    }
     // if (chart.type === "area") return getAreaChart(chart);
-    return getLineChart(chart);
+    return (
+      <Box p={3} key={chartId}>
+        <Typography variant="h5" component="h3">
+          {name}
+        </Typography>
+        {getLineChart(chart)}
+      </Box>
+    );
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      {chartData.map(
-        (c) =>
-          c && (
-            <Box pt={6} pl={3} key={c.chartId}>
-              <Typography variant="h5" component="h3">
-                {c.name}
-              </Typography>
-              {getChart(c)}
-            </Box>
-          )
-      )}
+    <Box display="flex" flexWrap="wrap" pt={8}>
+      {chartData.map(getChart)}
     </Box>
   );
 };
