@@ -8,6 +8,7 @@ import { Header } from "./Header";
 import { Charts } from "./Charts";
 import { COUNTRIES } from "../consts/countries";
 import { Box } from "@mui/system";
+import { transformLink } from "../utils/display";
 
 const homeTexts = [
   `
@@ -19,14 +20,18 @@ const SHOW_COLORS = false;
 
 export default function App() {
   const [chartData, setChartData] = React.useState([]);
+  const [dictionary, setDictionary] = React.useState([]);
   const [selectedIso, setIso] = React.useState(COUNTRIES[0].id);
 
   React.useEffect(() => {
     if (!selectedIso) return;
-    getData(selectedIso).then((data) => {
+    getData(selectedIso).then((result) => {
       console.log("@@@ ALL DATA: ");
-      console.log(data);
-      setChartData(data);
+      console.log(result.charts);
+      setChartData(result.charts);
+      if (_.isEmpty(dictionary)) {
+        setDictionary(result.dictionary);
+      }
     });
   }, [selectedIso]);
 
@@ -44,7 +49,7 @@ export default function App() {
   return (
     <Paper
       elevation={0}
-      style={{ background: "none", color: getRC(backgroundColor, 11) }}
+      style={{ background: "none", color: getRC(backgroundColor, 12) }}
     >
       <Header handleCountryChange={updateCountry} selectedIso={selectedIso} />
       <br />
@@ -76,6 +81,34 @@ export default function App() {
         </Box>
       ) : (
         <Charts selectedIso={selectedIso} chartData={chartData} />
+      )}
+      {dictionary.length && !loading && (
+        <Box p={3} mt={5}>
+          <Typography
+            variant="h4"
+            component="h2"
+            dangerouslySetInnerHTML={{
+              __html: "Glossary",
+            }}
+          />
+          {dictionary.map(({ term, definition }) => {
+            return (
+              <dl key={term}>
+                <dt>
+                  <strong>{term}</strong>
+                </dt>
+                <dd>
+                  <Typography
+                    sx={{ maxWidth: "500px" }}
+                    dangerouslySetInnerHTML={{
+                      __html: transformLink(definition),
+                    }}
+                  />
+                </dd>
+              </dl>
+            );
+          })}
+        </Box>
       )}
       {SHOW_COLORS &&
         radColors.map((rc) => (

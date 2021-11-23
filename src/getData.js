@@ -29,6 +29,7 @@ import { displayPercent } from "./utils/display";
 // fetch chart data on subsequent searches
 let chartConfigsMap = {};
 let chartIds = [];
+let dictionary = [];
 
 // ASYNC FETCHERS
 async function setConfigGids() {
@@ -278,6 +279,13 @@ async function getData(country_iso_code) {
     console.error("error in setConfigGids(): ", e);
   });
 
+  // GRAB DICTIONARY (unless already loaded)
+  if (_.isEmpty(dictionary)) {
+    dictionary = await csv(getUrl(GID_MAP.dictionary)).catch((e) => {
+      console.error("error in getDictionary: ", e);
+    });
+  }
+
   // GRAB CONFIGS (unless already loaded)
   if (_.isEmpty(chartConfigsMap)) {
     const result = await getChartConfigs().catch((e) => {
@@ -293,7 +301,7 @@ async function getData(country_iso_code) {
   const charts = await getCharts(country_iso_code).catch((e) => {
     console.error("error in getCharts(country_iso_code): ", e);
   });
-  return charts;
+  return { charts, dictionary };
 }
 
 export default getData;

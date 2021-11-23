@@ -101,6 +101,11 @@ export const Charts = ({ selectedIso, chartData }) => {
 
     const getName = (elem) => _.get(elementNameMap, elem, elem);
 
+    const hiddenMap = {};
+    const onLegendClick = (e) => {
+      console.log(e.dataKey);
+    };
+
     return (
       <ResponsiveContainer height={400} width={500}>
         <ComposedChart

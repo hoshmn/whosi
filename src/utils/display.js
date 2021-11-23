@@ -13,3 +13,6 @@ export const displayNumber = (v) => {
     .toString()
     .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1 ");
 };
+
+export const transformLink = (t) =>
+  t.replaceAll("<a ", "<a target='_blank' rel='noopener noreferrer'");
