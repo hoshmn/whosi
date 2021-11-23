@@ -19,7 +19,7 @@ const SHOW_COLORS = false;
 
 export default function App() {
   const [chartData, setChartData] = React.useState([]);
-  const [selectedIso, setIso] = React.useState(null);
+  const [selectedIso, setIso] = React.useState(COUNTRIES[0].id);
 
   React.useEffect(() => {
     if (!selectedIso) return;
@@ -66,13 +66,13 @@ export default function App() {
         </Box>
       ) : loading ? (
         <Box pt={"50vh"}>
-        <Typography
-          variant="body1"
-          sx={{ textAlign: "center" }}
-          dangerouslySetInnerHTML={{
-            __html: "loading...",
-          }}
-        />
+          <Typography
+            variant="body1"
+            sx={{ textAlign: "center" }}
+            dangerouslySetInnerHTML={{
+              __html: "loading...",
+            }}
+          />
         </Box>
       ) : (
         <Charts selectedIso={selectedIso} chartData={chartData} />

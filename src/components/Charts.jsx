@@ -25,10 +25,11 @@ import NestedBoxes from "./NestedBoxes";
 import { getRC, strokeIntensity, fillIntensity } from "../consts/colors";
 
 // TODO: CLEAN
-const CustomTooltip = ({ active, payload, label, isArea }) => {
+const CustomTooltip = ({ active, payload, label, isArea, source }) => {
   if (active && payload && payload.length) {
-    // debugger
+    // if lines, stack legend to match line height order
     const ps = isArea ? payload : _.sortBy(payload, "value");
+    // debugger
     return (
       <div
         style={{ background: "white", padding: "10px" }}
@@ -135,7 +136,9 @@ export const Charts = ({ selectedIso, chartData }) => {
           {row}
         </TableCell>
         {values.map(({ value, column }) => (
-          <TableCell key={column}>{value && value["DISPLAY_VALUE"]}</TableCell>
+          <TableCell key={column}>
+            {(value && value["DISPLAY_VALUE"]) || "N/A"}
+          </TableCell>
         ))}
       </TableRow>
     ));
