@@ -143,7 +143,7 @@ export const getDataPoint = ({
   country_iso_code,
   chartConfigsMap,
   chartSourceData,
-  valueParser = parseInt,
+  valueParser = _.round,
 }) => {
   const filter = getFilter({
     chartId,
@@ -161,6 +161,14 @@ export const getDataPoint = ({
   let value = _.get(row, valueField, null);
   // value = value && valueParser(value);
   value && _.set(row, G.DISPLAY_VALUE, valueParser(value));
+
+  // add display name for elements appearance in legend, tooltip
+  const displayName = getField({
+    element,
+    chartConfig: chartConfigsMap[chartId],
+    field: C.displayName,
+  });
+  displayName && _.set(row, G.DISPLAY_NAME, displayName);
 
   return { row, value };
 };
@@ -197,6 +205,14 @@ export const getCalculatedDataPoint = ({
     return { value: null };
   }
 
+  // add display name for elements appearance in legend, tooltip
+  const displayName =
+    getField({
+      element,
+      chartConfig,
+      field: C.displayName,
+    }) || element;
+
   // console.log(result);
-  return { value: result };
+  return { value: result, row: { [G.DISPLAY_NAME]: displayName } };
 };

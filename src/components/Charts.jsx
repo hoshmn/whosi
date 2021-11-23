@@ -14,7 +14,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-import { Box } from "@mui/system";
+import { Box, emphasize } from "@mui/system";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -24,29 +24,43 @@ import TableRow from "@mui/material/TableRow";
 import NestedBoxes from "./NestedBoxes";
 import { getRC, strokeIntensity, fillIntensity } from "../consts/colors";
 import { displayNumber, displayPercent } from "../utils/display";
+import { CONFIG_FIELDS as C, DATA_FIELDS as D, GENERATED_FIELDS as G } from "../consts/data";
 
 // TODO: CLEAN
-const CustomTooltip = ({ active, payload, label, isArea, source, formatter }) => {
+const CustomTooltip = ({ active, payload, label, isArea, formatter }) => {
   if (active && payload && payload.length) {
     // if lines, stack legend to match line height order
-    const ps = isArea ? payload : _.sortBy(payload, "value");
-    // debugger
+    const payloads = isArea ? payload : _.sortBy(payload, "value");
+
+    let source = null;
     return (
-      <div
-        style={{ background: "white", padding: "10px" }}
+      <Box
+        sx={{ background: "white", p: 2 }}
         className="custom-tooltip"
       >
         <strong className="label">{label}</strong>
-        {ps.reverse().map((p) => {
-          if (p.name.includes("_bounds")) return;
-          const b = _.get(p.payload, p.name + "_bounds", null);
+        {payloads.reverse().map((p) => {
+          if (p.dataKey.includes("_bounds")) return;
+
+          const bounds = _.get(p.payload, p.dataKey + "_bounds", null);
+
           const v = _.get(
             p.payload,
-            [p.name + "_row", "DISPLAY_VALUE"],
+            [p.dataKey + "_row", G.DISPLAY_VALUE],
             p.value
           );
+
+          // use first source
+          source = source || _.get(
+            p.payload,
+            [p.dataKey + "_row", D.source_display],
+          ) || _.get(
+            p.payload,
+            [p.dataKey + "_row", D.source_database],
+          );
+
           return (
-            <Typography key={p.name}>
+            <Typography key={p.dataKey}>
               <svg
                 width="18"
                 viewBox="0 0 160 100"
@@ -55,11 +69,12 @@ const CustomTooltip = ({ active, payload, label, isArea, source, formatter }) =>
                 <circle cx="50" cy="50" r="50" fill={p.fill}></circle>
               </svg>
               {p.name}: {formatter(v)}{" "}
-              {b && "(" + b.map((v) => formatter(v)).join(" - ") + ")"}
+              {bounds && "(" + bounds.map((v) => formatter(v)).join(" - ") + ")"}
             </Typography>
           );
         })}
-      </div>
+        {source && (<><br/><emphasize>{source}</emphasize></>)}
+      </Box>
     );
   } else return null;
 };
@@ -71,6 +86,15 @@ export const Charts = ({ selectedIso, chartData }) => {
     const [, ElementComponent] = isArea ? [AreaChart, Area] : [LineChart, Line];
 
     const formatter = isPercentage ? displayPercent : displayNumber;
+
+    const getName = (elem, idx) => {
+      console.log()
+      return _.get(
+        data,
+        [idx, elem + "_row", G.DISPLAY_NAME],
+        elem
+      )
+    }
     return (
       <ResponsiveContainer height={400} width={500}>
         <ComposedChart
@@ -113,6 +137,7 @@ export const Charts = ({ selectedIso, chartData }) => {
               // type="monotone"
               // dataBounds={_.get(elem, [elem + "_bounds"], [])}
               dataKey={elem}
+              name={getName(elem, i)}
               stackId={isArea ? 1 : i + 1000}
               stroke={getRC(colors[i], strokeIntensity)}
               fill={getRC(colors[i], fillIntensity)}

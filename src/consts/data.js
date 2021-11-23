@@ -76,5 +76,6 @@ export const DATA_FIELDS = {
 // GENERATED FIELDS - fields we add for the app
 export const GENERATED_FIELDS = {
   // we use UPPER_CASE to distinguish from actual "database" fields from the Sheet
+  DISPLAY_NAME: "DISPLAY_NAME",
   DISPLAY_VALUE: "DISPLAY_VALUE",
 };

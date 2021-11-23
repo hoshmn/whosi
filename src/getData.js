@@ -215,6 +215,7 @@ function getChart({
         dataPoints,
       });
       dataPoints[element] = value;
+      dataPoints[element + "_row"] = row;
     });
     // delete elements used only as constituents in calculations
     _.each(elements, (element) => {
