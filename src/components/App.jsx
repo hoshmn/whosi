@@ -21,7 +21,7 @@ const SHOW_COLORS = false;
 export default function App() {
   const [chartData, setChartData] = React.useState([]);
   const [dictionary, setDictionary] = React.useState([]);
-  const [selectedIso, setIso] = React.useState(COUNTRIES[0].id);
+  const [selectedIso, setIso] = React.useState(null);
 
   React.useEffect(() => {
     if (!selectedIso) return;
