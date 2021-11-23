@@ -3,6 +3,7 @@ import _ from "lodash";
 import {
   CONFIG_FIELDS as C,
   DATA_FIELDS as D,
+  GENERATED_FIELDS as G,
   GID_MAP,
   CONFIGURABLE_GID_NAMES,
   TABLE_DELIN,
@@ -19,6 +20,7 @@ import {
   transformYearRange,
   getDataPoint,
   getCalculatedDataPoint,
+  getField,
 } from "./utils/data";
 import { displayPercent } from "./utils/display";
 
@@ -191,6 +193,7 @@ function getChart({
   // getchartdata per element
   const data = _.map(years_arr, (year) => {
     const dataPoints = {};
+
     // add non-calculated points
     _.each(elements, (element) => {
       if (!!getFormula({ element, chartConfig })) return null;
@@ -206,6 +209,7 @@ function getChart({
       dataPoints[element + "_bounds"] = getBounds(row);
       dataPoints[element + "_row"] = row;
     });
+
     // add calculated points (now that non-calculated constituents have values)
     _.each(elements, (element) => {
       if (!getFormula({ element, chartConfig })) return null;
@@ -217,6 +221,7 @@ function getChart({
       dataPoints[element] = value;
       dataPoints[element + "_row"] = row;
     });
+
     // delete elements used only as constituents in calculations
     _.each(elements, (element) => {
       if (getFieldBoolean({ element, chartConfig, field: C.hidden })) {
@@ -229,6 +234,17 @@ function getChart({
     return dataPoints;
   });
 
+  const elementNameMap = {};
+  _.each(
+    visibleElements,
+    (element) =>
+      (elementNameMap[element] = getField({
+        element,
+        chartConfig: chartConfigsMap[chartId],
+        field: C.displayName,
+      }))
+  );
+
   const colors = getColors({
     chartSettings,
     chartConfig,
@@ -240,6 +256,7 @@ function getChart({
     chartId,
     country_iso_code,
     elements: visibleElements,
+    elementNameMap,
     colors,
     isPercentage: getFieldBoolean({
       chartConfig,

@@ -24,7 +24,11 @@ import TableRow from "@mui/material/TableRow";
 import NestedBoxes from "./NestedBoxes";
 import { getRC, strokeIntensity, fillIntensity } from "../consts/colors";
 import { displayNumber, displayPercent } from "../utils/display";
-import { CONFIG_FIELDS as C, DATA_FIELDS as D, GENERATED_FIELDS as G } from "../consts/data";
+import {
+  CONFIG_FIELDS as C,
+  DATA_FIELDS as D,
+  GENERATED_FIELDS as G,
+} from "../consts/data";
 
 // TODO: CLEAN
 const CustomTooltip = ({ active, payload, label, isArea, formatter }) => {
@@ -34,10 +38,7 @@ const CustomTooltip = ({ active, payload, label, isArea, formatter }) => {
 
     let source = null;
     return (
-      <Box
-        sx={{ background: "white", p: 2 }}
-        className="custom-tooltip"
-      >
+      <Box sx={{ background: "white", p: 2 }} className="custom-tooltip">
         <strong className="label">{label}</strong>
         {payloads.reverse().map((p) => {
           if (p.dataKey.includes("_bounds")) return;
@@ -51,13 +52,10 @@ const CustomTooltip = ({ active, payload, label, isArea, formatter }) => {
           );
 
           // use first source
-          source = source || _.get(
-            p.payload,
-            [p.dataKey + "_row", D.source_display],
-          ) || _.get(
-            p.payload,
-            [p.dataKey + "_row", D.source_database],
-          );
+          source =
+            source ||
+            _.get(p.payload, [p.dataKey + "_row", D.source_display]) ||
+            _.get(p.payload, [p.dataKey + "_row", D.source_database]);
 
           return (
             <Typography key={p.dataKey}>
@@ -69,11 +67,17 @@ const CustomTooltip = ({ active, payload, label, isArea, formatter }) => {
                 <circle cx="50" cy="50" r="50" fill={p.fill}></circle>
               </svg>
               {p.name}: {formatter(v)}{" "}
-              {bounds && "(" + bounds.map((v) => formatter(v)).join(" - ") + ")"}
+              {bounds &&
+                "(" + bounds.map((v) => formatter(v)).join(" - ") + ")"}
             </Typography>
           );
         })}
-        {source && (<><br/><emphasize>{source}</emphasize></>)}
+        {source && (
+          <>
+            <br />
+            <emphasize>{source}</emphasize>
+          </>
+        )}
       </Box>
     );
   } else return null;
@@ -81,20 +85,22 @@ const CustomTooltip = ({ active, payload, label, isArea, formatter }) => {
 
 export const Charts = ({ selectedIso, chartData }) => {
   const getLineChart = (chart) => {
-    const { data, elements, type, isPercentage, colors } = chart;
+    const {
+      data,
+      chartId,
+      elements,
+      type,
+      isPercentage,
+      colors,
+      elementNameMap,
+    } = chart;
     const isArea = type === "area";
     const [, ElementComponent] = isArea ? [AreaChart, Area] : [LineChart, Line];
 
     const formatter = isPercentage ? displayPercent : displayNumber;
 
-    const getName = (elem, idx) => {
-      console.log()
-      return _.get(
-        data,
-        [idx, elem + "_row", G.DISPLAY_NAME],
-        elem
-      )
-    }
+    const getName = (elem) => _.get(elementNameMap, elem, elem);
+
     return (
       <ResponsiveContainer height={400} width={500}>
         <ComposedChart
@@ -111,8 +117,16 @@ export const Charts = ({ selectedIso, chartData }) => {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis tickFormatter={formatter} />
-          <Tooltip content={<CustomTooltip isArea={isArea} formatter={formatter} source={"source"}/>} />
-          <Legend />
+          <Tooltip
+            content={
+              <CustomTooltip
+                isArea={isArea}
+                formatter={formatter}
+                source={"source"}
+              />
+            }
+          />
+          <Legend onClick={(x, y) => console.log(x, y)} />
           {elements.map((elem, i) => {
             const isBounded =
               !isArea &&
@@ -137,7 +151,8 @@ export const Charts = ({ selectedIso, chartData }) => {
               // type="monotone"
               // dataBounds={_.get(elem, [elem + "_bounds"], [])}
               dataKey={elem}
-              name={getName(elem, i)}
+              name={getName(elem)}
+              hide={false}
               stackId={isArea ? 1 : i + 1000}
               stroke={getRC(colors[i], strokeIntensity)}
               fill={getRC(colors[i], fillIntensity)}
