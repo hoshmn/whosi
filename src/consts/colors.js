@@ -30,8 +30,8 @@ import {
 } from "@radix-ui/colors";
 
 // keep in sync with index.html
-export const backgroundColor = mauve;
-export const headerColor = sky;
+export const backgroundColor = sand;
+export const headerColor = gold;
 export const coreColors = [orange, grass, plum];
 export const altColors = [tomato, indigo, gold];
 export const alt2Colors = [sky, brown, violet, sand];

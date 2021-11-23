@@ -63,6 +63,7 @@ export const DATA_FIELDS = {
   unit_format: "unit_format",
   source_organization: "source_organization",
   source_database: "source_database",
+  source_display: "source_display",
   notes: "notes",
   modality: "modality",
   modality_category: "modality_category",

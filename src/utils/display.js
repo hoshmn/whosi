@@ -6,3 +6,10 @@ export const displayPercent = (v) => {
   if (v > 100) console.warn("Incorrect %");
   return _.round(v, 0).toString() + "%";
 };
+
+export const displayNumber = (v) => {
+  // insert spaces rather than commas
+  return _.round(v, 0)
+    .toString()
+    .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1 ");
+};

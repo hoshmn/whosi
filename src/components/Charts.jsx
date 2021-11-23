@@ -23,9 +23,10 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import NestedBoxes from "./NestedBoxes";
 import { getRC, strokeIntensity, fillIntensity } from "../consts/colors";
+import { displayNumber, displayPercent } from "../utils/display";
 
 // TODO: CLEAN
-const CustomTooltip = ({ active, payload, label, isArea, source }) => {
+const CustomTooltip = ({ active, payload, label, isArea, source, formatter }) => {
   if (active && payload && payload.length) {
     // if lines, stack legend to match line height order
     const ps = isArea ? payload : _.sortBy(payload, "value");
@@ -35,7 +36,7 @@ const CustomTooltip = ({ active, payload, label, isArea, source }) => {
         style={{ background: "white", padding: "10px" }}
         className="custom-tooltip"
       >
-        <p className="label">{label}:</p>
+        <strong className="label">{label}</strong>
         {ps.reverse().map((p) => {
           if (p.name.includes("_bounds")) return;
           const b = _.get(p.payload, p.name + "_bounds", null);
@@ -45,17 +46,17 @@ const CustomTooltip = ({ active, payload, label, isArea, source }) => {
             p.value
           );
           return (
-            <p key={p.name}>
+            <Typography key={p.name}>
               <svg
-                width="10"
-                viewBox="0 0 100 100"
+                width="18"
+                viewBox="0 0 160 100"
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <circle cx="50" cy="50" r="50" fill={p.fill}></circle>
               </svg>
-              {p.name}: {v}{" "}
-              {b && "(" + b.map((v) => parseInt(v)).join(" - ") + ")"}
-            </p>
+              {p.name}: {formatter(v)}{" "}
+              {b && "(" + b.map((v) => formatter(v)).join(" - ") + ")"}
+            </Typography>
           );
         })}
       </div>
@@ -65,10 +66,11 @@ const CustomTooltip = ({ active, payload, label, isArea, source }) => {
 
 export const Charts = ({ selectedIso, chartData }) => {
   const getLineChart = (chart) => {
-    const { data, elements, type, chartId, colors } = chart;
+    const { data, elements, type, isPercentage, colors } = chart;
     const isArea = type === "area";
     const [, ElementComponent] = isArea ? [AreaChart, Area] : [LineChart, Line];
 
+    const formatter = isPercentage ? displayPercent : displayNumber;
     return (
       <ResponsiveContainer height={400} width={500}>
         <ComposedChart
@@ -84,8 +86,8 @@ export const Charts = ({ selectedIso, chartData }) => {
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip content={<CustomTooltip isArea={isArea} />} />
+          <YAxis tickFormatter={formatter} />
+          <Tooltip content={<CustomTooltip isArea={isArea} formatter={formatter} source={"source"}/>} />
           <Legend />
           {elements.map((elem, i) => {
             const isBounded =

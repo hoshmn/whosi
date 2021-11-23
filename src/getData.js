@@ -127,11 +127,11 @@ function getTable({
   const elements = getElements(chartConfig);
   const dataPoints = {};
   // add non-calculated points
+  const isPercentage = getFieldBoolean({
+    chartConfig,
+    field: C.percentage,
+  });
   _.each(elements, (element) => {
-    const isPercentage = getFieldBoolean({
-      chartConfig,
-      field: C.percentage,
-    });
     const { row, value } = getDataPoint({
       chartId,
       element,
@@ -159,6 +159,7 @@ function getTable({
     chartId,
     country_iso_code,
     elements: elements,
+    isPercentage,
     type: _.get(chartSettings, C.chartType),
     name: _.get(chartSettings, C.displayName, chartId),
   };
@@ -239,6 +240,10 @@ function getChart({
     country_iso_code,
     elements: visibleElements,
     colors,
+    isPercentage: getFieldBoolean({
+      chartConfig,
+      field: C.percentage,
+    }),
     type: _.get(chartSettings, C.chartType),
     name: _.get(chartSettings, C.displayName, chartId),
   };

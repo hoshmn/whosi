@@ -8,7 +8,7 @@ import { getRC, headerColor } from "../consts/colors";
 export const Header = ({ selectedIso, handleCountryChange }) => {
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="fixed" sx={{ background: getRC(headerColor, 8) }}>
+      <AppBar position="fixed" sx={{ background: getRC(headerColor, 7) }}>
         <Toolbar>
           <CountrySelect
             handleCountryChange={handleCountryChange}
