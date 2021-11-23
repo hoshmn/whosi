@@ -1,35 +1,13 @@
 import { csv } from "d3-fetch";
 import _ from "lodash";
 import {
-  tomato,
-  // red,
-  // crimson,
-  // pink,
-  plum,
-  // purple,
-  violet,
-  indigo,
-  // blue,
-  // cyan,
-  // teal,
-  // green,
-  grass,
-  orange,
-  brown,
-  sky,
-  // mint,
-  // lime,
-  // yellow,
-  // amber,
-  // gray,
-  // mauve,
-  // slate,
-  // sage,
-  // olive,
-  sand,
-  gold,
-  // bronze,
-} from "@radix-ui/colors";
+  coreColors,
+  altColors,
+  alt2Colors,
+  colorGroups,
+} from "./consts/colors";
+
+// TODO: split up this file
 
 // CONSTS
 const DISABLED = false;
@@ -45,11 +23,6 @@ const gids = {
   // // settings: null,
 };
 let chartConfigsMap = {};
-
-const coreColors = [orange, grass, plum];
-const altColors = [tomato, indigo, gold];
-const alt2Colors = [sky, brown, violet, sand];
-const colorGroups = [coreColors, altColors, alt2Colors];
 
 let chartIds = [];
 // const chartIds = [
@@ -292,7 +265,9 @@ const getCalculatedDataPoint = ({ chartConfig, element, dataPoints }) => {
 async function setConfigGids() {
   // return if already configured
   if (configurableGidNames.every((name) => !!gids[name])) return;
-  const homeRows = await csv(getUrl(gids.home));
+  const homeRows = await csv(getUrl(gids.home)).catch((e) => {
+    console.error("error in csv(getUrl(gids.home)): ", e);
+  });
   configurableGidNames.forEach((name) => {
     const lastConfiguredRow = _.findLast(homeRows, (r) => !!r[name]);
     if (!lastConfiguredRow) {
@@ -304,12 +279,16 @@ async function setConfigGids() {
 }
 
 async function getChartConfigs() {
-  const baseConfigs = await csv(getUrl(gids.configs), configParser);
+  const baseConfigs = await csv(getUrl(gids.configs), configParser).catch(
+    (e) => {
+      console.error("error in csv(getUrl(gids.configs), configParser): ", e);
+    }
+  );
   const shaped = _.groupBy(baseConfigs, C.chartId);
 
-  const orderedChartIds = _.uniqBy(baseConfigs, "chart_id").map(
-    (c) => c.chart_id
-  );
+  const orderedChartIds = _.uniqBy(baseConfigs, "chart_id")
+    .map((c) => c.chart_id)
+    .filter((id) => id !== "all");
 
   const chartConfigs = _.mapValues(shaped, (configParams, name) => {
     // wise?
@@ -330,7 +309,9 @@ async function getChartConfigs() {
 async function getCharts(country_iso_code) {
   return await Promise.all(
     chartIds.map((chartId) => getChartOrTable(chartId, country_iso_code))
-  );
+  ).catch((e) => {
+    console.error("error in getCharts(): ", e);
+  });
 }
 
 async function getChartOrTable(chartId, country_iso_code) {
@@ -347,7 +328,9 @@ async function getChartOrTable(chartId, country_iso_code) {
   const chartSourceData = await csv(
     getUrl(chartSettings[C.sourceGid]),
     filterByCountryGenerator(country_iso_code)
-  );
+  ).catch((e) => {
+    console.error("error in getChartOrTable()): ", e);
+  });
 
   const getterMap = {
     table: getTable,
@@ -520,11 +503,15 @@ function getChart({
 async function getData(country_iso_code) {
   // if (DISABLED) return [];
   // CONFIGURE GIDS MAP
-  await setConfigGids();
+  await setConfigGids().catch((e) => {
+    console.error("error in setConfigGids(): ", e);
+  });
 
   // GRAB CONFIGS (unless already loaded)
   if (_.isEmpty(chartConfigsMap)) {
-    const result = await getChartConfigs();
+    const result = await getChartConfigs().catch((e) => {
+      console.error("error in getChartConfigs(): ", e);
+    });
     chartConfigsMap = result.chartConfigs;
     chartIds = result.orderedChartIds;
     console.log("@@@ ALL CONFIGS: ");
@@ -532,7 +519,9 @@ async function getData(country_iso_code) {
   }
 
   // CREATE CHARTS
-  const charts = await getCharts(country_iso_code);
+  const charts = await getCharts(country_iso_code).catch((e) => {
+    console.error("error in getCharts(country_iso_code): ", e);
+  });
   return charts;
 }
 

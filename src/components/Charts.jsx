@@ -1,5 +1,6 @@
-import "./styles.css";
 import React from "react";
+import _ from "lodash";
+import Typography from "@mui/material/Typography";
 import {
   AreaChart,
   Area,
@@ -13,8 +14,6 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-import getData from "./getData";
-import _ from "lodash";
 import { Box } from "@mui/system";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -22,106 +21,12 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import { Paper, Typography } from "@mui/material";
 import NestedBoxes from "./NestedBoxes";
-import {
-  tomato,
-  red,
-  crimson,
-  pink,
-  plum,
-  purple,
-  violet,
-  indigo,
-  blue,
-  cyan,
-  teal,
-  green,
-  grass,
-  orange,
-  brown,
-  sky,
-  mint,
-  lime,
-  yellow,
-  amber,
-  gray,
-  mauve,
-  slate,
-  sage,
-  olive,
-  sand,
-  gold,
-  bronze,
-} from "@radix-ui/colors";
-
-const radColors = [
-  tomato,
-  red,
-  crimson,
-  pink,
-  plum,
-  purple,
-  violet,
-  indigo,
-  blue,
-  cyan,
-  teal,
-  green,
-  grass,
-  orange,
-  brown,
-  sky,
-  mint,
-  lime,
-  yellow,
-  amber,
-  gray,
-  mauve,
-  slate,
-  sage,
-  olive,
-  sand,
-  gold,
-  bronze,
-];
-
-const SHOW_COLORS = false;
-
-// TODO: add to sheet?
-const countries = [
-  "CIV",
-  "CMR",
-  "GHA",
-  "GIN",
-  "IDN",
-  "MOZ",
-  "NGA",
-  "PHL",
-  "TZA",
-  "ZMB",
-];
-
-// const data = [
-//   {
-//     name: "Page A",
-//     uv: 4000,
-//     pv: 2400,
-//     amt: 2400
-//   },
-//   {
-//     name: "Page B",
-//     uv: 3000,
-//     pv: 1398,
-//     amt: 2210
-//   },
-//   ]
-
-// const coreColors = [orange, grass, plum];
-// const altColors = [tomato, indigo, gold];
-// const alt2Colors = [sky, brown, violet, sand];
-const strokeIntensity = 10;
-const fillIntensity = 7;
+import { getRC, strokeIntensity, fillIntensity } from "../consts/colors";
+// import Typography from '@mui/material/Typography';
+// import Button from '@mui/material/Button';
+// import IconButton from '@mui/material/IconButton';
+// import MenuIcon from '@mui/icons-material/Menu';
 
 // TODO: CLEAN
 const CustomTooltip = ({ active, payload, label, isArea }) => {
@@ -161,28 +66,11 @@ const CustomTooltip = ({ active, payload, label, isArea }) => {
   } else return null;
 };
 
-export default function App() {
-  const [chartData, setChartData] = React.useState([]);
-  const [iso, setIso] = React.useState(countries[0]);
-
-  React.useEffect(() => {
-    getData(iso).then((data) => {
-      console.log("@@@ ALL DATA: ");
-      console.log(data);
-      setChartData(data);
-    });
-  }, [iso]);
-
+export const Charts = ({ selectedIso, chartData }) => {
   const getLineChart = (chart) => {
     const { data, elements, type, chartId, colors } = chart;
     const isArea = type === "area";
     const [, ElementComponent] = isArea ? [AreaChart, Area] : [LineChart, Line];
-
-    // todo: add to Sheet
-    // const colors =
-    //   chartId === "plhiv_diagnosis" || chartId === "testing_coverage"
-    //     ? altColors
-    //     : coreColors;
 
     return (
       <ResponsiveContainer height={400}>
@@ -276,7 +164,7 @@ export default function App() {
   const getNested = (chart) => {
     const { data, elements, colors } = chart;
     const xl = false;
-    console.log(radColors);
+    // console.log(radColors);
     const ratios = elements.map((el) => {
       const val = data[el];
       return val && val / 100;
@@ -326,67 +214,19 @@ export default function App() {
     return getLineChart(chart);
   };
 
-  const updateCountry = (e) => {
-    setIso(e.target.value);
-  };
-
-  // console.log("*", chartData);
-  const loading = !_.some(chartData, (c) => c && c.country_iso_code === iso);
   return (
-    <Paper
-      elevation={0}
-      style={{ background: "none", color: getRC(mauve, 11) }}
-    >
-      <select name="country" onChange={updateCountry}>
-        {countries.map((c) => (
-          <option id={c} key={c} value={c}>
-            {c}
-          </option>
-        ))}
-      </select>
-      <br />
-
-      {loading
-        ? "loading..."
-        : chartData.map(
-            (c) =>
-              c && (
-                <Box pt={6} pl={3} key={c.chartId}>
-                  <Typography variant="h5" component="h3">
-                    {c.name}
-                  </Typography>
-                  {getChart(c)}
-                </Box>
-              )
-          )}
-      {SHOW_COLORS &&
-        radColors.map((rc) => (
-          <>
-            <br></br>
-            {_.map(Object.keys(radColors[0]), (meh, idx) => (
-              <span
-                style={{
-                  background: getRC(rc, idx + 1),
-                  height: "70px",
-                  width: "70px",
-                  display: "inline-block",
-                  textAlign: "center",
-                }}
-              >
-                {idx + 1}
-              </span>
-            ))}
-            {Object.keys(rc)[0].replace(/\d/, "")}
-          </>
-        ))}
-    </Paper>
+    <Box sx={{ flexGrow: 1 }}>
+      {chartData.map(
+        (c) =>
+          c && (
+            <Box pt={6} pl={3} key={c.chartId}>
+              <Typography variant="h5" component="h3">
+                {c.name}
+              </Typography>
+              {getChart(c)}
+            </Box>
+          )
+      )}
+    </Box>
   );
-}
-
-function getRC(radColor, idx) {
-  // return custom colors as-is
-  if (typeof radColor === "string") return radColor;
-  const c1 = Object.keys(radColor)[0];
-  const c = c1.replace(/\d/, "") + idx;
-  return radColor[c];
-}
+};
