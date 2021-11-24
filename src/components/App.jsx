@@ -1,4 +1,4 @@
-import "./styles.css";
+// import "./styles.css";
 import React from "react";
 import _ from "lodash";
 import getData from "../getData";
@@ -50,7 +50,11 @@ export default function App() {
   return (
     <Paper
       elevation={0}
-      style={{ background: "none", color: getRC(themePrimary, 12) }}
+      sx={{ 
+        background: "none",
+        color: getRC(themePrimary, 12),
+        fontFamily: "'Archivo', sans-serif"
+      }}
     >
       <Header handleCountryChange={updateCountry} selectedIso={selectedIso} />
       <br />
