@@ -157,9 +157,9 @@ export const Charts = ({ selectedIso, chartData }) => {
           />
           <Tooltip
             cursor={{ stroke: getRC(themeSecondary, 10), strokeWidth: 1 }}
-            content={<CustomTooltip isArea={isArea} source={"source"} />}
+            content={<CustomTooltip isArea={isArea} />}
           />
-          <Legend onClick={onLegendClick} />
+          <Legend onClick={onLegendClick} iconSize={isArea ? 8 : 14} iconType={isArea && "circle"} />
           {elements.map((elem, i) => {
             const isBounded =
               !isArea &&
