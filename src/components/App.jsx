@@ -50,10 +50,10 @@ export default function App() {
   return (
     <Paper
       elevation={0}
-      sx={{ 
+      sx={{
         background: "none",
         color: getRC(themePrimary, 12),
-        fontFamily: "'Archivo', sans-serif"
+        fontFamily: "'Archivo', sans-serif",
       }}
     >
       <Header handleCountryChange={updateCountry} selectedIso={selectedIso} />

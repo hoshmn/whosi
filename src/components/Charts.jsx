@@ -14,7 +14,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-import { Box, emphasize } from "@mui/system";
+import { Box, useTheme } from "@mui/system";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -35,6 +35,8 @@ import {
   DATA_FIELDS as D,
   GENERATED_FIELDS as G,
 } from "../consts/data";
+import { COUNTRIES } from "../consts/countries";
+import { useMediaQuery } from "@mui/material";
 
 // TODO: CLEAN
 const CustomTooltip = ({ active, payload, label, isArea }) => {
@@ -127,11 +129,12 @@ export const Charts = ({ selectedIso, chartData }) => {
     };
 
     return (
-      <ResponsiveContainer width="99%" 
-      aspect={1.25}
-      // height={400}
-      maxHeight={400}
-      // maxWidth={600}
+      <ResponsiveContainer
+        width="99%"
+        aspect={1.25}
+        // height={400}
+        maxHeight={400}
+        // maxWidth={600}
       >
         <ComposedChart
           // width={500}
@@ -202,7 +205,6 @@ export const Charts = ({ selectedIso, chartData }) => {
       </TableCell>
     ));
 
-    debugger;
     const rows = data.map(({ row, values }) => (
       <TableRow key={row}>
         <TableCell scope="row" component="th">
@@ -244,6 +246,9 @@ export const Charts = ({ selectedIso, chartData }) => {
   };
 
   const getNested = (chart) => {
+    const theme = useTheme()
+    const isSm = useMediaQuery(theme.breakpoints.down("sm"));
+    const isXl = useMediaQuery(theme.breakpoints.up("md"));
     const { data, elements, colors } = chart;
     const xl = false;
     // console.log(radColors);
@@ -256,13 +261,13 @@ export const Charts = ({ selectedIso, chartData }) => {
       <>
         <NestedBoxes
           // circle={true}
-          classes={xl ? "xl" : ""}
+          // classes={xl ? "xl" : ""}
           title={"title"}
-          bufferRatio={xl ? 0.8 : 0.2}
-          lineHeight={xl ? 1.4 : 1.1}
+          bufferRatio={!isSm ? 0.8 : 0.2}
+          lineHeight={!isSm ? 1.4 : 1.1}
           textBufferRatio={0.2}
           firstSide={20}
-          horizontal={true}
+          horizontal={!isSm}
           ratios={ratios}
           fillColors={colors.map((c) => getRC(c, 8))}
           textColors={colors.map((c) => getRC(c, 9))}
@@ -290,10 +295,82 @@ export const Charts = ({ selectedIso, chartData }) => {
     );
   };
 
+  const getIntro = (chart) => {
+    const country = COUNTRIES.find((c) => c.id === selectedIso);
+    return (
+      <>
+        <Typography
+          variant="h2"
+          component="h1"
+          sx={{
+            fontWeight: 500,
+            fontSize: { lg: "6rem"},
+            maxWidth: { lg: "60%"},
+          }}
+        >
+          {country && country.name}
+        </Typography>
+        <Box
+          sx={{
+            display: { sm: "flex" },
+            "& dl:not(:last-child)": { mr: { sm: 4, md: 10} },
+            "& dt h2": { 
+              fontWeight: 300,
+              letterSpacing: "1.2px",
+              textTransform: "uppercase"
+            },
+            "& dt, dd": { m: 0 },
+          }}
+        >
+          {chart.elements.map((elem) => {
+            return (
+              <dl key={elem}>
+                <dt>
+                  <Typography variant="h6" component="h2">
+                    {_.get(
+                      chart,
+                      ["textValues", `${elem}_row`, G.DISPLAY_NAME],
+                      ""
+                    )}
+                  </Typography>
+                </dt>
+                <dd>
+                  <Typography variant="h4" component="h2">
+                    {_.get(
+                      chart,
+                      ["textValues", `${elem}_row`, G.DISPLAY_VALUE],
+                      chart.textValues[elem]
+                    )}
+                  </Typography>
+                </dd>
+              </dl>
+            );
+          })}
+        </Box>
+      </>
+    );
+  };
+
   const getChart = (chart) => {
     // TODO: simplify
     if (!chart) return null;
     const { type, chartId, name } = chart;
+
+    // if (type === "text") {
+    if (chartId === "intro") {
+      return (
+        <Box
+          sx={{
+            flexBasis: "100%",
+            p: 3,
+            // display: {md: "flex"},
+          }}
+          key={chartId}
+        >
+          {getIntro(chart)}
+        </Box>
+      );
+    }
 
     if (type === "table") {
       return (
