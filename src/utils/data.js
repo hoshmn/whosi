@@ -186,6 +186,18 @@ export const getDataPoint = ({
   if (valueField && valueField !== D.value) return { row, value };
 
   // assume that value holds numeric data, proceed to process
+  return capAndFormat({ row, value, chartConfigsMap, chartId, element });
+};
+
+// mutates its row input!
+// applies caps and display formatting settings to numeric row/values
+export const capAndFormat = ({
+  row,
+  value,
+  chartConfigsMap,
+  chartId,
+  element,
+}) => {
   let displayValue = value;
 
   const isPercentage = getFieldBoolean({
@@ -221,7 +233,13 @@ export const getDataPoint = ({
     });
   } else {
     // is integer
-    displayValue = _.round(value, 0);
+    const coarseFormatting = !!getSetting({
+      chartConfigsMap,
+      chartId,
+      element,
+      field: C.coarseIntegerFormatting,
+    });
+    displayValue = displayNumber(value, { coarseFormatting });
 
     [D.value_lower, D.value_upper].forEach((F) => {
       let v = _.get(row, F);
@@ -234,16 +252,17 @@ export const getDataPoint = ({
   // formatted value for tooltips
   displayValue && _.set(row, G.DISPLAY_VALUE, displayValue);
 
-  // if (!row || !value) debugger;
   return { row, value };
 };
 
 // create derived data point (from other found points) using formula provided in Sheet
 export const getCalculatedDataPoint = ({
-  chartConfig,
+  chartConfigsMap,
   element,
   dataPoints,
+  chartId,
 }) => {
+  const chartConfig = chartConfigsMap[chartId];
   const rawFormula = getFormula({ element, chartConfig });
   let convertedFormula = rawFormula;
 
@@ -279,5 +298,11 @@ export const getCalculatedDataPoint = ({
     }) || element;
 
   // console.log(result);
-  return { value: result, row: { [G.DISPLAY_NAME]: displayName } };
+  return capAndFormat({
+    value: result,
+    row: { [G.DISPLAY_NAME]: displayName },
+    chartConfigsMap,
+    chartId,
+    element,
+  });
 };

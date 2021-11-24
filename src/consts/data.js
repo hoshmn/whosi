@@ -33,6 +33,7 @@ export const CONFIG_FIELDS = {
   element: "element",
   displayName: "display_name",
   capPercentage: "cap_percentage",
+  coarseIntegerFormatting: "coarse_integer_formatting",
   colorOverride: "color_override",
   chartType: "chart_type",
   modelled: "modelled",

@@ -35,13 +35,13 @@ export const displayNumber = (v, options = {}) => {
       return "<500";
     } else if (v < 1000) {
       return "<1000";
+    } else {
+      v = Number(v.toPrecision(2));
     }
   }
 
   // insert spaces rather than commas
-  return _.round(v, 0)
-    .toString()
-    .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1 ");
+  return v.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1 ");
 };
 
 export const transformLink = (t) =>

@@ -21,7 +21,8 @@ const SHOW_COLORS = false;
 export default function App() {
   const [chartData, setChartData] = React.useState([]);
   const [dictionary, setDictionary] = React.useState([]);
-  const [selectedIso, setIso] = React.useState(null);
+  // TODO undo
+  const [selectedIso, setIso] = React.useState("NGA");
 
   React.useEffect(() => {
     if (!selectedIso) return;
@@ -82,7 +83,7 @@ export default function App() {
       ) : (
         <Charts selectedIso={selectedIso} chartData={chartData} />
       )}
-      {dictionary.length && !loading && (
+      {!!dictionary.length && !loading && (
         <Box p={3} mt={5}>
           <Typography
             variant="h4"

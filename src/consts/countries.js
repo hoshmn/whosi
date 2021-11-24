@@ -1,6 +1,6 @@
 // TODO: add to sheet?
 export const COUNTRIES = [
-  { id: "CIV", name: "Cote D'Ivoire" },
+  { id: "CIV", name: "Côte d'Ivoire" },
   { id: "CMR", name: "Cameroon" },
   { id: "GHA", name: "Ghana" },
   { id: "GIN", name: "Guinea" },

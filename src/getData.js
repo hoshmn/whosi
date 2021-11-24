@@ -216,8 +216,9 @@ function getChart({
     _.each(elements, (element) => {
       if (!getFormula({ element, chartConfig })) return null;
       const { row, value } = getCalculatedDataPoint({
+        chartId,
         element,
-        chartConfig,
+        chartConfigsMap,
         dataPoints,
       });
       dataPoints[element] = value;
