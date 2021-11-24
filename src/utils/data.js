@@ -5,6 +5,7 @@ import {
   DATA_FIELDS as D,
   GENERATED_FIELDS as G,
 } from "../consts/data";
+import { capValue, displayNumber, displayPercent } from "./display";
 
 // HELPERS
 export const getUrl = (gid) =>
@@ -31,6 +32,17 @@ export const filterByCountryGenerator = (country_iso_code) => {
 // determine actual chart elements from chart config
 export const getElements = (chartConfig) =>
   Object.keys(chartConfig).filter((k) => k !== "all" && !k.startsWith("_key_"));
+
+// get setting from element, else chart, else global
+export const getSetting = ({
+  element = "all",
+  chartConfigsMap,
+  field,
+  chartId = "all",
+}) =>
+  _.get(chartConfigsMap, [chartId, element, 0, field]) ||
+  _.get(chartConfigsMap, [chartId, "all", 0, field]) ||
+  _.get(chartConfigsMap, ["all", 0, field]);
 
 // omit element to get chart-wide setting
 export const getField = ({ element = "all", chartConfig, field }) =>
@@ -143,7 +155,7 @@ export const getDataPoint = ({
   country_iso_code,
   chartConfigsMap,
   chartSourceData,
-  valueParser = _.round,
+  // valueParser = _.identity,
 }) => {
   const filter = getFilter({
     chartId,
@@ -159,8 +171,8 @@ export const getDataPoint = ({
   // usually we care about "value", but sometimes "value_comment"
   const valueField = _.get(filter, C.valueField, D.value);
   let value = _.get(row, valueField, null);
-  // value = value && valueParser(value);
-  value && _.set(row, G.DISPLAY_VALUE, valueParser(value));
+
+  if (!row || !value) return {};
 
   // add display name for elements appearance in legend, tooltip
   const displayName = getField({
@@ -170,6 +182,59 @@ export const getDataPoint = ({
   });
   displayName && _.set(row, G.DISPLAY_NAME, displayName);
 
+  // assume that value_comment (or other non-value) field is for non-numeric column
+  if (valueField && valueField !== D.value) return { row, value };
+
+  // assume that value holds numeric data, proceed to process
+  let displayValue = value;
+
+  const isPercentage = getFieldBoolean({
+    chartConfig: chartConfigsMap[chartId],
+    field: C.percentage,
+  });
+
+  if (isPercentage) {
+    const cap = getSetting({
+      chartConfigsMap,
+      chartId,
+      element,
+      field: C.capPercentage,
+    });
+
+    // value = value && valueParser(value);
+    const options = { cap };
+    // be sure to capture display value BEFORE capping, so it includes >
+    displayValue = displayPercent(value, options);
+    value = capValue(value, options);
+    // overwriting
+    capValue && _.set(row, D.value, value);
+
+    [D.value_lower, D.value_upper].forEach((F) => {
+      const v = _.get(row, F);
+
+      // formatted capped val for tooltips
+      v && _.set(row, `DISPLAY_${F.toUpperCase()}`, displayPercent(v, options));
+
+      // capped val for plotting
+      const cv = v && capValue(v, options);
+      cv && _.set(row, F, cv);
+    });
+  } else {
+    // is integer
+    displayValue = _.round(value, 0);
+
+    [D.value_lower, D.value_upper].forEach((F) => {
+      let v = _.get(row, F);
+      // formatted value for tooltips
+      v && _.set(row, `DISPLAY_${F.toUpperCase()}`, displayNumber(v));
+      // v && _.set(row, F, v);
+    });
+  }
+
+  // formatted value for tooltips
+  displayValue && _.set(row, G.DISPLAY_VALUE, displayValue);
+
+  // if (!row || !value) debugger;
   return { row, value };
 };
 
@@ -201,7 +266,7 @@ export const getCalculatedDataPoint = ({
 
   // only allow numbers & arith operators (otherwise eg null will evaluate to 0)
   if (!/^[\d-+*\/\.]+$/.test(convertedFormula) || !_.isNumber(result)) {
-    console.log(`missing values for ${rawFormula} (${convertedFormula})`);
+    console.warn(`missing values for ${rawFormula} (${convertedFormula})`);
     return { value: null };
   }
 

@@ -22,7 +22,12 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import NestedBoxes from "./NestedBoxes";
-import { getRC, strokeIntensity, fillIntensity } from "../consts/colors";
+import {
+  getRC,
+  strokeIntensity,
+  fillIntensity,
+  backgroundColor,
+} from "../consts/colors";
 import { displayNumber, displayPercent } from "../utils/display";
 import {
   CONFIG_FIELDS as C,
@@ -31,7 +36,7 @@ import {
 } from "../consts/data";
 
 // TODO: CLEAN
-const CustomTooltip = ({ active, payload, label, isArea, formatter }) => {
+const CustomTooltip = ({ active, payload, label, isArea }) => {
   if (active && payload && payload.length) {
     // if lines, stack legend to match line height order
     const payloads = isArea ? payload : _.sortBy(payload, "value");
@@ -43,13 +48,21 @@ const CustomTooltip = ({ active, payload, label, isArea, formatter }) => {
         {payloads.reverse().map((p) => {
           if (p.dataKey.includes("_bounds")) return;
 
-          const bounds = _.get(p.payload, p.dataKey + "_bounds", null);
+          const bounds = _.get(p.payload, p.dataKey + "_bounds", []);
+          const formattedBounds = [D.value_lower, D.value_upper].map((F, i) =>
+            _.get(
+              p.payload,
+              [p.dataKey + "_row", `DISPLAY_${F.toUpperCase()}`],
+              bounds[i]
+            )
+          );
 
           const v = _.get(
             p.payload,
             [p.dataKey + "_row", G.DISPLAY_VALUE],
             p.value
           );
+          // console.log("$$$", v, p.payload);
 
           // use first source
           source =
@@ -66,16 +79,15 @@ const CustomTooltip = ({ active, payload, label, isArea, formatter }) => {
               >
                 <circle cx="50" cy="50" r="50" fill={p.fill}></circle>
               </svg>
-              {p.name}: {formatter(v)}{" "}
-              {bounds &&
-                "(" + bounds.map((v) => formatter(v)).join(" - ") + ")"}
+              {p.name}: {v}{" "}
+              {!!bounds.length && `(${formattedBounds.join(" - ")})`}
             </Typography>
           );
         })}
         {source && (
           <>
             <br />
-            <emphasize>{source}</emphasize>
+            <u>Source</u>: {source}
           </>
         )}
       </Box>
@@ -97,7 +109,9 @@ export const Charts = ({ selectedIso, chartData }) => {
     const isArea = type === "area";
     const [, ElementComponent] = isArea ? [AreaChart, Area] : [LineChart, Line];
 
-    const formatter = isPercentage ? displayPercent : displayNumber;
+    const formatter = isPercentage
+      ? (v) => displayPercent(v)
+      : (v) => displayNumber(v);
 
     const getName = (elem) => _.get(elementNameMap, elem, elem);
 
@@ -121,12 +135,15 @@ export const Charts = ({ selectedIso, chartData }) => {
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
-          <YAxis tickFormatter={formatter} />
+          <YAxis
+            width={70}
+            domain={isPercentage ? [0, 100] : undefined}
+            tickFormatter={formatter}
+          />
           <Tooltip
             content={
               <CustomTooltip
                 isArea={isArea}
-                formatter={formatter}
                 source={"source"}
               />
             }
@@ -177,14 +194,16 @@ export const Charts = ({ selectedIso, chartData }) => {
       </TableCell>
     ));
 
+    debugger
     const rows = data.map(({ row, values }) => (
       <TableRow key={row}>
         <TableCell scope="row" component="th">
           {row}
         </TableCell>
-        {values.map(({ value, column }) => (
+        {values.map(({ value, column, sheetRow }) => (
           <TableCell key={column}>
-            {(value && value["DISPLAY_VALUE"]) || "N/A"}
+            {_.get(sheetRow, G.DISPLAY_VALUE, value) || "N/A"}
+            {/* {(value && (sheetRow && sheetRow[G.DISPLAY_VALUE] || value)) || "N/A"} */}
           </TableCell>
         ))}
       </TableRow>
@@ -193,7 +212,13 @@ export const Charts = ({ selectedIso, chartData }) => {
     return (
       <ResponsiveContainer>
         <TableContainer>
-          <Table>
+          <Table
+            sx={{
+              "& tbody tr:nth-child(odd)": {
+                background: getRC(backgroundColor, 6),
+              },
+            }}
+          >
             <TableHead>
               <TableRow>
                 <TableCell scope="col"></TableCell>
@@ -215,7 +240,7 @@ export const Charts = ({ selectedIso, chartData }) => {
       const val = data[el];
       return val && val / 100;
     });
-    console.log(ratios);
+    // console.log(ratios);
     return (
       <>
         <NestedBoxes

@@ -3,7 +3,7 @@
   text-align: center;
 }
 
-tbody tr:nth-child(odd) {background-color: #f2f2f2;}
+/* tbody tr:nth-child(odd) {background-color: #f2f2f2;} */
 /* table th {
   text-align: start;
   max-width: 220px;

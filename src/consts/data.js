@@ -32,6 +32,7 @@ export const CONFIG_FIELDS = {
   sourceGid: "source_gid",
   element: "element",
   displayName: "display_name",
+  capPercentage: "cap_percentage",
   colorOverride: "color_override",
   chartType: "chart_type",
   modelled: "modelled",
@@ -78,4 +79,6 @@ export const GENERATED_FIELDS = {
   // we use UPPER_CASE to distinguish from actual "database" fields from the Sheet
   DISPLAY_NAME: "DISPLAY_NAME",
   DISPLAY_VALUE: "DISPLAY_VALUE",
+  DISPLAY_VALUE_LOWER: `DISPLAY_${DATA_FIELDS.value_lower.toUpperCase()}`,
+  DISPLAY_VALUE_UPPER: `DISPLAY_${DATA_FIELDS.value_upper.toUpperCase()}`,
 };

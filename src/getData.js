@@ -141,10 +141,10 @@ function getTable({
       country_iso_code,
       chartConfigsMap,
       chartSourceData,
-      valueParser: isPercentage ? displayPercent : _.identity,
+      // valueParser: isPercentage
     });
-    dataPoints[element] = row;
-    // dataPoints[element + "_row"] = row;
+    dataPoints[element] = value;
+    dataPoints[element + "_row"] = row;
   });
 
   const rowNames = _.uniq(elements.map((elem) => elem.split(TABLE_DELIN)[0]));
@@ -155,6 +155,7 @@ function getTable({
     values: colNames.map((cn) => ({
       column: _.get(chartConfig, [`_key_${cn}`, 0, C.displayName], cn),
       value: _.get(dataPoints, `${rn}${TABLE_DELIN}${cn}`),
+      sheetRow: _.get(dataPoints, `${rn}${TABLE_DELIN}${cn}_row`),
     })),
   }));
   const chart = {
@@ -207,8 +208,8 @@ function getChart({
         chartSourceData,
       });
       dataPoints[element] = value;
-      dataPoints[element + "_bounds"] = getBounds(row);
       dataPoints[element + "_row"] = row;
+      dataPoints[element + "_bounds"] = getBounds(row);
     });
 
     // add calculated points (now that non-calculated constituents have values)

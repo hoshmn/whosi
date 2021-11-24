@@ -4,7 +4,7 @@ import { COUNTRIES } from "../consts/countries";
 
 export const CountrySelect = ({ handleCountryChange, selectedIso }) => {
   return (
-    <FormControl sx={{ width: 200, marginTop: 1, marginBottom: 1 }}>
+    <FormControl sx={{ width: 300, marginTop: 1, marginBottom: 1 }}>
       <InputLabel id="country">Country</InputLabel>
       <Select
         labelId="country"
