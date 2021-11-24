@@ -85,7 +85,7 @@ async function getCharts(country_iso_code) {
 }
 
 async function getChartOrTable(chartId, country_iso_code) {
-  // if (chartId !== "key_populations") return;
+  // if (chartId !== "plhiv_diagnosis") return;
   // console.log("creating : ", chartId);
   const chartConfig = chartConfigsMap[chartId];
   // the chart settings are the values on the chart config where element === "all"

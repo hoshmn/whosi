@@ -127,10 +127,15 @@ export const Charts = ({ selectedIso, chartData }) => {
     };
 
     return (
-      <ResponsiveContainer height={400} width={500}>
+      <ResponsiveContainer width="99%" 
+      aspect={1.25}
+      // height={400}
+      maxHeight={400}
+      // maxWidth={600}
+      >
         <ComposedChart
-          width={500}
-          height={400}
+          // width={500}
+          // height={400}
           data={data}
           margin={{
             top: 30,
@@ -217,8 +222,11 @@ export const Charts = ({ selectedIso, chartData }) => {
         <TableContainer>
           <Table
             sx={{
-              "& tbody tr:nth-child(odd)": {
+              "& tbody tr:nth-of-type(odd)": {
                 background: getRC(themePrimary, 6),
+              },
+              "& td, & thead th": {
+                textAlign: "right",
               },
             }}
           >
@@ -289,7 +297,7 @@ export const Charts = ({ selectedIso, chartData }) => {
 
     if (type === "table") {
       return (
-        <Box sx={{ flexBasis: "100%", maxWidth: 1000, p: 3 }} key={chartId}>
+        <Box sx={{ flexBasis: "100%", maxWidth: 864, p: 3 }} key={chartId}>
           <Typography variant="h5" component="h3">
             {name}
           </Typography>
@@ -301,7 +309,7 @@ export const Charts = ({ selectedIso, chartData }) => {
     if (type === "nested") {
       return (
         <>
-          <Box sx={{ flexBasis: "100%", maxWidth: 800, p: 3 }} key={chartId}>
+          <Box sx={{ flexBasis: "100%", maxWidth: 864, p: 3 }} key={chartId}>
             <Typography pb={3} variant="h5" component="h3">
               {name}
             </Typography>
@@ -313,7 +321,7 @@ export const Charts = ({ selectedIso, chartData }) => {
     }
     // if (chart.type === "area") return getAreaChart(chart);
     return (
-      <Box p={3} key={chartId}>
+      <Box p={3} key={chartId} width="100%" maxWidth="560px">
         <Typography variant="h5" component="h3">
           {name}
         </Typography>
