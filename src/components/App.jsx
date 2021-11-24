@@ -53,7 +53,8 @@ export default function App() {
     <Paper
       elevation={0}
       sx={{
-        background: "none",
+// keep in sync with index.html background
+        background: getRC(themePrimary, 3),
         color: getRC(themePrimary, 12),
         fontFamily: theme.typography.fontFamily,
         p: { lg: 6 },

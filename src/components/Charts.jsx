@@ -304,8 +304,9 @@ export const Charts = ({ selectedIso, chartData }) => {
           component="h1"
           sx={{
             fontWeight: 500,
+            lineHeight: 1,
             fontSize: { lg: "6rem" },
-            maxWidth: { lg: "60%" },
+            maxWidth: { lg: 760, xl: "100%" },
             mb: { sm: 1, lg: 2 },
           }}
         >
@@ -362,7 +363,9 @@ export const Charts = ({ selectedIso, chartData }) => {
       return (
         <Box
           sx={{
-            flexBasis: "100%",
+            // background: { xs: "red", sm: "blue", md: "green", lg: "yellow", xl: "purple" },
+            flexBasis: { xs: "100%", xl: 600 },
+            flexGrow: { xl: 0 },
             p: 3,
             // display: {md: "flex"},
           }}
@@ -388,8 +391,11 @@ export const Charts = ({ selectedIso, chartData }) => {
       return (
         <>
           <Box sx={{
-            flexBasis: "100%",
+            flexBasis: { xs: "100%", xl: 700 },
+            flexGrow: { xl: 1 },
+            flexShrink: { xl: 1 },
             mr: "auto",
+            ml: { xl: "auto"},
             maxWidth: 864,
             p: 3
           }} key={chartId}>
@@ -406,7 +412,7 @@ export const Charts = ({ selectedIso, chartData }) => {
     return (
       <Box key={chartId} sx={{
         width: "100%",
-        maxWidth: { md: "44%", lg: "660px" },
+        maxWidth: { md: "44%", xl: "29%" },
         p: 3
       }} 
       >
@@ -419,7 +425,9 @@ export const Charts = ({ selectedIso, chartData }) => {
   };
 
   return (
-    <Box display="flex" justifyContent="space-between" flexWrap="wrap" pt={8}>
+    <Box display="flex" flexWrap="wrap" pt={8} sx={{
+      justifyContent: { xs: "space-evenly", md: "space-between" }
+    }}>
       {chartData.map(getChart)}
     </Box>
   );

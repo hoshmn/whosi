@@ -29,7 +29,7 @@ import {
   bronze,
 } from "@radix-ui/colors";
 
-// keep in sync with index.html
+// keep in sync with index.html background
 export const themePrimary = sand;
 export const themeSecondary = indigo;
 export const headerColor = gold;
