@@ -38,7 +38,8 @@ import {
 import { COUNTRIES } from "../consts/countries";
 import { useMediaQuery } from "@mui/material";
 
-// TODO: CLEAN
+// TODO: standardize / create sane system for styles
+// TODO: CLEAN / EXTRACt this and other components
 const CustomTooltip = ({ active, payload, label, isArea }) => {
   if (active && payload && payload.length) {
     // if lines, stack legend to match line height order
