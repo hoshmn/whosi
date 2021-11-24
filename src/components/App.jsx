@@ -53,7 +53,7 @@ export default function App() {
     <Paper
       elevation={0}
       sx={{
-// keep in sync with index.html background
+        // keep in sync with index.html background
         background: getRC(themePrimary, 3),
         color: getRC(themePrimary, 12),
         fontFamily: theme.typography.fontFamily,
@@ -93,7 +93,7 @@ export default function App() {
       )}
       {!!dictionary.length && !loading && (
         <Box
-        sx={{
+          sx={{
             px: { xs: 3, lg: 10 },
             mx: { lg: 5 },
             mb: { lg: 5 },
@@ -117,9 +117,9 @@ export default function App() {
               "& dl": {
                 display: "inline-block",
                 mt: 0,
-                mb: { lg: 3 }
+                mb: { lg: 3 },
               },
-              "& dd": { ml: 0, mt: { xs: 1 }, },
+              "& dd": { ml: 0, mt: { xs: 1 } },
             }}
           >
             {dictionary

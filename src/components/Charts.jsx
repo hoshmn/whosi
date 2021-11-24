@@ -390,15 +390,18 @@ export const Charts = ({ selectedIso, chartData }) => {
     if (type === "nested") {
       return (
         <>
-          <Box sx={{
-            flexBasis: { xs: "100%", xl: 700 },
-            flexGrow: { xl: 1 },
-            flexShrink: { xl: 1 },
-            mr: "auto",
-            ml: { xl: "auto"},
-            maxWidth: 864,
-            p: 3
-          }} key={chartId}>
+          <Box
+            sx={{
+              flexBasis: { xs: "100%", xl: 700 },
+              flexGrow: { xl: 1 },
+              flexShrink: { xl: 1 },
+              mr: "auto",
+              ml: { xl: "auto" },
+              maxWidth: 864,
+              p: 3,
+            }}
+            key={chartId}
+          >
             <Typography pb={3} variant="h5" component="h3">
               {name}
             </Typography>
@@ -410,11 +413,13 @@ export const Charts = ({ selectedIso, chartData }) => {
     }
     // if (chart.type === "area") return getAreaChart(chart);
     return (
-      <Box key={chartId} sx={{
-        width: "100%",
-        maxWidth: { md: "44%", xl: "29%" },
-        p: 3
-      }} 
+      <Box
+        key={chartId}
+        sx={{
+          width: "100%",
+          maxWidth: { md: "44%", xl: "29%" },
+          p: 3,
+        }}
       >
         <Typography variant="h5" component="h3">
           {name}
@@ -425,9 +430,14 @@ export const Charts = ({ selectedIso, chartData }) => {
   };
 
   return (
-    <Box display="flex" flexWrap="wrap" pt={8} sx={{
-      justifyContent: { xs: "space-evenly", md: "space-between" }
-    }}>
+    <Box
+      display="flex"
+      flexWrap="wrap"
+      pt={8}
+      sx={{
+        justifyContent: { xs: "space-evenly", md: "space-between" },
+      }}
+    >
       {chartData.map(getChart)}
     </Box>
   );
