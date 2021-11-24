@@ -96,6 +96,8 @@ const CustomTooltip = ({ active, payload, label, isArea }) => {
 };
 
 export const Charts = ({ selectedIso, chartData }) => {
+  const [hiddenElements, setHiddenElements] = React.useState({});
+  
   const getLineChart = (chart) => {
     const {
       data,
@@ -115,9 +117,12 @@ export const Charts = ({ selectedIso, chartData }) => {
 
     const getName = (elem) => _.get(elementNameMap, elem, elem);
 
-    const hiddenMap = {};
     const onLegendClick = (e) => {
       console.log(e.dataKey);
+      const hiddenMap = _.cloneDeep(hiddenElements);
+      const hidden = _.get(hiddenMap, [chartId, e.dataKey], false)
+      _.set(hiddenMap, [chartId, e.dataKey], !hidden)
+      setHiddenElements(hiddenMap)
     };
 
     return (
@@ -148,7 +153,7 @@ export const Charts = ({ selectedIso, chartData }) => {
               />
             }
           />
-          <Legend onClick={(x, y) => console.log(x, y)} />
+          <Legend onClick={onLegendClick} />
           {elements.map((elem, i) => {
             const isBounded =
               !isArea &&
@@ -159,6 +164,7 @@ export const Charts = ({ selectedIso, chartData }) => {
                 key={i + "_b"}
                 // type="step"
                 dataKey={elem + "_bounds"}
+                hide={_.get(hiddenElements, [chartId, elem], false)}
                 // stackId={i + 1}
                 legendType="none"
                 tooltipType="none"
@@ -174,7 +180,7 @@ export const Charts = ({ selectedIso, chartData }) => {
               // dataBounds={_.get(elem, [elem + "_bounds"], [])}
               dataKey={elem}
               name={getName(elem)}
-              hide={false}
+              hide={_.get(hiddenElements, [chartId, elem], false)}
               stackId={isArea ? 1 : i + 1000}
               stroke={getRC(colors[i], strokeIntensity)}
               fill={getRC(colors[i], fillIntensity)}
