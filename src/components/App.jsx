@@ -2,7 +2,7 @@ import "./styles.css";
 import React from "react";
 import _ from "lodash";
 import getData from "../getData";
-import { backgroundColor, radColors, getRC } from "../consts/colors";
+import { themePrimary, radColors, getRC } from "../consts/colors";
 import { Container, Paper, Typography } from "@mui/material";
 import { Header } from "./Header";
 import { Charts } from "./Charts";
@@ -12,7 +12,7 @@ import { transformLink } from "../utils/display";
 
 const homeTexts = [
   `
-Overview: The HTS dashboard brings together data on HIV testing services from various sources into one visual tool. We would like to acknowledge the support of the Ministries of Health of Member States, UNAIDS, the Bill and Melinda Gates Foundation, the President’s Emergency Programme for AIDS Relief (PEPFAR), USAID, the World Health Organization, and the Global Fund to Fight AIDS, Tuberculosis and Malaria. This project aims to provide local level data for in country action for policy-makers, programme directors, outreach workers and community activists among others. The most recent data available has been collected from the relevant organisation including UNAIDS (Spectrum estimates, Global AIDS Monitoring and the Key Population Atlas), UNPOP, UNICEF and the World Bank. USAID/PEPFAR have kindly provided HIV testing data by approach. Data gaps have been filled (where possible) by reviewing publicly available sources, most notably from Ministries of Health and PEPFAR country operational plans. All dashboards have been viewed and approved by the Ministries of Health. This dashboard does not cover in-depth policy information, PrEP or paediatric HIV testing but includes links to relevant sites that do cover this information.`,
+Overview: The WHO Differentiated Services Delivery Strategic Initiatives dashboard brings together data on HIV testing services from various sources into one visual tool. We would like to acknowledge the support of the Ministries of Health of Member States, UNAIDS, the Bill and Melinda Gates Foundation, the President’s Emergency Programme for AIDS Relief (PEPFAR), USAID, the World Health Organization, and the Global Fund to Fight AIDS, Tuberculosis and Malaria. This project aims to provide local level data for in country action for policy-makers, programme directors, outreach workers and community activists among others. The most recent data available has been collected from the relevant organisation including UNAIDS (Spectrum estimates, Global AIDS Monitoring and the Key Population Atlas), UNPOP, UNICEF and the World Bank. USAID/PEPFAR have kindly provided HIV testing data by approach. Data gaps have been filled (where possible) by reviewing publicly available sources, most notably from Ministries of Health and PEPFAR country operational plans. All dashboards have been viewed and approved by the Ministries of Health. This dashboard does not cover in-depth policy information, PrEP or paediatric HIV testing but includes links to relevant sites that do cover this information.`,
   `Contact: Cheryl Case Johnson (johnsonc@who.int)`,
 ];
 
@@ -50,7 +50,7 @@ export default function App() {
   return (
     <Paper
       elevation={0}
-      style={{ background: "none", color: getRC(backgroundColor, 12) }}
+      style={{ background: "none", color: getRC(themePrimary, 12) }}
     >
       <Header handleCountryChange={updateCountry} selectedIso={selectedIso} />
       <br />

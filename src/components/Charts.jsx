@@ -26,7 +26,8 @@ import {
   getRC,
   strokeIntensity,
   fillIntensity,
-  backgroundColor,
+  themePrimary,
+  themeSecondary,
 } from "../consts/colors";
 import { displayNumber, displayPercent } from "../utils/display";
 import {
@@ -97,7 +98,7 @@ const CustomTooltip = ({ active, payload, label, isArea }) => {
 
 export const Charts = ({ selectedIso, chartData }) => {
   const [hiddenElements, setHiddenElements] = React.useState({});
-  
+
   const getLineChart = (chart) => {
     const {
       data,
@@ -120,9 +121,9 @@ export const Charts = ({ selectedIso, chartData }) => {
     const onLegendClick = (e) => {
       console.log(e.dataKey);
       const hiddenMap = _.cloneDeep(hiddenElements);
-      const hidden = _.get(hiddenMap, [chartId, e.dataKey], false)
-      _.set(hiddenMap, [chartId, e.dataKey], !hidden)
-      setHiddenElements(hiddenMap)
+      const hidden = _.get(hiddenMap, [chartId, e.dataKey], false);
+      _.set(hiddenMap, [chartId, e.dataKey], !hidden);
+      setHiddenElements(hiddenMap);
     };
 
     return (
@@ -146,12 +147,8 @@ export const Charts = ({ selectedIso, chartData }) => {
             tickFormatter={formatter}
           />
           <Tooltip
-            content={
-              <CustomTooltip
-                isArea={isArea}
-                source={"source"}
-              />
-            }
+            cursor={{ stroke: getRC(themeSecondary, 10), strokeWidth: 1 }}
+            content={<CustomTooltip isArea={isArea} source={"source"} />}
           />
           <Legend onClick={onLegendClick} />
           {elements.map((elem, i) => {
@@ -200,7 +197,7 @@ export const Charts = ({ selectedIso, chartData }) => {
       </TableCell>
     ));
 
-    debugger
+    debugger;
     const rows = data.map(({ row, values }) => (
       <TableRow key={row}>
         <TableCell scope="row" component="th">
@@ -221,7 +218,7 @@ export const Charts = ({ selectedIso, chartData }) => {
           <Table
             sx={{
               "& tbody tr:nth-child(odd)": {
-                background: getRC(backgroundColor, 6),
+                background: getRC(themePrimary, 6),
               },
             }}
           >

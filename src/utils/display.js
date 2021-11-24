@@ -17,7 +17,9 @@ export const displayPercent = (v, options = {}) => {
     return x;
   }
   if (v > 100) console.warn("Incorrect %");
-  return _.round(v, 0).toString() + "%";
+
+  const decimals = options.decimals || 0;
+  return _.round(v, decimals).toString() + "%";
 };
 
 export const displayNumber = (v, options = {}) => {

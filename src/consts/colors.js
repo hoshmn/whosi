@@ -30,14 +30,16 @@ import {
 } from "@radix-ui/colors";
 
 // keep in sync with index.html
-export const backgroundColor = sand;
+export const themePrimary = sand;
+export const themeSecondary = indigo;
 export const headerColor = gold;
 export const coreColors = [orange, grass, plum];
 export const altColors = [tomato, indigo, gold];
 export const alt2Colors = [sky, brown, violet, sand];
 export const colorGroups = [coreColors, altColors, alt2Colors];
-export const fillIntensity = 7;
-export const strokeIntensity = 10;
+// these intensities correspond to the radix index to use
+export const fillIntensity = 8;
+export const strokeIntensity = 11;
 
 export const radColors = [
   tomato,

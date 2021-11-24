@@ -212,9 +212,15 @@ export const capAndFormat = ({
       element,
       field: C.capPercentage,
     });
+    const decimals = getSetting({
+      chartConfigsMap,
+      chartId,
+      element,
+      field: C.percentageDecimals,
+    });
 
     // value = value && valueParser(value);
-    const options = { cap };
+    const options = { cap, decimals };
     // be sure to capture display value BEFORE capping, so it includes >
     displayValue = displayPercent(value, options);
     value = capValue(value, options);
