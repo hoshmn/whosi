@@ -22,7 +22,6 @@ import {
   getCalculatedDataPoint,
   getField,
 } from "./utils/data";
-import { displayPercent } from "./utils/display";
 
 // NOTE: *bad practice* currently these are set as global state
 // so that after the data fetch for the first country we can just
@@ -85,7 +84,12 @@ async function getCharts(country_iso_code) {
 }
 
 async function getChartOrTable(chartId, country_iso_code) {
-  // if (chartId !== "plhiv_diagnosis") return;
+  // if (![
+  //   "intro",
+  //   "p95",
+  //   "plhiv_diagnosis",
+  //   "late_hiv"
+  // ].includes(chartId)) return;
   // console.log("creating : ", chartId);
   const chartConfig = chartConfigsMap[chartId];
   // the chart settings are the values on the chart config where element === "all"
@@ -104,7 +108,8 @@ async function getChartOrTable(chartId, country_iso_code) {
 
   const getterMap = {
     table: getTable,
-    // nested: getNested,
+    text: getText,
+    // nested: getNested, // uses chart
   };
 
   const getter = _.get(getterMap, chartSettings[C.chartType], getChart);
@@ -117,6 +122,47 @@ async function getChartOrTable(chartId, country_iso_code) {
     country_iso_code,
   });
 }
+
+function getText({
+  chartId,
+  chartSettings,
+  chartConfigsMap,
+  chartSourceData,
+  country_iso_code,
+}) {
+
+  console.log(
+    chartId,
+    chartSettings,
+    chartConfigsMap,
+    chartSourceData,
+    country_iso_code
+  );
+
+  const elements = getElements(chartConfigsMap[chartId]);
+  const textValues = {}
+  _.each(elements, (element) => {
+    const { row, value } = getDataPoint({
+      chartId,
+      element,
+      country_iso_code,
+      chartConfigsMap,
+      chartSourceData,
+      // valueParser: isPercentage
+    });
+    textValues[element] = value;
+    textValues[`${element}_row`] = row;
+  });
+
+  return {
+    textValues,
+    chartId,
+    country_iso_code,
+    elements,
+    type: _.get(chartSettings, C.chartType),
+    name: _.get(chartSettings, C.displayName, chartId),
+  };
+};
 
 function getTable({
   chartId,

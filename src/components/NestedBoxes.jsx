@@ -169,7 +169,7 @@ const NestedBoxes = ({
     <div className={classNames}>
       {/* <p className='title'>{title}</p> */}
       <svg
-        viewBox={`0 0 ${resolveOrientation(
+        viewBox={`0 -2 ${resolveOrientation(
           totalX,
           totalXh
         )} ${resolveOrientation(totalY, totalYh)}`}

@@ -7,6 +7,16 @@ import {
 } from "../consts/data";
 import { capValue, displayNumber, displayPercent } from "./display";
 
+// functions to test whether a row matches a filter for special Sheet cell input values
+const SPECIAL_FILTERS_MAP = {
+  _NONE_: _.negate(_.identity), // cells only included if empty
+  _SOMETHING_: _.identity, // cells only included if not empty
+  _ANY_: _.stubTrue, // allow any cell value (to overwrite broader filter)
+};
+// default function to test whether a row matches a filter
+const defaultCompFn = (cellVal, filterVal) =>
+  cellVal.toLowerCase() === filterVal.toLowerCase();
+
 // HELPERS
 export const getUrl = (gid) =>
   `https://docs.google.com/spreadsheets/d/e/2PACX-1vSAEOXOt5aHDcb35lpCsSO5AvHTZPplXHrHGaIXTJjCtW_B96D0MOItWZLGv1j4lagTxnuVClms6M0X/pub?gid=${gid}&single=true&output=csv`;
@@ -19,7 +29,7 @@ export const configParser = (row) => {
     // remove k/v pair for actually empty values
     if (value === "") delete row[key];
     // turn "null" in sheet into "" values
-    else row[key] = value === "null" ? "" : value;
+    // else row[key] = value === "null" ? "" : value;
   });
 
   return row;
@@ -130,12 +140,15 @@ export const getFilter = ({
 // find appropriate row using filter
 export const getRow = ({ filter, chartSourceData }) => {
   const matchingRows = _.filter(chartSourceData, (row) => {
-    return _.every(filter, (val, key) => {
+    return _.every(filter, (filterVal, field) => {
       // only filter by data sheet fields
-      if (!D[key]) return true;
-      // if no/null row value, matches if we're looking for null value
-      if (!row[key]) return !val;
-      return row[key].toLowerCase() === val.toLowerCase();
+      if (!D[field]) return true;
+
+      const cellVal = row[field] || "";
+      let comparisonFn = SPECIAL_FILTERS_MAP[filterVal] || defaultCompFn;
+
+      // if (!row[field]) return !filterVal;
+      return !!comparisonFn(cellVal, filterVal);
     });
   });
 

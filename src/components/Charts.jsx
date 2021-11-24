@@ -246,7 +246,7 @@ export const Charts = ({ selectedIso, chartData }) => {
   };
 
   const getNested = (chart) => {
-    const theme = useTheme()
+    const theme = useTheme();
     const isSm = useMediaQuery(theme.breakpoints.down("sm"));
     const isXl = useMediaQuery(theme.breakpoints.up("md"));
     const { data, elements, colors } = chart;
@@ -304,8 +304,9 @@ export const Charts = ({ selectedIso, chartData }) => {
           component="h1"
           sx={{
             fontWeight: 500,
-            fontSize: { lg: "6rem"},
-            maxWidth: { lg: "60%"},
+            fontSize: { lg: "6rem" },
+            maxWidth: { lg: "60%" },
+            mb: { sm: 1, lg: 2 },
           }}
         >
           {country && country.name}
@@ -313,11 +314,11 @@ export const Charts = ({ selectedIso, chartData }) => {
         <Box
           sx={{
             display: { sm: "flex" },
-            "& dl:not(:last-child)": { mr: { sm: 4, md: 10} },
-            "& dt h2": { 
-              fontWeight: 300,
-              letterSpacing: "1.2px",
-              textTransform: "uppercase"
+            "& dl:not(:last-child)": { mr: { sm: 4, md: 10 } },
+            "& dt h2": {
+              fontWeight: 100,
+              letterSpacing: ".8px",
+              textTransform: "uppercase",
             },
             "& dt, dd": { m: 0 },
           }}
@@ -386,7 +387,12 @@ export const Charts = ({ selectedIso, chartData }) => {
     if (type === "nested") {
       return (
         <>
-          <Box sx={{ flexBasis: "100%", maxWidth: 864, p: 3 }} key={chartId}>
+          <Box sx={{
+            flexBasis: "100%",
+            mr: "auto",
+            maxWidth: 864,
+            p: 3
+          }} key={chartId}>
             <Typography pb={3} variant="h5" component="h3">
               {name}
             </Typography>
@@ -398,7 +404,12 @@ export const Charts = ({ selectedIso, chartData }) => {
     }
     // if (chart.type === "area") return getAreaChart(chart);
     return (
-      <Box p={3} key={chartId} width="100%" maxWidth="560px">
+      <Box key={chartId} sx={{
+        width: "100%",
+        maxWidth: { md: "44%", lg: "660px" },
+        p: 3
+      }} 
+      >
         <Typography variant="h5" component="h3">
           {name}
         </Typography>
@@ -408,7 +419,7 @@ export const Charts = ({ selectedIso, chartData }) => {
   };
 
   return (
-    <Box display="flex" flexWrap="wrap" pt={8}>
+    <Box display="flex" justifyContent="space-between" flexWrap="wrap" pt={8}>
       {chartData.map(getChart)}
     </Box>
   );

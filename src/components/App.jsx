@@ -3,7 +3,7 @@ import React from "react";
 import _ from "lodash";
 import getData from "../getData";
 import { themePrimary, radColors, getRC } from "../consts/colors";
-import { Container, Paper, Typography } from "@mui/material";
+import { Container, Paper, Typography, useTheme } from "@mui/material";
 import { Header } from "./Header";
 import { Charts } from "./Charts";
 import { COUNTRIES } from "../consts/countries";
@@ -47,13 +47,16 @@ export default function App() {
     chartData,
     (c) => c && c.country_iso_code === selectedIso
   );
+
+  const theme = useTheme();
   return (
     <Paper
       elevation={0}
       sx={{
         background: "none",
         color: getRC(themePrimary, 12),
-        fontFamily: "'Archivo', sans-serif",
+        fontFamily: theme.typography.fontFamily,
+        p: { lg: 6 },
       }}
     >
       <Header handleCountryChange={updateCountry} selectedIso={selectedIso} />
@@ -88,7 +91,16 @@ export default function App() {
         <Charts selectedIso={selectedIso} chartData={chartData} />
       )}
       {!!dictionary.length && !loading && (
-        <Box p={3} mt={5}>
+        <Box
+        sx={{
+            px: { xs: 3, lg: 10 },
+            mx: { lg: 5 },
+            mb: { lg: 5 },
+            py: 9,
+            mt: 9,
+            background: theme.palette.background.paper,
+          }}
+        >
           <Typography
             variant="h4"
             component="h2"
@@ -96,23 +108,39 @@ export default function App() {
               __html: "Glossary",
             }}
           />
-          {dictionary.map(({ term, definition }) => {
-            return (
-              <dl key={term}>
-                <dt>
-                  <strong>{term}</strong>
-                </dt>
-                <dd>
-                  <Typography
-                    sx={{ maxWidth: "500px" }}
-                    dangerouslySetInnerHTML={{
-                      __html: transformLink(definition),
-                    }}
-                  />
-                </dd>
-              </dl>
-            );
-          })}
+          <Box
+            sx={{
+              columnCount: { md: 2, xl: 3 },
+              columnGap: { xs: "2rem", lg: "5rem" },
+              mt: 3,
+              "& dl": {
+                display: "inline-block",
+                mt: 0,
+                mb: { lg: 3 }
+              },
+              "& dd": { ml: 0, mt: { xs: 1 }, },
+            }}
+          >
+            {dictionary
+              .sort((a, b) => a.term.toLowerCase() > b.term.toLowerCase())
+              .map(({ term, definition }) => {
+                return (
+                  <dl>
+                    <dt>
+                      <strong>{term}</strong>
+                    </dt>
+                    <dd>
+                      <Typography
+                        // sx={{ maxWidth: "500px" }}
+                        dangerouslySetInnerHTML={{
+                          __html: transformLink(definition),
+                        }}
+                      />
+                    </dd>
+                  </dl>
+                );
+              })}
+          </Box>
         </Box>
       )}
       {SHOW_COLORS &&
