@@ -131,6 +131,7 @@ export const Charts = ({ selectedIso, chartData }) => {
 
     return (
       <ResponsiveContainer
+        // needed for proper resizing https://github.com/recharts/recharts/issues/172#issuecomment-307858843
         width="99%"
         aspect={1.25}
         // height={400}
@@ -151,7 +152,7 @@ export const Charts = ({ selectedIso, chartData }) => {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis
-            width={70}
+            width={80}
             domain={isPercentage ? [0, 100] : undefined}
             tickFormatter={formatter}
           />
