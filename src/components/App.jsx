@@ -20,7 +20,7 @@ const SHOW_COLORS = false;
 export default function App() {
   const [selectedIso, setIso] = React.useState(null);
   const [chartData, setChartData] = React.useState([]);
-  
+
   const [dictionary, setDictionary] = React.useState([]);
   const [countries, setCountries] = React.useState([]);
   const [chartIds, setChartIds] = React.useState([]);
@@ -29,8 +29,8 @@ export default function App() {
   // on page load, get site-wide data
   React.useEffect(() => {
     getSiteData().then((result) => {
-      setDictionary(result.dictionary);
-      setCountries(result.countries);
+      setDictionary(result.dictionary.filter((d) => d.term && d.definition));
+      setCountries(result.countries.filter((c) => c.iso && c.name));
       setChartIds(result.chartIds);
       setChartConfigsMap(result.chartConfigsMap);
     });
@@ -53,10 +53,7 @@ export default function App() {
   };
 
   // console.log("*", chartData);
-  const loading = !_.some(
-    chartData,
-    (c) => c && c.countryIso === selectedIso
-  );
+  const loading = !_.some(chartData, (c) => c && c.countryIso === selectedIso);
 
   const theme = useTheme();
   return (
@@ -70,7 +67,11 @@ export default function App() {
         p: { lg: 6 },
       }}
     >
-      <Header countries={countries} handleCountryChange={updateCountry} selectedIso={selectedIso} />
+      <Header
+        countries={countries}
+        handleCountryChange={updateCountry}
+        selectedIso={selectedIso}
+      />
       <br />
 
       {!selectedIso ? (
@@ -99,7 +100,11 @@ export default function App() {
           />
         </Box>
       ) : (
-        <Charts countries={countries} selectedIso={selectedIso} chartData={chartData} />
+        <Charts
+          countries={countries}
+          selectedIso={selectedIso}
+          chartData={chartData}
+        />
       )}
       {!!dictionary.length && !loading && (
         <Box

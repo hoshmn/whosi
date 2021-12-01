@@ -1,7 +1,11 @@
 import React from "react";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 
-export const CountrySelect = ({ handleCountryChange, selectedIso, countries }) => {
+export const CountrySelect = ({
+  handleCountryChange,
+  selectedIso,
+  countries,
+}) => {
   return (
     <FormControl sx={{ width: 300, marginTop: 1, marginBottom: 1 }}>
       <InputLabel id="country">Country</InputLabel>
