@@ -12,7 +12,7 @@ import {
   LineChart,
   Line,
   ResponsiveContainer,
-  Legend,
+  Legend
 } from "recharts";
 import { Box, useTheme } from "@mui/system";
 import Table from "@mui/material/Table";
@@ -27,14 +27,14 @@ import {
   strokeIntensity,
   fillIntensity,
   themePrimary,
-  themeSecondary,
+  themeSecondary
 } from "../consts/colors";
 import { displayNumber, displayPercent } from "../utils/display";
 import {
   CONFIG_FIELDS as C,
   DATA_FIELDS as D,
   GENERATED_FIELDS as G,
-  MULTI_LINE_TEXT_DELIN,
+  MULTI_LINE_TEXT_DELIN
 } from "../consts/data";
 import { useMediaQuery } from "@mui/material";
 
@@ -110,7 +110,7 @@ export const Charts = ({ selectedIso, chartData, countries }) => {
       type,
       isPercentage,
       colors,
-      elementNameMap,
+      elementNameMap
     } = chart;
     const isArea = type === "area";
     const [, ElementComponent] = isArea ? [AreaChart, Area] : [LineChart, Line];
@@ -146,7 +146,7 @@ export const Charts = ({ selectedIso, chartData, countries }) => {
             top: 30,
             right: 30,
             left: 0,
-            bottom: 0,
+            bottom: 0
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
@@ -231,11 +231,11 @@ export const Charts = ({ selectedIso, chartData, countries }) => {
           <Table
             sx={{
               "& tbody tr:nth-of-type(odd)": {
-                background: getRC(themePrimary, 6),
+                background: getRC(themePrimary, 6)
               },
               "& td, & thead th": {
-                textAlign: "right",
-              },
+                textAlign: "right"
+              }
             }}
           >
             <TableHead>
@@ -289,7 +289,7 @@ export const Charts = ({ selectedIso, chartData, countries }) => {
   };
 
   const getIntro = (chart) => {
-    const country = countries.find((c) => c.id === selectedIso);
+    const country = countries.find((c) => c.iso === selectedIso);
     return (
       <>
         <Typography
@@ -300,7 +300,7 @@ export const Charts = ({ selectedIso, chartData, countries }) => {
             lineHeight: 1,
             fontSize: { lg: "6rem" },
             maxWidth: { lg: 760, xl: "100%" },
-            mb: { sm: 1, lg: 2 },
+            mb: { sm: 1, lg: 2 }
           }}
         >
           {country && country.name}
@@ -312,9 +312,9 @@ export const Charts = ({ selectedIso, chartData, countries }) => {
             "& dt h2": {
               fontWeight: 100,
               letterSpacing: ".8px",
-              textTransform: "uppercase",
+              textTransform: "uppercase"
             },
-            "& dt, dd": { m: 0 },
+            "& dt, dd": { m: 0 }
           }}
         >
           {chart.elements.map((elem) => {
@@ -359,7 +359,7 @@ export const Charts = ({ selectedIso, chartData, countries }) => {
             // background: { xs: "red", sm: "blue", md: "green", lg: "yellow", xl: "purple" },
             flexBasis: { xs: "100%", xl: 600 },
             flexGrow: { xl: 0 },
-            p: 3,
+            p: 3
             // display: {md: "flex"},
           }}
           key={chartId}
@@ -391,7 +391,7 @@ export const Charts = ({ selectedIso, chartData, countries }) => {
               mr: "auto",
               ml: { xl: "auto" },
               maxWidth: 864,
-              p: 3,
+              p: 3
             }}
             key={chartId}
           >
@@ -411,7 +411,7 @@ export const Charts = ({ selectedIso, chartData, countries }) => {
         sx={{
           width: "100%",
           maxWidth: { md: "44%", xl: "29%" },
-          p: 3,
+          p: 3
         }}
       >
         <Typography variant="h5" component="h3">
@@ -428,7 +428,7 @@ export const Charts = ({ selectedIso, chartData, countries }) => {
       flexWrap="wrap"
       pt={8}
       sx={{
-        justifyContent: { xs: "space-evenly", md: "space-between" },
+        justifyContent: { xs: "space-evenly", md: "space-between" }
       }}
     >
       {chartData.map(getChart)}
