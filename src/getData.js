@@ -6,7 +6,8 @@ import {
   GENERATED_FIELDS as G,
   GID_MAP,
   CONFIGURABLE_GID_NAMES,
-  TABLE_DELIN
+  TABLE_DELIN,
+  PRE_LOAD_DATA
 } from "./consts/data";
 import {
   getUrl,
@@ -20,7 +21,8 @@ import {
   transformYearRange,
   getDataPoint,
   getCalculatedDataPoint,
-  getField
+  getField,
+  getSetting
 } from "./utils/data";
 
 // ASYNC FETCHERS
@@ -70,6 +72,7 @@ async function getChartConfigs() {
 
 async function getAllDataFromTab(gid) {
   // console.log("get data from", gid);
+  if (!gid) return null;
   return await csv(getUrl(gid)).catch((e) => {
     console.error("error in getChartOrTable()): ", e);
   });
@@ -357,6 +360,15 @@ export async function getSiteData() {
   );
   console.log("@@@ ALL CONFIGS: ");
   console.log(chartConfigsMap);
+
+  // request all data tabs' data for speedy loading on country selection
+  if (PRE_LOAD_DATA) {
+    const gids = _.map(chartConfigsMap, (config, chartId) =>
+      getSetting({ chartConfigsMap, chartId, field: C.sourceGid })
+    );
+    // console.log("gids: ", gids);
+    gids.forEach(memoizedGetAllDataFromTab);
+  }
 
   return { dictionary, countries, chartConfigsMap, chartIds };
 }
