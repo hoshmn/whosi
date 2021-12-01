@@ -1,6 +1,7 @@
 // export CONSTS
 export const DISABLED = false;
 export const TABLE_DELIN = "__";
+export const MULTI_LINE_TEXT_DELIN = "__";
 
 // these are set in the home sheet for version controlability
 export const CONFIGURABLE_GID_NAMES = ["configs", "dictionary"];

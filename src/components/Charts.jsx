@@ -34,6 +34,7 @@ import {
   CONFIG_FIELDS as C,
   DATA_FIELDS as D,
   GENERATED_FIELDS as G,
+  MULTI_LINE_TEXT_DELIN,
 } from "../consts/data";
 import { COUNTRIES } from "../consts/countries";
 import { useMediaQuery } from "@mui/material";
@@ -251,12 +252,18 @@ export const Charts = ({ selectedIso, chartData }) => {
     const theme = useTheme();
     const isSm = useMediaQuery(theme.breakpoints.down("sm"));
     const isXl = useMediaQuery(theme.breakpoints.up("md"));
-    const { data, elements, colors } = chart;
+    const { data, elements, colors, 
+      elementNameMap,
+     } = chart;
     const xl = false;
     // console.log(radColors);
     const ratios = elements.map((el) => {
       const val = data[el];
       return val && val / 100;
+    });
+    const content = elements.map((el) => {
+      const text = elementNameMap[el];
+      return { below: text.split(MULTI_LINE_TEXT_DELIN) }
     });
     // console.log(ratios);
     return (
@@ -273,24 +280,7 @@ export const Charts = ({ selectedIso, chartData }) => {
           ratios={ratios}
           fillColors={colors.map((c) => getRC(c, 8))}
           textColors={colors.map((c) => getRC(c, 9))}
-          content={[
-            {
-              // inner: status,
-              below: ["of people living with", "HIV know their status"],
-            },
-            {
-              // inner: art,
-              below: [
-                "of people living with",
-                "HIV who know their status",
-                "are on treatment",
-              ],
-            },
-            {
-              // inner: suppression,
-              below: ["of people on treatment", "are virally suppressed"],
-            },
-          ]}
+          content={content}
         />
         <br />
       </>
