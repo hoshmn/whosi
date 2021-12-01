@@ -1,8 +1,7 @@
 import React from "react";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import { COUNTRIES } from "../consts/countries";
 
-export const CountrySelect = ({ handleCountryChange, selectedIso }) => {
+export const CountrySelect = ({ handleCountryChange, selectedIso, countries }) => {
   return (
     <FormControl sx={{ width: 300, marginTop: 1, marginBottom: 1 }}>
       <InputLabel id="country">Country</InputLabel>
@@ -14,8 +13,8 @@ export const CountrySelect = ({ handleCountryChange, selectedIso }) => {
         onChange={handleCountryChange}
       >
         <MenuItem value={"home"}>Select a country...</MenuItem>
-        {COUNTRIES.map(({ id, name }) => (
-          <MenuItem key={id} value={id}>
+        {countries.map(({ iso, name }) => (
+          <MenuItem key={iso} value={iso}>
             {name}
           </MenuItem>
         ))}

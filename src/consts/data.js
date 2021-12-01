@@ -4,13 +4,13 @@ export const TABLE_DELIN = "__";
 export const MULTI_LINE_TEXT_DELIN = "__";
 
 // these are set in the home sheet for version controlability
-export const CONFIGURABLE_GID_NAMES = ["configs", "dictionary"];
+export const CONFIGURABLE_GID_NAMES = ["configs", "dictionary", "countries"];
 // gids pointing to Sheet tabs
 export const GID_MAP = {
   home: "0",
   // configs: null,
   // dictionary: null,
-  // // settings: null,
+  // countries: null,
 };
 
 // now extracted from chart configs sheet

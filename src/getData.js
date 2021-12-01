@@ -23,13 +23,6 @@ import {
   getField,
 } from "./utils/data";
 
-// NOTE: *bad practice* currently these are set as global state
-// so that after the data fetch for the first country we can just
-// fetch chart data on subsequent searches
-let chartConfigsMap = {};
-let chartIds = [];
-let dictionary = [];
-
 // ASYNC FETCHERS
 async function setConfigGids() {
   // return if already configured
@@ -55,41 +48,54 @@ async function getChartConfigs() {
   );
   const shaped = _.groupBy(baseConfigs, C.chartId);
 
-  const orderedChartIds = _.uniqBy(baseConfigs, "chart_id")
+  const chartIds = _.uniqBy(baseConfigs, "chart_id")
     .map((c) => c.chart_id)
     .filter((id) => id !== "all");
 
-  const chartConfigs = _.mapValues(shaped, (configParams, name) => {
+  const chartConfigsMap = _.mapValues(shaped, (configParams, name) => {
     // wise?
     if (name === "all") return configParams;
     return _.groupBy(configParams, C.element);
   });
 
-  _.each(chartConfigs, (configParams, name) => {
+  _.each(chartConfigsMap, (configParams, name) => {
     if (name === "all") return;
     _.each(configParams, (elemDetails, elementName) => {
       if (elementName === "all") return;
     });
   });
 
-  return { chartConfigs, orderedChartIds };
+  return { chartConfigsMap, chartIds };
 }
 
-async function getCharts(country_iso_code) {
+async function getCharts({
+  chartConfigsMap,
+  chartIds,
+  selectedIso,
+}) {
   return await Promise.all(
-    chartIds.map((chartId) => getChartOrTable(chartId, country_iso_code))
+    chartIds.map((chartId) =>
+      getChartOrTable({ chartConfigsMap, chartId, selectedIso })
+    )
   ).catch((e) => {
     console.error("error in getCharts(): ", e);
   });
 }
 
-async function getChartOrTable(chartId, country_iso_code) {
-  // if (![
-  //   "intro",
-  //   "p95",
-  //   "plhiv_diagnosis",
-  //   "late_hiv"
-  // ].includes(chartId)) return;
+async function getChartOrTable({
+  chartConfigsMap,
+  chartId,
+  selectedIso,
+}) {
+  // if (
+  //   ![
+      // "intro",
+      // "p95",
+      // "plhiv_diagnosis",
+      // "late_hiv"
+  //   ].includes(chartId)
+  // )
+    // return;
   // console.log("creating : ", chartId);
   const chartConfig = chartConfigsMap[chartId];
   // the chart settings are the values on the chart config where element === "all"
@@ -101,7 +107,7 @@ async function getChartOrTable(chartId, country_iso_code) {
   }
   const chartSourceData = await csv(
     getUrl(chartSettings[C.sourceGid]),
-    filterByCountryGenerator(country_iso_code)
+    filterByCountryGenerator(selectedIso)
   ).catch((e) => {
     console.error("error in getChartOrTable()): ", e);
   });
@@ -119,7 +125,7 @@ async function getChartOrTable(chartId, country_iso_code) {
     chartSettings,
     chartConfigsMap,
     chartSourceData,
-    country_iso_code,
+    selectedIso,
   });
 }
 
@@ -128,7 +134,7 @@ function getText({
   chartSettings,
   chartConfigsMap,
   chartSourceData,
-  country_iso_code,
+  selectedIso,
 }) {
 
   console.log(
@@ -136,7 +142,7 @@ function getText({
     chartSettings,
     chartConfigsMap,
     chartSourceData,
-    country_iso_code
+    selectedIso
   );
 
   const elements = getElements(chartConfigsMap[chartId]);
@@ -145,7 +151,7 @@ function getText({
     const { row, value } = getDataPoint({
       chartId,
       element,
-      country_iso_code,
+      selectedIso,
       chartConfigsMap,
       chartSourceData,
       // valueParser: isPercentage
@@ -157,7 +163,7 @@ function getText({
   return {
     textValues,
     chartId,
-    country_iso_code,
+    countryIso: selectedIso,
     elements,
     type: _.get(chartSettings, C.chartType),
     name: _.get(chartSettings, C.displayName, chartId),
@@ -169,7 +175,7 @@ function getTable({
   chartSettings,
   chartConfigsMap,
   chartSourceData,
-  country_iso_code,
+  selectedIso,
 }) {
   const chartConfig = chartConfigsMap[chartId];
 
@@ -184,7 +190,7 @@ function getTable({
     const { row, value } = getDataPoint({
       chartId,
       element,
-      country_iso_code,
+      selectedIso,
       chartConfigsMap,
       chartSourceData,
       // valueParser: isPercentage
@@ -207,7 +213,7 @@ function getTable({
   const chart = {
     data,
     chartId,
-    country_iso_code,
+    countryIso: selectedIso,
     elements: elements,
     isPercentage,
     type: _.get(chartSettings, C.chartType),
@@ -222,7 +228,7 @@ function getChart({
   chartSettings,
   chartConfigsMap,
   chartSourceData,
-  country_iso_code,
+  selectedIso,
 }) {
   const chartConfig = chartConfigsMap[chartId];
 
@@ -249,7 +255,7 @@ function getChart({
         chartId,
         element,
         year: isTimeseries ? year : null,
-        country_iso_code,
+        selectedIso,
         chartConfigsMap,
         chartSourceData,
       });
@@ -303,7 +309,7 @@ function getChart({
   const chart = {
     data: isTimeseries ? data : data[0],
     chartId,
-    country_iso_code,
+    countryIso: selectedIso,
     elements: visibleElements,
     elementNameMap,
     colors,
@@ -319,37 +325,46 @@ function getChart({
 }
 // ___ END ASYNC FETCHERS _____
 
-// MAIN FUNCTION
-async function getData(country_iso_code) {
+// MAIN FUNCTIONS
+
+/** SITE DATA - runs once on site load */
+export async function getSiteData() {
   // if (DISABLED) return [];
   // CONFIGURE GIDS MAP
   await setConfigGids().catch((e) => {
     console.error("error in setConfigGids(): ", e);
   });
 
-  // GRAB DICTIONARY (unless already loaded)
-  if (_.isEmpty(dictionary)) {
-    dictionary = await csv(getUrl(GID_MAP.dictionary)).catch((e) => {
-      console.error("error in getDictionary: ", e);
-    });
-  }
+  // GRAB DICTIONARY
+  const dictionary = await csv(getUrl(GID_MAP.dictionary))
+    .catch((e) => console.error("error in getDictionary: ", e));
 
-  // GRAB CONFIGS (unless already loaded)
-  if (_.isEmpty(chartConfigsMap)) {
-    const result = await getChartConfigs().catch((e) => {
-      console.error("error in getChartConfigs(): ", e);
-    });
-    chartConfigsMap = result.chartConfigs;
-    chartIds = result.orderedChartIds;
-    console.log("@@@ ALL CONFIGS: ");
-    console.log(chartConfigsMap);
-  }
+  // GRAB DICTIONARY
+  const countries = await csv(getUrl(GID_MAP.countries))
+    .catch((e) => console.error("error in getcountries: ", e));
 
-  // CREATE CHARTS
-  const charts = await getCharts(country_iso_code).catch((e) => {
-    console.error("error in getCharts(country_iso_code): ", e);
-  });
-  return { charts, dictionary };
+  // GRAB CONFIGS
+  const { chartConfigsMap, chartIds } = await getChartConfigs()
+    .catch((e) => console.error("error in getChartConfigs(): ", e));
+  console.log("@@@ ALL CONFIGS: ");
+  console.log(chartConfigsMap)
+
+  return { dictionary, countries, chartConfigsMap, chartIds }
 }
 
-export default getData;
+/** CREATE CHARTS - whenever selected country changes */
+export async function getChartData({
+  chartConfigsMap,
+  chartIds,
+  selectedIso,
+}) {
+  const charts = await getCharts({
+    chartConfigsMap,
+    chartIds,
+    selectedIso,
+  }).catch((e) => {
+    console.error("error in getCharts(selectedIso): ", e);
+  });
+
+  return { charts };
+}

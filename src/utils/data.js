@@ -35,8 +35,8 @@ export const configParser = (row) => {
   return row;
 };
 
-export const filterByCountryGenerator = (country_iso_code) => {
-  return (row) => (row[D.country_iso_code] === country_iso_code ? row : null);
+export const filterByCountryGenerator = (selectedIso) => {
+  return (row) => (row[D.country_iso_code] === selectedIso ? row : null);
 };
 
 // determine actual chart elements from chart config
@@ -111,7 +111,7 @@ export const getFilter = ({
   chartId,
   element,
   year = null,
-  country_iso_code,
+  selectedIso,
   chartConfigsMap,
 }) => {
   // filter applied to all charts
@@ -131,7 +131,7 @@ export const getFilter = ({
     ...allChartsFilter,
     ...allElementsFilter,
     ...elementFilter,
-    country_iso_code,
+    selectedIso,
   };
   if (!!year) filter.year = year;
   return filter;
@@ -165,7 +165,7 @@ export const getDataPoint = ({
   chartId,
   element,
   year = null,
-  country_iso_code,
+  selectedIso,
   chartConfigsMap,
   chartSourceData,
   // valueParser = _.identity,
@@ -174,7 +174,7 @@ export const getDataPoint = ({
     chartId,
     element,
     year,
-    country_iso_code,
+    selectedIso,
     chartConfigsMap,
     chartSourceData,
   });

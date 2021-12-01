@@ -1,12 +1,11 @@
 // import "./styles.css";
 import React from "react";
 import _ from "lodash";
-import getData from "../getData";
+import { getSiteData, getChartData } from "../getData";
 import { themePrimary, radColors, getRC } from "../consts/colors";
 import { Container, Paper, Typography, useTheme } from "@mui/material";
 import { Header } from "./Header";
 import { Charts } from "./Charts";
-import { COUNTRIES } from "../consts/countries";
 import { Box } from "@mui/system";
 import { transformLink } from "../utils/display";
 
@@ -19,32 +18,44 @@ Overview: The WHO Differentiated Services Delivery Strategic Initiatives dashboa
 const SHOW_COLORS = false;
 
 export default function App() {
-  const [chartData, setChartData] = React.useState([]);
-  const [dictionary, setDictionary] = React.useState([]);
   const [selectedIso, setIso] = React.useState(null);
+  const [chartData, setChartData] = React.useState([]);
+  
+  const [dictionary, setDictionary] = React.useState([]);
+  const [countries, setCountries] = React.useState([]);
+  const [chartIds, setChartIds] = React.useState([]);
+  const [chartConfigsMap, setChartConfigsMap] = React.useState(null);
 
+  // on page load, get site-wide data
+  React.useEffect(() => {
+    getSiteData().then((result) => {
+      setDictionary(result.dictionary);
+      setCountries(result.countries);
+      setChartIds(result.chartIds);
+      setChartConfigsMap(result.chartConfigsMap);
+    });
+  }, []);
+
+  // on country selection change, get country-specific chart data
   React.useEffect(() => {
     if (!selectedIso) return;
-    getData(selectedIso).then((result) => {
+    getChartData({ chartConfigsMap, chartIds, selectedIso }).then((result) => {
       console.log("@@@ ALL DATA: ");
       console.log(result.charts);
       setChartData(result.charts);
-      if (_.isEmpty(dictionary)) {
-        setDictionary(result.dictionary);
-      }
     });
   }, [selectedIso]);
 
   const updateCountry = (e) => {
     const value = e.target.value;
-    const realIso = _.some(COUNTRIES, ({ id }) => id === value);
+    const realIso = _.some(countries, ({ iso }) => iso === value);
     setIso(realIso ? value : null);
   };
 
   // console.log("*", chartData);
   const loading = !_.some(
     chartData,
-    (c) => c && c.country_iso_code === selectedIso
+    (c) => c && c.countryIso === selectedIso
   );
 
   const theme = useTheme();
@@ -59,7 +70,7 @@ export default function App() {
         p: { lg: 6 },
       }}
     >
-      <Header handleCountryChange={updateCountry} selectedIso={selectedIso} />
+      <Header countries={countries} handleCountryChange={updateCountry} selectedIso={selectedIso} />
       <br />
 
       {!selectedIso ? (
@@ -88,7 +99,7 @@ export default function App() {
           />
         </Box>
       ) : (
-        <Charts selectedIso={selectedIso} chartData={chartData} />
+        <Charts countries={countries} selectedIso={selectedIso} chartData={chartData} />
       )}
       {!!dictionary.length && !loading && (
         <Box

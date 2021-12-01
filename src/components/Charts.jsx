@@ -36,7 +36,6 @@ import {
   GENERATED_FIELDS as G,
   MULTI_LINE_TEXT_DELIN,
 } from "../consts/data";
-import { COUNTRIES } from "../consts/countries";
 import { useMediaQuery } from "@mui/material";
 
 // TODO: standardize / create sane system for styles
@@ -100,7 +99,7 @@ const CustomTooltip = ({ active, payload, label, isArea }) => {
   } else return null;
 };
 
-export const Charts = ({ selectedIso, chartData }) => {
+export const Charts = ({ selectedIso, chartData, countries }) => {
   const [hiddenElements, setHiddenElements] = React.useState({});
 
   const getLineChart = (chart) => {
@@ -161,7 +160,11 @@ export const Charts = ({ selectedIso, chartData }) => {
             cursor={{ stroke: getRC(themeSecondary, 10), strokeWidth: 1 }}
             content={<CustomTooltip isArea={isArea} />}
           />
-          <Legend onClick={onLegendClick} iconSize={isArea ? 8 : 14} iconType={isArea && "circle"} />
+          <Legend
+            onClick={onLegendClick}
+            iconSize={isArea ? 8 : 14}
+            iconType={isArea && "circle"}
+          />
           {elements.map((elem, i) => {
             const isBounded =
               !isArea &&
@@ -252,9 +255,7 @@ export const Charts = ({ selectedIso, chartData }) => {
     const theme = useTheme();
     const isSm = useMediaQuery(theme.breakpoints.down("sm"));
     const isXl = useMediaQuery(theme.breakpoints.up("md"));
-    const { data, elements, colors, 
-      elementNameMap,
-     } = chart;
+    const { data, elements, colors, elementNameMap } = chart;
     const xl = false;
     // console.log(radColors);
     const ratios = elements.map((el) => {
@@ -263,7 +264,7 @@ export const Charts = ({ selectedIso, chartData }) => {
     });
     const content = elements.map((el) => {
       const text = elementNameMap[el];
-      return { below: text.split(MULTI_LINE_TEXT_DELIN) }
+      return { below: text.split(MULTI_LINE_TEXT_DELIN) };
     });
     // console.log(ratios);
     return (
@@ -288,7 +289,7 @@ export const Charts = ({ selectedIso, chartData }) => {
   };
 
   const getIntro = (chart) => {
-    const country = COUNTRIES.find((c) => c.id === selectedIso);
+    const country = countries.find((c) => c.id === selectedIso);
     return (
       <>
         <Typography
