@@ -8,6 +8,7 @@ import { Header } from "./Header";
 import { Charts } from "./Charts";
 import { Box } from "@mui/system";
 import { transformLink } from "../utils/display";
+import { HomePage } from "./HomePage";
 
 const homeTexts = [
   `
@@ -23,6 +24,7 @@ export default function App() {
 
   const [dictionary, setDictionary] = React.useState([]);
   const [countries, setCountries] = React.useState([]);
+  const [homeCopy, setHomeCopy] = React.useState([]);
   const [chartIds, setChartIds] = React.useState([]);
   const [chartConfigsMap, setChartConfigsMap] = React.useState(null);
 
@@ -31,6 +33,7 @@ export default function App() {
     getSiteData().then((result) => {
       setDictionary(result.dictionary.filter((d) => d.term && d.definition));
       setCountries(result.countries.filter((c) => c.iso && c.name));
+      setHomeCopy(result.homecopy);
       setChartIds(result.chartIds);
       setChartConfigsMap(result.chartConfigsMap);
     });
@@ -75,20 +78,7 @@ export default function App() {
       <br />
 
       {!selectedIso ? (
-        <Box pt={"20vh"}>
-          {homeTexts.map((text, i) => (
-            <Typography
-              variant="body1"
-              key={i}
-              sx={{ maxWidth: 600, margin: "auto" }}
-              pt={2}
-              px={3}
-              dangerouslySetInnerHTML={{
-                __html: text,
-              }}
-            />
-          ))}
-        </Box>
+        <HomePage homeCopy={homeCopy} />
       ) : loading ? (
         <Box pt={"50vh"}>
           <Typography
@@ -139,11 +129,11 @@ export default function App() {
           >
             {dictionary
               .sort((a, b) => a.term.toLowerCase() > b.term.toLowerCase())
-              .map(({ term, definition }) => {
+              .map(({ ["term"]: x, definition }) => {
                 return (
                   <dl>
                     <dt>
-                      <strong>{term}</strong>
+                      <strong>{x}</strong>
                     </dt>
                     <dd>
                       <Typography

@@ -4,14 +4,17 @@ export const PRE_LOAD_DATA = true;
 export const TABLE_DELIN = "__";
 export const MULTI_LINE_TEXT_DELIN = "__";
 
+// sheets we can just grab copy directly from
+export const CMS_SHEETS = ["dictionary", "countries", "homecopy"];
 // these are set in the home sheet for version controlability
-export const CONFIGURABLE_GID_NAMES = ["configs", "dictionary", "countries"];
+export const CONFIGURABLE_GID_NAMES = ["configs", ...CMS_SHEETS];
 // gids pointing to Sheet tabs
 export const GID_MAP = {
-  home: "0"
+  home: "0",
   // configs: null,
   // dictionary: null,
   // countries: null,
+  // homepage: null,
 };
 
 // now extracted from chart configs sheet
@@ -43,7 +46,7 @@ export const CONFIG_FIELDS = {
   formula: "formula",
   hidden: "hidden",
   valueField: "value_field",
-  percentage: "percentage"
+  percentage: "percentage",
 };
 
 // DATA SHEETS - data fields (fields that configs can filter by)
@@ -75,7 +78,20 @@ export const DATA_FIELDS = {
   import_file: "import_file",
   import_timestamp: "import_timestamp",
   row_id: "row_id",
-  suppressed: "suppressed"
+  suppressed: "suppressed",
+};
+
+// fields used in the "cms" sheets (countries, dictionary, etc)
+export const CMS_FIELDS = {
+  // dictionary
+  term: "term",
+  definition: "definition",
+  // countries
+  iso: "iso",
+  name: "name",
+  // homecopy
+  blurb: "blurb",
+  TAP: "_TAP_", // prefix to fields for the Technical Assistance Provider fields
 };
 
 // GENERATED FIELDS - fields we add for the app
@@ -84,5 +100,5 @@ export const GENERATED_FIELDS = {
   DISPLAY_NAME: "DISPLAY_NAME",
   DISPLAY_VALUE: "DISPLAY_VALUE",
   DISPLAY_VALUE_LOWER: `DISPLAY_${DATA_FIELDS.value_lower.toUpperCase()}`,
-  DISPLAY_VALUE_UPPER: `DISPLAY_${DATA_FIELDS.value_upper.toUpperCase()}`
+  DISPLAY_VALUE_UPPER: `DISPLAY_${DATA_FIELDS.value_upper.toUpperCase()}`,
 };
