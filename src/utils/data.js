@@ -4,6 +4,7 @@ import {
   CONFIG_FIELDS as C,
   DATA_FIELDS as D,
   GENERATED_FIELDS as G,
+  SPECIAL_VALUES as S,
 } from "../consts/data";
 import { capValue, displayNumber, displayPercent } from "./display";
 
@@ -41,25 +42,25 @@ export const filterByCountryGenerator = (selectedIso) => {
 
 // determine actual chart elements from chart config
 export const getElements = (chartConfig) =>
-  Object.keys(chartConfig).filter((k) => k !== "all" && !k.startsWith("_key_"));
+  Object.keys(chartConfig).filter((k) => k !== S.all && !k.startsWith(S._key_));
 
 // get setting from element, else chart, else global
 export const getSetting = ({
-  element = "all",
+  element = S.all,
   chartConfigsMap,
   field,
-  chartId = "all",
+  chartId = S.all,
 }) =>
   _.get(chartConfigsMap, [chartId, element, 0, field]) ||
-  _.get(chartConfigsMap, [chartId, "all", 0, field]) ||
-  _.get(chartConfigsMap, ["all", 0, field]);
+  _.get(chartConfigsMap, [chartId, S.all, 0, field]) ||
+  _.get(chartConfigsMap, [S.all, 0, field]);
 
 // omit element to get chart-wide setting
-export const getField = ({ element = "all", chartConfig, field }) =>
+export const getField = ({ element = S.all, chartConfig, field }) =>
   _.get(chartConfig, [element, 0, field]);
 
 // omit element to get chart-wide setting
-export const getFieldBoolean = ({ element = "all", chartConfig, field }) =>
+export const getFieldBoolean = ({ element = S.all, chartConfig, field }) =>
   !!getField({ element, chartConfig, field });
 
 export const getFormula = ({ element, chartConfig }) =>
@@ -117,7 +118,7 @@ export const getFilter = ({
   // filter applied to all charts
   const allChartsFilter = _.get(chartConfigsMap, "all[0]", {});
   // filter applied to all elements within this chart
-  const allElementsFilter = _.get(chartConfigsMap, [chartId, "all", 0], {});
+  const allElementsFilter = _.get(chartConfigsMap, [chartId, S.all, 0], {});
   // filter applied to this element
   // (backupFilters may be used for source prioritization)
   const [elementFilter, ...backupFilters] = _.get(

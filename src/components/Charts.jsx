@@ -203,25 +203,39 @@ export const Charts = ({ selectedIso, chartData, countries }) => {
   };
 
   const getTable = (chart) => {
-    const { data } = chart;
+    const { data, hideRowNames } = chart;
 
+    const firstRow = data[0];
+
+    // TODO: empty row? skip title?
+    if (!firstRow) return null;
     // const columnsNamed = _.some(data[0]["values"], "columnNamed");
     const headers =
       // columnsNamed &&
-      data[0]["values"].map(({ column, columnNamed }) => (
-        <TableCell scope="col" key={column}>
-          {columnNamed && column}
+      firstRow["values"].map(({ columnName, columnNamed }) => (
+        <TableCell scope="col" key={columnName}>
+          {columnNamed && columnName}
         </TableCell>
       ));
 
-    const rows = data.map(({ row, values }) => (
-      <TableRow key={row}>
-        <TableCell scope="row" component="th">
-          {row}
-        </TableCell>
-        {values.map(({ value, column, sheetRow }) => (
-          <TableCell key={column}>
-            {_.get(sheetRow, G.DISPLAY_VALUE, value) || "N/A"}
+    const rows = data.map(({ rowName, values }) => (
+      <TableRow key={rowName}>
+        {!hideRowNames && (
+          <TableCell scope="row" component="th">
+            {rowName}
+          </TableCell>
+        )}
+        {values.map(({ value, columnName, sheetRow, color }) => (
+          <TableCell
+            key={columnName}
+            sx={{
+              background: color,
+            }}
+          >
+            {/*  */}
+            {/* {_.get(sheetRow, G.DISPLAY_VALUE, value) || "N/A"} (move to getData?) */}
+            {/* to not overwrite "" with "N/A":  */}
+            {_.get(sheetRow, G.DISPLAY_VALUE, _.get([value], 0, "N/A"))}
             {/* {(value && (sheetRow && sheetRow[G.DISPLAY_VALUE] || value)) || "N/A"} */}
           </TableCell>
         ))}
@@ -239,11 +253,15 @@ export const Charts = ({ selectedIso, chartData, countries }) => {
               "& td, & thead th": {
                 textAlign: "right",
               },
+              "& th": {
+                fontWeight: "bold",
+                minWidth: "60px",
+              },
             }}
           >
             <TableHead>
               <TableRow>
-                <TableCell scope="col"></TableCell>
+                {!hideRowNames && <TableCell scope="col"></TableCell>}
                 {headers}
               </TableRow>
             </TableHead>
@@ -372,7 +390,7 @@ export const Charts = ({ selectedIso, chartData, countries }) => {
       );
     }
 
-    if (type === "table") {
+    if (type === "table" || type === "table_list") {
       return (
         <Box sx={{ flexBasis: "100%", maxWidth: 864, p: 3 }} key={chartId}>
           <Typography variant="h5" component="h3">
@@ -434,7 +452,7 @@ export const Charts = ({ selectedIso, chartData, countries }) => {
         justifyContent: { xs: "space-evenly", md: "space-between" },
       }}
     >
-      {chartData.map(getChart)}
+      {chartData.map((c, i) => <div key={i}>{getChart(c)}</div>)}
     </Box>
   );
 };

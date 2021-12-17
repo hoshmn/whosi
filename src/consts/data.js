@@ -79,6 +79,20 @@ export const DATA_FIELDS = {
   import_timestamp: "import_timestamp",
   row_id: "row_id",
   suppressed: "suppressed",
+  Deliverable: "Deliverable",
+  Supplier: "Supplier",
+
+  REGEX: {
+    quarter: /Q\d\s\d{4}/,
+  },
+};
+
+// values in the config Sheet that hold special meanings
+// see also SPECIAL_FILTERS_MAP
+export const SPECIAL_VALUES = {
+  all: "all",
+  _key_: "_key_",
+  _color_by_: "_color_by_",
 };
 
 // fields used in the "cms" sheets (countries, dictionary, etc)

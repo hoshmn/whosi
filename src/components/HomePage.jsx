@@ -44,7 +44,7 @@ export const HomePage = ({ homeCopy }) => {
           {homeCopy.map(
             (row, i) =>
               !!row[f] && (
-                <li>
+                <li key={row[f]}>
                   <Typography
                     variant="body1"
                     key={i}

@@ -3,7 +3,8 @@ import _ from "lodash";
 import {
   CONFIG_FIELDS as C,
   DATA_FIELDS as D,
-  GENERATED_FIELDS as G,
+  // GENERATED_FIELDS as G,
+  SPECIAL_VALUES as S,
   GID_MAP,
   CONFIGURABLE_GID_NAMES,
   TABLE_DELIN,
@@ -53,18 +54,18 @@ async function getChartConfigs() {
 
   const chartIds = _.uniqBy(baseConfigs, "chart_id")
     .map((c) => c.chart_id)
-    .filter((id) => id !== "all");
+    .filter((id) => id !== S.all);
 
   const chartConfigsMap = _.mapValues(shaped, (configParams, name) => {
     // wise?
-    if (name === "all") return configParams;
+    if (name === S.all) return configParams;
     return _.groupBy(configParams, C.element);
   });
 
   _.each(chartConfigsMap, (configParams, name) => {
-    if (name === "all") return;
+    if (name === S.all) return;
     _.each(configParams, (elemDetails, elementName) => {
-      if (elementName === "all") return;
+      if (elementName === S.all) return;
     });
   });
 
@@ -100,19 +101,20 @@ async function getCharts({ chartConfigsMap, chartIds, selectedIso }) {
 }
 
 async function getChartOrTable({ chartConfigsMap, chartId, selectedIso }) {
-  // if (
-  //   ![
-  //     "interventions",
-  //     "priorities",
-  //     "policy",
-  //     "commun_deliv",
-  //     "late_hiv"
-  //   ].includes(chartId)
-  // )
-  //   return;
+  if (
+    [
+      // "deliverables",
+      // "interventions",
+      // "priorities",
+      // "policy",
+      // "commun_deliv",
+      // "late_hiv"
+    ].includes(chartId)
+  )
+    return;
   // console.log("creating : ", chartId);
   const chartConfig = chartConfigsMap[chartId];
-  // the chart settings are the values on the chart config where element === "all"
+  // the chart settings are the values on the chart config where element === S.all ("all")
   const chartSettings = _.get(chartConfig, "all[0]");
 
   if (!chartConfig || !chartSettings || !chartSettings[C.sourceGid]) {
@@ -126,6 +128,7 @@ async function getChartOrTable({ chartConfigsMap, chartId, selectedIso }) {
 
   const getterMap = {
     table: getTable,
+    table_list: getTableList,
     text: getText,
     // nested: getNested, // uses chart
   };
@@ -148,13 +151,13 @@ function getText({
   chartSourceData,
   selectedIso,
 }) {
-  console.log(
-    chartId,
-    chartSettings,
-    chartConfigsMap,
-    chartSourceData,
-    selectedIso
-  );
+  // console.log(
+  //   chartId,
+  //   chartSettings,
+  //   chartConfigsMap,
+  //   chartSourceData,
+  //   selectedIso
+  // );
 
   const elements = getElements(chartConfigsMap[chartId]);
   const textValues = {};
@@ -181,6 +184,84 @@ function getText({
   };
 }
 
+function getTableList({
+  chartId,
+  chartSettings,
+  chartConfigsMap,
+  chartSourceData,
+  selectedIso,
+}) {
+  const chartConfig = chartConfigsMap[chartId];
+  const chartWideConfig = _.get(chartConfig, [S.all, 0]);
+  const colNames = Object.keys(chartWideConfig).filter(
+    (f) => !!D[f] || _.some(D.REGEX, (rgx) => !!rgx.test(f))
+  );
+
+  /*
+   * Get colorBy background color
+   * eg "Q3 2021" data field has value "_color_by_status"
+   * for Deliverables table. It also has a "key" element of
+   * _key__color_by_status__completed with corresponding
+   * display_name of green. Here we create a map of:
+   * { status: { completed: green, ... }} to later identify
+   * "completed" cells to give a background color "green".
+   */
+  let colorMap = {};
+  try {
+    colorMap = Object.keys(chartConfig)
+      .filter((key) => key.startsWith(`${S._key_}${S._color_by_}`))
+      .reduce((accum, key) => {
+        const KVPairToBeColored = key.replace(`${S._key_}${S._color_by_}`, "");
+        const [k, v] = KVPairToBeColored.split("__");
+        const color = _.get(chartConfig, [key, 0, C.displayName]);
+        if (color) _.set(accum, [k, v], color);
+        return accum;
+      }, {});
+  } catch (error) {
+    console.warn(
+      `color mapping entered incorrectly for ${chartId}, ignoring. ${error}`
+    );
+  }
+
+  const data = chartSourceData.map((row, i) => {
+    return {
+      rowName: i,
+      values: colNames.map((cn) => {
+        const value = _.get(row, cn);
+        const LCVal = value && value.toLowerCase();
+
+        let chartWideFieldVal = _.get(chartWideConfig, cn, "");
+        chartWideFieldVal =
+          chartWideFieldVal.includes(S._color_by_) &&
+          chartWideFieldVal.replace(S._color_by_, "");
+        // use the above described map to _.get, eg, ["status", "complete"]
+        const chartColorSetting = _.get(colorMap, [chartWideFieldVal, LCVal]);
+
+        return {
+          columnName: cn,
+          columnNamed: true, // always named with the field name
+          value,
+          color: chartColorSetting,
+          sheetRow: row,
+        };
+      }),
+    };
+  });
+
+  const chart = {
+    data,
+    chartId,
+    countryIso: selectedIso,
+    hideRowNames: true,
+    // elements: elements,
+    // isPercentage,
+    type: _.get(chartSettings, C.chartType),
+    name: _.get(chartSettings, C.displayName, chartId),
+  };
+
+  return chart;
+}
+
 function getTable({
   chartId,
   chartSettings,
@@ -192,7 +273,7 @@ function getTable({
 
   const elements = getElements(chartConfig);
   const dataPoints = {};
-  // add non-calculated points
+
   const isPercentage = getFieldBoolean({
     chartConfig,
     field: C.percentage,
@@ -214,10 +295,14 @@ function getTable({
   const colNames = _.uniq(elements.map((elem) => elem.split(TABLE_DELIN)[1]));
 
   const data = rowNames.map((rn) => ({
-    row: _.get(chartConfig, [`_key_${rn}`, 0, C.displayName], rn),
+    rowName: _.get(chartConfig, [`${S._key_}${rn}`, 0, C.displayName], rn),
     values: colNames.map((cn) => ({
-      column: _.get(chartConfig, [`_key_${cn}`, 0, C.displayName], cn),
-      columnNamed: _.get(chartConfig, [`_key_${cn}`, 0, C.displayName], false),
+      columnName: _.get(chartConfig, [`${S._key_}${cn}`, 0, C.displayName], cn),
+      columnNamed: _.get(
+        chartConfig,
+        [`${S._key_}${cn}`, 0, C.displayName],
+        false
+      ),
       value: _.get(dataPoints, `${rn}${TABLE_DELIN}${cn}`),
       sheetRow: _.get(dataPoints, `${rn}${TABLE_DELIN}${cn}_row`),
     })),
@@ -252,9 +337,9 @@ function getChart({
   // console.log(elements);
 
   // NOTE: currently all charts range over years
-  const year_range = _.get(chartConfig, ["all", 0, D.year]);
+  const year_range = _.get(chartConfig, [S.all, 0, D.year]);
   const isTimeseries = year_range;
-  const years_arr = isTimeseries ? transformYearRange(year_range) : ["all"];
+  const years_arr = isTimeseries ? transformYearRange(year_range) : [S.all];
   // console.log(years_arr);
 
   // getchartdata per element

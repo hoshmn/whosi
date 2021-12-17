@@ -1,7 +1,7 @@
 import React from "react";
 import Box from "@mui/material/Box";
 import { Typography, useTheme } from "@mui/material";
-import { CMS_FIELDS } from "../consts/data";
+import { CMS_FIELDS as M } from "../consts/data";
 import { transformLink } from "../utils/display";
 
 export const Dictionary = ({ dictionary }) => {
@@ -42,11 +42,11 @@ export const Dictionary = ({ dictionary }) => {
       >
         {dictionary
           .sort((a, b) => a.term.toLowerCase() > b.term.toLowerCase())
-          .map(({ ["term"]: x, definition }) => {
+          .map(({ [M.term]: term, [M.definition]: definition }) => {
             return (
-              <dl>
+              <dl key={term}>
                 <dt>
-                  <strong>{x}</strong>
+                  <strong>{term}</strong>
                 </dt>
                 <dd>
                   <Typography
