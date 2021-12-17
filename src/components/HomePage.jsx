@@ -76,9 +76,9 @@ export const HomePage = ({ homeCopy }) => {
               <Typography
                 variant="body1"
                 key={i}
-                    sx={{
-                      fontSize: { sm: "smaller", md: "unset" },
-                    }}
+                sx={{
+                  fontSize: { sm: "smaller", md: "unset" },
+                }}
                 // sx={{ maxWidth: 600, margin: "auto" }}
                 pt={1}
                 // px={3}

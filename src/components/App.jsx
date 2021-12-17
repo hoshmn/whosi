@@ -9,6 +9,7 @@ import { Charts } from "./Charts";
 import { Box } from "@mui/system";
 import { transformLink } from "../utils/display";
 import { HomePage } from "./HomePage";
+import { Dictionary } from "./Dictionary";
 
 const SHOW_COLORS = false;
 
@@ -91,57 +92,7 @@ export default function App() {
         />
       )}
       {!!dictionary.length && !loading && (
-        <Box
-          sx={{
-            px: { xs: 3, lg: 10 },
-            mx: { lg: 5 },
-            mb: { lg: 5 },
-            py: 9,
-            mt: 9,
-            background: theme.palette.background.paper,
-          }}
-        >
-          <Typography
-            variant="h4"
-            component="h2"
-            dangerouslySetInnerHTML={{
-              __html: "Glossary",
-            }}
-          />
-          <Box
-            sx={{
-              columnCount: { md: 2, xl: 3 },
-              columnGap: { xs: "2rem", lg: "5rem" },
-              mt: 3,
-              "& dl": {
-                display: "inline-block",
-                mt: 0,
-                mb: { lg: 3 },
-              },
-              "& dd": { ml: 0, mt: { xs: 1 } },
-            }}
-          >
-            {dictionary
-              .sort((a, b) => a.term.toLowerCase() > b.term.toLowerCase())
-              .map(({ ["term"]: x, definition }) => {
-                return (
-                  <dl>
-                    <dt>
-                      <strong>{x}</strong>
-                    </dt>
-                    <dd>
-                      <Typography
-                        // sx={{ maxWidth: "500px" }}
-                        dangerouslySetInnerHTML={{
-                          __html: transformLink(definition),
-                        }}
-                      />
-                    </dd>
-                  </dl>
-                );
-              })}
-          </Box>
-        </Box>
+        <Dictionary dictionary={dictionary} />
       )}
       {SHOW_COLORS &&
         radColors.map((rc) => (

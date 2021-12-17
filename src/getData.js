@@ -100,15 +100,16 @@ async function getCharts({ chartConfigsMap, chartIds, selectedIso }) {
 }
 
 async function getChartOrTable({ chartConfigsMap, chartId, selectedIso }) {
-  if (
-    ![
-      "interventions",
-      // "p95",
-      // "plhiv_diagnosis",
-      // "late_hiv"
-    ].includes(chartId)
-  )
-    return;
+  // if (
+  //   ![
+  //     "interventions",
+  //     "priorities",
+  //     "policy",
+  //     "commun_deliv",
+  //     "late_hiv"
+  //   ].includes(chartId)
+  // )
+  //   return;
   // console.log("creating : ", chartId);
   const chartConfig = chartConfigsMap[chartId];
   // the chart settings are the values on the chart config where element === "all"
@@ -221,9 +222,7 @@ function getTable({
       sheetRow: _.get(dataPoints, `${rn}${TABLE_DELIN}${cn}_row`),
     })),
   }));
-  console.log(rowNames);
-  console.log(colNames);
-  console.log(data);
+
   const chart = {
     data,
     chartId,
