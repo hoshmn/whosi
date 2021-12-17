@@ -100,15 +100,15 @@ async function getCharts({ chartConfigsMap, chartIds, selectedIso }) {
 }
 
 async function getChartOrTable({ chartConfigsMap, chartId, selectedIso }) {
-  // if (
-  //   ![
-  // "intro",
-  // "p95",
-  // "plhiv_diagnosis",
-  // "late_hiv"
-  //   ].includes(chartId)
-  // )
-  // return;
+  if (
+    ![
+      "interventions",
+      // "p95",
+      // "plhiv_diagnosis",
+      // "late_hiv"
+    ].includes(chartId)
+  )
+    return;
   // console.log("creating : ", chartId);
   const chartConfig = chartConfigsMap[chartId];
   // the chart settings are the values on the chart config where element === "all"
@@ -216,10 +216,14 @@ function getTable({
     row: _.get(chartConfig, [`_key_${rn}`, 0, C.displayName], rn),
     values: colNames.map((cn) => ({
       column: _.get(chartConfig, [`_key_${cn}`, 0, C.displayName], cn),
+      columnNamed: _.get(chartConfig, [`_key_${cn}`, 0, C.displayName], false),
       value: _.get(dataPoints, `${rn}${TABLE_DELIN}${cn}`),
       sheetRow: _.get(dataPoints, `${rn}${TABLE_DELIN}${cn}_row`),
     })),
   }));
+  console.log(rowNames);
+  console.log(colNames);
+  console.log(data);
   const chart = {
     data,
     chartId,

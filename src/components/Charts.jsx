@@ -205,7 +205,8 @@ export const Charts = ({ selectedIso, chartData, countries }) => {
   const getTable = (chart) => {
     const { data } = chart;
 
-    const headers = data[0]["values"].map(({ column }) => (
+    const columnsNamed = _.some(data[0]["values"], 'columnNamed');
+    const headers = columnsNamed && data[0]["values"].map(({ column }) => (
       <TableCell scope="col" key={column}>
         {column}
       </TableCell>
@@ -238,12 +239,12 @@ export const Charts = ({ selectedIso, chartData, countries }) => {
               },
             }}
           >
-            <TableHead>
+            {columnsNamed && <TableHead>
               <TableRow>
                 <TableCell scope="col"></TableCell>
                 {headers}
               </TableRow>
-            </TableHead>
+            </TableHead>}
             <TableBody>{rows}</TableBody>
           </Table>
         </TableContainer>

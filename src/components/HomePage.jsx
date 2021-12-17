@@ -5,7 +5,7 @@ import { CMS_FIELDS } from "../consts/data";
 
 export const HomePage = ({ homeCopy }) => {
   if (!homeCopy || !homeCopy.length) return null; // TODO: spinner
-  console.log(homeCopy, homeCopy && homeCopy[0]);
+  // console.log(homeCopy, homeCopy && homeCopy[0]);
   const tapFields = Object.keys(homeCopy[0]).filter((f) =>
     f.startsWith(CMS_FIELDS.TAP)
   );
