@@ -7,7 +7,8 @@ import {
   GID_MAP,
   CONFIGURABLE_GID_NAMES,
   TABLE_DELIN,
-  PRE_LOAD_DATA
+  PRE_LOAD_DATA,
+  CMS_SHEETS,
 } from "./consts/data";
 import {
   getUrl,
@@ -22,7 +23,7 @@ import {
   getDataPoint,
   getCalculatedDataPoint,
   getField,
-  getSetting
+  getSetting,
 } from "./utils/data";
 
 // ASYNC FETCHERS
@@ -101,13 +102,14 @@ async function getCharts({ chartConfigsMap, chartIds, selectedIso }) {
 async function getChartOrTable({ chartConfigsMap, chartId, selectedIso }) {
   // if (
   //   ![
-  // "intro",
-  // "p95",
-  // "plhiv_diagnosis",
-  // "late_hiv"
+  //     "interventions",
+  //     "priorities",
+  //     "policy",
+  //     "commun_deliv",
+  //     "late_hiv"
   //   ].includes(chartId)
   // )
-  // return;
+  //   return;
   // console.log("creating : ", chartId);
   const chartConfig = chartConfigsMap[chartId];
   // the chart settings are the values on the chart config where element === "all"
@@ -124,7 +126,7 @@ async function getChartOrTable({ chartConfigsMap, chartId, selectedIso }) {
 
   const getterMap = {
     table: getTable,
-    text: getText
+    text: getText,
     // nested: getNested, // uses chart
   };
 
@@ -135,7 +137,7 @@ async function getChartOrTable({ chartConfigsMap, chartId, selectedIso }) {
     chartSettings,
     chartConfigsMap,
     chartSourceData,
-    selectedIso
+    selectedIso,
   });
 }
 
@@ -144,7 +146,7 @@ function getText({
   chartSettings,
   chartConfigsMap,
   chartSourceData,
-  selectedIso
+  selectedIso,
 }) {
   console.log(
     chartId,
@@ -162,7 +164,7 @@ function getText({
       element,
       selectedIso,
       chartConfigsMap,
-      chartSourceData
+      chartSourceData,
       // valueParser: isPercentage
     });
     textValues[element] = value;
@@ -175,7 +177,7 @@ function getText({
     countryIso: selectedIso,
     elements,
     type: _.get(chartSettings, C.chartType),
-    name: _.get(chartSettings, C.displayName, chartId)
+    name: _.get(chartSettings, C.displayName, chartId),
   };
 }
 
@@ -184,7 +186,7 @@ function getTable({
   chartSettings,
   chartConfigsMap,
   chartSourceData,
-  selectedIso
+  selectedIso,
 }) {
   const chartConfig = chartConfigsMap[chartId];
 
@@ -193,7 +195,7 @@ function getTable({
   // add non-calculated points
   const isPercentage = getFieldBoolean({
     chartConfig,
-    field: C.percentage
+    field: C.percentage,
   });
   _.each(elements, (element) => {
     const { row, value } = getDataPoint({
@@ -201,7 +203,7 @@ function getTable({
       element,
       selectedIso,
       chartConfigsMap,
-      chartSourceData
+      chartSourceData,
       // valueParser: isPercentage
     });
     dataPoints[element] = value;
@@ -215,10 +217,12 @@ function getTable({
     row: _.get(chartConfig, [`_key_${rn}`, 0, C.displayName], rn),
     values: colNames.map((cn) => ({
       column: _.get(chartConfig, [`_key_${cn}`, 0, C.displayName], cn),
+      columnNamed: _.get(chartConfig, [`_key_${cn}`, 0, C.displayName], false),
       value: _.get(dataPoints, `${rn}${TABLE_DELIN}${cn}`),
-      sheetRow: _.get(dataPoints, `${rn}${TABLE_DELIN}${cn}_row`)
-    }))
+      sheetRow: _.get(dataPoints, `${rn}${TABLE_DELIN}${cn}_row`),
+    })),
   }));
+
   const chart = {
     data,
     chartId,
@@ -226,7 +230,7 @@ function getTable({
     elements: elements,
     isPercentage,
     type: _.get(chartSettings, C.chartType),
-    name: _.get(chartSettings, C.displayName, chartId)
+    name: _.get(chartSettings, C.displayName, chartId),
   };
 
   return chart;
@@ -237,7 +241,7 @@ function getChart({
   chartSettings,
   chartConfigsMap,
   chartSourceData,
-  selectedIso
+  selectedIso,
 }) {
   const chartConfig = chartConfigsMap[chartId];
 
@@ -266,7 +270,7 @@ function getChart({
         year: isTimeseries ? year : null,
         selectedIso,
         chartConfigsMap,
-        chartSourceData
+        chartSourceData,
       });
       dataPoints[element] = value;
       dataPoints[element + "_row"] = row;
@@ -280,7 +284,7 @@ function getChart({
         chartId,
         element,
         chartConfigsMap,
-        dataPoints
+        dataPoints,
       });
       dataPoints[element] = value;
       dataPoints[element + "_row"] = row;
@@ -305,14 +309,14 @@ function getChart({
       (elementNameMap[element] = getField({
         element,
         chartConfig: chartConfigsMap[chartId],
-        field: C.displayName
+        field: C.displayName,
       }))
   );
 
   const colors = getColors({
     chartSettings,
     chartConfig,
-    chartElements: visibleElements
+    chartElements: visibleElements,
   });
 
   const chart = {
@@ -324,10 +328,10 @@ function getChart({
     colors,
     isPercentage: getFieldBoolean({
       chartConfig,
-      field: C.percentage
+      field: C.percentage,
     }),
     type: _.get(chartSettings, C.chartType),
-    name: _.get(chartSettings, C.displayName, chartId)
+    name: _.get(chartSettings, C.displayName, chartId),
   };
 
   return chart;
@@ -344,15 +348,24 @@ export async function getSiteData() {
     console.error("error in setConfigGids(): ", e);
   });
 
-  // GRAB DICTIONARY
-  const dictionary = await csv(getUrl(GID_MAP.dictionary)).catch((e) =>
-    console.error("error in getDictionary: ", e)
+  // GRAB STRAIGHT-FORWARD TEXT COPY
+  const cmsDataResults = await Promise.all(
+    CMS_SHEETS.map((sheetName) =>
+      csv(getUrl(GID_MAP[sheetName])).catch((e) =>
+        console.error(`error getting ${sheetName}: `, e)
+      )
+    )
   );
+  const cmsData = cmsDataResults.reduce((accum, result, idx) => {
+    const sheetName = CMS_SHEETS[idx];
+    accum[sheetName] = result;
 
-  // GRAB DICTIONARY
-  const countries = await csv(getUrl(GID_MAP.countries)).catch((e) =>
-    console.error("error in getcountries: ", e)
-  );
+    return accum;
+  }, {});
+
+  // const countries = await csv(getUrl(GID_MAP.countries)).catch((e) =>
+  //   console.error("error in getcountries: ", e)
+  // );
 
   // GRAB CONFIGS
   const { chartConfigsMap, chartIds } = await getChartConfigs().catch((e) =>
@@ -370,7 +383,7 @@ export async function getSiteData() {
     gids.forEach(memoizedGetAllDataFromTab);
   }
 
-  return { dictionary, countries, chartConfigsMap, chartIds };
+  return { ...cmsData, chartConfigsMap, chartIds };
 }
 
 /** CREATE CHARTS - whenever selected country changes */

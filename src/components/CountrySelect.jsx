@@ -16,7 +16,9 @@ export const CountrySelect = ({
         label="Country"
         onChange={handleCountryChange}
       >
-        <MenuItem value={"home"}>Select a country...</MenuItem>
+        <MenuItem value={"home"}>
+          {!countries.length ? "Loading..." : "Select a country..."}
+        </MenuItem>
         {countries.map(({ iso, name }) => (
           <MenuItem key={iso} value={iso}>
             {name}
