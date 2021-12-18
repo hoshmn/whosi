@@ -24,6 +24,7 @@ export const getUrl = (gid) =>
 
 export const configParser = (row) => {
   if (!row[C.chartId]) return;
+  // if (row[C.chartId].startsWith(S._page_element_)) {}
   delete row[""];
 
   _.each(row, (value, key) => {
@@ -116,7 +117,7 @@ export const getFilter = ({
   chartConfigsMap,
 }) => {
   // filter applied to all charts
-  const allChartsFilter = _.get(chartConfigsMap, "all[0]", {});
+  const allChartsFilter = _.get(chartConfigsMap, [S.all, 0], {});
   // filter applied to all elements within this chart
   const allElementsFilter = _.get(chartConfigsMap, [chartId, S.all, 0], {});
   // filter applied to this element

@@ -23,6 +23,9 @@ export default function App() {
   const [chartIds, setChartIds] = React.useState([]);
   const [chartConfigsMap, setChartConfigsMap] = React.useState(null);
 
+  const [dashExpanded, setDashExpanded] = React.useState(false);
+  const toggleDashExpanded = () => setDashExpanded(!dashExpanded);
+
   // on page load, get site-wide data
   React.useEffect(() => {
     getSiteData().then((result) => {
@@ -89,9 +92,11 @@ export default function App() {
           countries={countries}
           selectedIso={selectedIso}
           chartData={chartData}
+          dashExpanded={dashExpanded}
+          toggleDashExpanded={toggleDashExpanded}
         />
       )}
-      {!!dictionary.length && !loading && (
+      {!!dictionary.length && !loading && dashExpanded && (
         <Dictionary dictionary={dictionary} />
       )}
       {SHOW_COLORS &&

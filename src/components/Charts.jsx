@@ -15,12 +15,6 @@ import {
   Legend,
 } from "recharts";
 import { Box, useTheme } from "@mui/system";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
 import NestedBoxes from "./NestedBoxes";
 import {
   getRC,
@@ -36,7 +30,17 @@ import {
   GENERATED_FIELDS as G,
   MULTI_LINE_TEXT_DELIN,
 } from "../consts/data";
-import { useMediaQuery } from "@mui/material";
+import {
+  Button,
+  Link,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  useMediaQuery,
+} from "@mui/material";
 
 // TODO: standardize / create sane system for styles
 // TODO: CLEAN / EXTRACt this and other components
@@ -99,7 +103,13 @@ const CustomTooltip = ({ active, payload, label, isArea }) => {
   } else return null;
 };
 
-export const Charts = ({ selectedIso, chartData, countries }) => {
+export const Charts = ({
+  selectedIso,
+  chartData,
+  countries,
+  dashExpanded,
+  toggleDashExpanded,
+}) => {
   const [hiddenElements, setHiddenElements] = React.useState({});
 
   const getLineChart = (chart) => {
@@ -370,7 +380,62 @@ export const Charts = ({ selectedIso, chartData, countries }) => {
   const getChart = (chart) => {
     // TODO: simplify
     if (!chart) return null;
-    const { type, chartId, name } = chart;
+
+    const { type, chartId, name, hiddenUntilExpand } = chart;
+    if (hiddenUntilExpand && !dashExpanded) return null;
+
+    if (type === "accordion") {
+      // for clarity...
+      const element = chart;
+
+      const showHide = dashExpanded ? "Hide" : "Show";
+      const caret = <b>↑</b>;
+      return (
+        <Box
+          sx={{
+            display: "block",
+            width: "100%",
+            pt: 1,
+            pb: 2,
+            pl: 3,
+            "& button": { p: 0, textTransform: "none" },
+            "& b": {
+              px: 1,
+              transform: `rotate(${dashExpanded ? "0" : "180"}deg)`,
+              transition: "transform .2s linear",
+            },
+          }}
+        >
+          <Button onClick={toggleDashExpanded}>
+            {showHide} {element.text} {caret}
+          </Button>
+        </Box>
+      );
+    }
+
+    if (type === "link") {
+      // for clarity...
+      const element = chart;
+      const country = countries.find((c) => c.iso === selectedIso);
+
+      const url = _.get(country, element.elementId);
+      console.log(chart);
+      return (
+        <Box
+          sx={{
+            display: "block",
+            width: "100%",
+            pt: 1,
+            pb: 2,
+            pl: 3,
+          }}
+        >
+          <Link target="_blank" rel="noopener noreferrer" href={url}>
+            {element.text}
+          </Link>
+        </Box>
+      );
+    }
 
     // if (type === "text") {
     if (chartId === "intro") {
@@ -426,6 +491,11 @@ export const Charts = ({ selectedIso, chartData, countries }) => {
       );
     }
     // if (chart.type === "area") return getAreaChart(chart);
+    if (type && type !== "line") {
+      console.warn("Unknown type: ", type);
+      return null;
+    }
+
     return (
       <Box
         key={chartId}
@@ -452,7 +522,7 @@ export const Charts = ({ selectedIso, chartData, countries }) => {
         justifyContent: { xs: "space-evenly", md: "space-between" },
       }}
     >
-      {chartData.map((c, i) => <div key={i}>{getChart(c)}</div>)}
+      {chartData.map(getChart)}
     </Box>
   );
 };

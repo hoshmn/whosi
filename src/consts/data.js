@@ -37,6 +37,7 @@ export const CONFIG_FIELDS = {
   sourceGid: "source_gid",
   element: "element",
   displayName: "display_name",
+  hiddenUntilExpand: "hidden_until_expand",
   capPercentage: "cap_percentage",
   percentageDecimals: "percentage_decimals",
   coarseIntegerFormatting: "coarse_integer_formatting",
@@ -91,8 +92,10 @@ export const DATA_FIELDS = {
 // see also SPECIAL_FILTERS_MAP
 export const SPECIAL_VALUES = {
   all: "all",
+  _page_element_: "_page_element_",
   _key_: "_key_",
   _color_by_: "_color_by_",
+  link_url: "link_url",
 };
 
 // fields used in the "cms" sheets (countries, dictionary, etc)

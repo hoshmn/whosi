@@ -2,6 +2,7 @@ import React from "react";
 import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
 import { CMS_FIELDS } from "../consts/data";
+import { transformLink } from "../utils/display";
 
 export const HomePage = ({ homeCopy }) => {
   if (!homeCopy || !homeCopy.length) return null; // TODO: spinner
@@ -83,7 +84,7 @@ export const HomePage = ({ homeCopy }) => {
                 pt={1}
                 // px={3}
                 dangerouslySetInnerHTML={{
-                  __html: row[CMS_FIELDS.blurb],
+                  __html: transformLink(row[CMS_FIELDS.blurb]),
                 }}
               />
             )

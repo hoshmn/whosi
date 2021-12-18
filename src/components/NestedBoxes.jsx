@@ -69,7 +69,7 @@ const NestedBoxes = ({
     // add outer box
     rects.push(
       <rect
-        key={"rect1-"+i}
+        key={"rect1-" + i}
         x={resolveOrientation(x, y)}
         y={resolveOrientation(y, x)}
         width={side}
@@ -81,7 +81,7 @@ const NestedBoxes = ({
     const { below = [] } = _.get(content, i, {});
     const text = (
       <text
-        key={"text-"+i}
+        key={"text-" + i}
         fontSize={fontSize}
         // set the initial y for all tspans
         // the x we set on each individually so they don't try to go one after another
@@ -117,7 +117,7 @@ const NestedBoxes = ({
     // add inner box
     rects.push(
       <rect
-        key={"rect2-"+i}
+        key={"rect2-" + i}
         x={resolveOrientation(x, y)}
         y={resolveOrientation(y, x)}
         width={side}
@@ -137,7 +137,7 @@ const NestedBoxes = ({
     // if there's another box coming, add lines to it
     const line1 = (
       <line
-        key={"line1-"+i}
+        key={"line1-" + i}
         style={lineStyle}
         stroke={colorInner}
         x1={resolveOrientation(x, y + side)}
@@ -148,7 +148,7 @@ const NestedBoxes = ({
     );
     const line2 = (
       <line
-        key={"line2-"+i}
+        key={"line2-" + i}
         style={lineStyle}
         stroke={colorInner}
         x1={resolveOrientation(x + side, y + side)}

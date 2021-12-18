@@ -93,11 +93,32 @@ async function getCountryDataFromTab(gid, selectedIso) {
 async function getCharts({ chartConfigsMap, chartIds, selectedIso }) {
   return await Promise.all(
     chartIds.map((chartId) =>
-      getChartOrTable({ chartConfigsMap, chartId, selectedIso })
+      chartId.startsWith(S._page_element_)
+        ? getPageElement({ chartConfigsMap, chartId, selectedIso })
+        : getChartOrTable({ chartConfigsMap, chartId, selectedIso })
     )
   ).catch((e) => {
     console.error("error in getCharts(): ", e);
   });
+}
+
+async function getPageElement({ chartConfigsMap, chartId }) {
+  const elementConfig = chartConfigsMap[chartId];
+  const elementSettings = _.get(elementConfig, [S.all, 0]);
+  const text = _.get(elementSettings, C.displayName);
+
+  const elementId = chartId.replace(S._page_element_, "");
+  const type = elementId.startsWith("link")
+    ? "link"
+    : elementId.startsWith("accordion")
+    ? "accordion"
+    : null;
+
+  return {
+    elementId,
+    text,
+    type,
+  };
 }
 
 async function getChartOrTable({ chartConfigsMap, chartId, selectedIso }) {
@@ -115,7 +136,7 @@ async function getChartOrTable({ chartConfigsMap, chartId, selectedIso }) {
   // console.log("creating : ", chartId);
   const chartConfig = chartConfigsMap[chartId];
   // the chart settings are the values on the chart config where element === S.all ("all")
-  const chartSettings = _.get(chartConfig, "all[0]");
+  const chartSettings = _.get(chartConfig, [S.all, 0]);
 
   if (!chartConfig || !chartSettings || !chartSettings[C.sourceGid]) {
     console.warn("skipping chart: ", chartId);
@@ -181,6 +202,7 @@ function getText({
     elements,
     type: _.get(chartSettings, C.chartType),
     name: _.get(chartSettings, C.displayName, chartId),
+    hiddenUntilExpand: _.get(chartSettings, C.hiddenUntilExpand),
   };
 }
 
@@ -257,6 +279,7 @@ function getTableList({
     // isPercentage,
     type: _.get(chartSettings, C.chartType),
     name: _.get(chartSettings, C.displayName, chartId),
+    hiddenUntilExpand: _.get(chartSettings, C.hiddenUntilExpand),
   };
 
   return chart;
@@ -316,6 +339,7 @@ function getTable({
     isPercentage,
     type: _.get(chartSettings, C.chartType),
     name: _.get(chartSettings, C.displayName, chartId),
+    hiddenUntilExpand: _.get(chartSettings, C.hiddenUntilExpand),
   };
 
   return chart;
@@ -417,6 +441,7 @@ function getChart({
     }),
     type: _.get(chartSettings, C.chartType),
     name: _.get(chartSettings, C.displayName, chartId),
+    hiddenUntilExpand: _.get(chartSettings, C.hiddenUntilExpand),
   };
 
   return chart;
