@@ -441,7 +441,7 @@ function getChart({
       chartConfig,
       field: C.percentage,
     }),
-    type: _.get(chartSettings, C.chartType),
+    type: _.get(chartSettings, C.chartType) || "line",
     name: _.get(chartSettings, C.displayName, chartId),
     hiddenUntilExpand: _.get(chartSettings, C.hiddenUntilExpand),
   };

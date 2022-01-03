@@ -112,7 +112,7 @@ export const Charts = ({
 }) => {
   const [hiddenElements, setHiddenElements] = React.useState({});
 
-  const getLineChart = (chart) => {
+  const getLineAreaChart = (chart) => {
     const {
       data,
       chartId,
@@ -564,8 +564,9 @@ export const Charts = ({
         </>
       );
     }
+
     // if (chart.type === "area") return getAreaChart(chart);
-    if (type && type !== "line") {
+    if (!type || !["line", "area"].includes(type)) {
       console.warn("Unknown type: ", type);
       return null;
     }
@@ -582,7 +583,7 @@ export const Charts = ({
         <Typography variant="h5" component="h3">
           {name}
         </Typography>
-        {getLineChart(chart)}
+        {getLineAreaChart(chart)}
       </Box>
     );
   };
