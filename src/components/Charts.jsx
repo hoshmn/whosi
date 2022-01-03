@@ -321,15 +321,16 @@ export const Charts = ({
 
   const getIntro = (chart) => {
     const country = countries.find((c) => c.iso === selectedIso);
+    
+    // #NFS (Nested Flex Solution): nested boxes share the intro line on md+
     return (
       <>
         <Typography
-          variant="h2"
-          component="h1"
+          variant="h1"
           sx={{
             fontWeight: 500,
             lineHeight: 1,
-            fontSize: { lg: "6rem" },
+            fontSize: 32,
             maxWidth: { lg: 760, xl: "100%" },
             mb: { sm: 1, lg: 2 },
           }}
@@ -338,21 +339,27 @@ export const Charts = ({
         </Typography>
         <Box
           sx={{
-            display: { sm: "flex" },
-            "& dl:not(:last-child)": { mr: { sm: 4, md: 10 } },
+            // #NFS - intro details are stacked on xs, md, lg 
+            display: { sm: "flex", md: "unset", xl: "flex" }, 
+            "& dl:not(:last-child)": { mr: 10 },
             "& dt h2": {
               fontWeight: 100,
               letterSpacing: ".8px",
               textTransform: "uppercase",
             },
-            "& dt, dd": { m: 0 },
+            "& dt, dd": {
+              m: 0,
+              "& h2": {
+                fontSize: 18,
+              },
+            },
           }}
         >
           {chart.elements.map((elem) => {
             return (
               <dl key={elem}>
                 <dt>
-                  <Typography variant="h6" component="h2">
+                  <Typography component="h2">
                     {_.get(
                       chart,
                       ["textValues", `${elem}_row`, G.DISPLAY_NAME],
@@ -361,7 +368,7 @@ export const Charts = ({
                   </Typography>
                 </dt>
                 <dd>
-                  <Typography variant="h4" component="h2">
+                  <Typography component="h2">
                     {_.get(
                       chart,
                       ["textValues", `${elem}_row`, G.DISPLAY_VALUE],
@@ -469,7 +476,8 @@ export const Charts = ({
         <Box
           sx={{
             // background: { xs: "red", sm: "blue", md: "green", lg: "yellow", xl: "purple" },
-            flexBasis: { xs: "100%", xl: 600 },
+            // #NFS - designate intro section width to make room for boxes
+            flexBasis: { xs: "100%", md: 220, lg: 400, xl: 425 },
             flexGrow: { xl: 0 },
             p: 3,
             // display: {md: "flex"},
@@ -535,17 +543,19 @@ export const Charts = ({
         <>
           <Box
             sx={{
-              flexBasis: { xs: "100%", xl: 700 },
-              flexGrow: { xl: 1 },
-              flexShrink: { xl: 1 },
+              // see #NFS
+              flexBasis: { xs: "100%", md: 580 },
+              flexGrow: { md: 1 },
+              flexShrink: { md: 1 },
               mr: "auto",
               ml: { xl: "auto" },
-              maxWidth: 864,
-              p: 3,
+              maxWidth: 750,
+              pt: { md: 3 },
+              pl: 3,
             }}
             key={chartId}
           >
-            <Typography pb={3} variant="h5" component="h3">
+            <Typography sx={{ pb: { xl: 3 } }} variant="h5" component="h3">
               {name}
             </Typography>
             {getNested(chart)}
