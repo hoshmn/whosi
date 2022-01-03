@@ -3,7 +3,13 @@ import React from "react";
 import _ from "lodash";
 import { getSiteData, getChartData } from "../getData";
 import { themePrimary, radColors, getRC } from "../consts/colors";
-import { Container, Paper, Typography, useTheme } from "@mui/material";
+import {
+  CircularProgress,
+  Container,
+  Paper,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { Header } from "./Header";
 import { Charts } from "./Charts";
 import { Box } from "@mui/system";
@@ -54,7 +60,10 @@ export default function App() {
   };
 
   // console.log("*", chartData);
-  const loading = !_.some(chartData, (c) => c && c.countryIso === selectedIso);
+  const loading =
+    !homeCopy.length ||
+    (selectedIso &&
+      !_.some(chartData, (c) => c && c.countryIso === selectedIso));
 
   const theme = useTheme();
   return (
@@ -75,18 +84,19 @@ export default function App() {
       />
       <br />
 
-      {!selectedIso ? (
-        <HomePage homeCopy={homeCopy} />
-      ) : loading ? (
-        <Box pt={"50vh"}>
+      {loading ? (
+        <Box pt={"45vh"} sx={{ textAlign: "center" }}>
+          <CircularProgress color="secondary" />
           <Typography
+            mt={1}
             variant="body1"
-            sx={{ textAlign: "center" }}
             dangerouslySetInnerHTML={{
-              __html: "loading...",
+              __html: "Loading...",
             }}
           />
         </Box>
+      ) : !selectedIso ? (
+        <HomePage homeCopy={homeCopy} />
       ) : (
         <Charts
           countries={countries}

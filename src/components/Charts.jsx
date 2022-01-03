@@ -454,7 +454,7 @@ export const Charts = ({
         >
           <Typography
             sx={{
-              "& > *": {mb: 0},
+              "& > *": { mb: 0 },
             }}
             dangerouslySetInnerHTML={{
               __html: element.text,
@@ -487,7 +487,7 @@ export const Charts = ({
           sx={{
             pl: 3,
             width: "100%",
-            "& dl": {display: "flex" },
+            "& dl": { display: "flex" },
           }}
         >
           {chart.elements.map((elem) => {
@@ -499,7 +499,8 @@ export const Charts = ({
                       chart,
                       ["textValues", `${elem}_row`, G.DISPLAY_NAME],
                       ""
-                    )}:
+                    )}
+                    :
                   </Typography>
                 </dt>
                 <dd>
