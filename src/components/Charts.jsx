@@ -420,13 +420,14 @@ export const Charts = ({
 
       const url = _.get(country, element.elementId);
       console.log(chart);
+      if (!url) return null;
       return (
         <Box
           sx={{
             display: "block",
             width: "100%",
             pt: 1,
-            pb: 2,
+            pb: 1,
             pl: 3,
           }}
         >
@@ -437,7 +438,32 @@ export const Charts = ({
       );
     }
 
-    // if (type === "text") {
+    if (type === "html") {
+      // for clarity...
+      const element = chart;
+
+      return (
+        <Box
+          sx={{
+            display: "block",
+            width: "100%",
+            // pt: 1,
+            // pb: 2,
+            pl: 3,
+          }}
+        >
+          <Typography
+            sx={{
+              "& > *": {mb: 0},
+            }}
+            dangerouslySetInnerHTML={{
+              __html: element.text,
+            }}
+          />
+        </Box>
+      );
+    }
+
     if (chartId === "intro") {
       return (
         <Box
@@ -451,6 +477,43 @@ export const Charts = ({
           key={chartId}
         >
           {getIntro(chart)}
+        </Box>
+      );
+    }
+
+    if (type === "text") {
+      return (
+        <Box
+          sx={{
+            pl: 3,
+            width: "100%",
+            "& dl": {display: "flex" },
+          }}
+        >
+          {chart.elements.map((elem) => {
+            return (
+              <dl key={elem}>
+                <dt>
+                  <Typography variant="body" sx={{ fontWeight: "bold" }}>
+                    {_.get(
+                      chart,
+                      ["textValues", `${elem}_row`, G.DISPLAY_NAME],
+                      ""
+                    )}:
+                  </Typography>
+                </dt>
+                <dd>
+                  <Typography variant="body">
+                    {_.get(
+                      chart,
+                      ["textValues", `${elem}_row`, G.DISPLAY_VALUE],
+                      chart.textValues[elem]
+                    )}
+                  </Typography>
+                </dd>
+              </dl>
+            );
+          })}
         </Box>
       );
     }

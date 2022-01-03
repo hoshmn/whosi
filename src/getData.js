@@ -112,6 +112,8 @@ async function getPageElement({ chartConfigsMap, chartId }) {
     ? "link"
     : elementId.startsWith("accordion")
     ? "accordion"
+    : elementId.startsWith("html")
+    ? "html"
     : null;
 
   return {

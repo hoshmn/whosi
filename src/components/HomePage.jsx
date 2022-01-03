@@ -68,8 +68,14 @@ export const HomePage = ({ homeCopy }) => {
   };
 
   return (
-    <Box pt={"72px"} px={3}>
-      {/* todo: constify header height */}
+    <Box
+      sx={{
+        pt: "72px", // TODO constify header height
+        px: 3,
+        maxWidth: "900px", // TODO replace with M breakpoint
+        m: "auto",
+      }}
+    >
       <Box>
         {homeCopy.map(
           (row, i) =>
