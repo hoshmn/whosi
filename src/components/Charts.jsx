@@ -543,7 +543,7 @@ export const Charts = ({
           sx={{
             flexBasis: "100%", // never display on same line
             "& table": {
-              maxWidth: 864,
+              maxWidth: 904, // approx width of intro/p95 on md
             },
             p: 3,
             height: "100%",
@@ -570,13 +570,13 @@ export const Charts = ({
               flexShrink: { md: 1 },
               mr: "auto",
               ml: { xl: "auto" },
-              maxWidth: 750,
+              maxWidth: { xs: 450, sm: 750}, // vertical orientation on xs
               pt: { md: 3 },
               pl: 3,
             }}
             key={chartId}
           >
-            <Typography sx={{ pb: { xl: 3 } }} variant="h5" component="h3">
+            <Typography sx={{ pb: { xl: 3 }, pr: 3 }} variant="h5" component="h3">
               {name}
             </Typography>
             {getNested(chart)}
