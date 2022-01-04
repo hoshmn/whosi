@@ -219,8 +219,13 @@ export const Charts = ({
 
     if (!firstRow) return null;
     // const columnsNamed = _.some(data[0]["values"], "columnNamed");
+    const hasHeaders = firstRow["values"].some(
+      ({ columnName, columnNamed }) => columnNamed && columnName
+    );
+
     const headers =
       // columnsNamed &&
+      hasHeaders &&
       firstRow["values"].map(({ columnName, columnNamed }) => (
         <TableCell scope="col" key={columnName}>
           {columnNamed && columnName}
@@ -253,7 +258,7 @@ export const Charts = ({
 
     return (
       <ResponsiveContainer>
-        <TableContainer>
+        <TableContainer sx={{ pt: 1 }}>
           <Table
             sx={{
               // "& tbody th:first-of-type::before": {
@@ -277,12 +282,14 @@ export const Charts = ({
               },
             }}
           >
-            <TableHead>
-              <TableRow>
-                {!hideRowNames && <TableCell scope="col"></TableCell>}
-                {headers}
-              </TableRow>
-            </TableHead>
+            {hasHeaders && (
+              <TableHead>
+                <TableRow>
+                  {!hideRowNames && <TableCell scope="col"></TableCell>}
+                  {headers}
+                </TableRow>
+              </TableHead>
+            )}
             <TableBody>{rows}</TableBody>
           </Table>
         </TableContainer>
@@ -570,13 +577,17 @@ export const Charts = ({
               flexShrink: { md: 1 },
               mr: "auto",
               ml: { xl: "auto" },
-              maxWidth: { xs: 450, sm: 750}, // vertical orientation on xs
+              maxWidth: { xs: 450, sm: 750 }, // vertical orientation on xs
               pt: { md: 3 },
               pl: 3,
             }}
             key={chartId}
           >
-            <Typography sx={{ pb: { xl: 3 }, pr: 3 }} variant="h5" component="h3">
+            <Typography
+              sx={{ pb: { xl: 3 }, pr: 3 }}
+              variant="h5"
+              component="h3"
+            >
               {name}
             </Typography>
             {getNested(chart)}
