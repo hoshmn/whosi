@@ -217,7 +217,6 @@ export const Charts = ({
 
     const firstRow = data[0];
 
-    // TODO: empty row? skip title?
     if (!firstRow) return null;
     // const columnsNamed = _.some(data[0]["values"], "columnNamed");
     const headers =
@@ -257,8 +256,17 @@ export const Charts = ({
         <TableContainer>
           <Table
             sx={{
+              // "& tbody th:first-of-type::before": {
+              // borderLeft: `solid 2px ${getRC(themePrimary, 6)}`,
+              // },
+              // "& tbody td:last-of-type::before": {
+              // borderRight: `solid 2px ${getRC(themePrimary, 6)}`,
+              // },
               "& tbody tr:nth-of-type(odd)": {
-                background: getRC(themePrimary, 6),
+                background: getRC(themePrimary, 5),
+              },
+              "& tbody tr:nth-of-type(even)": {
+                background: getRC(themePrimary, 7),
               },
               "& td, & thead th": {
                 textAlign: "right",
@@ -321,7 +329,7 @@ export const Charts = ({
 
   const getIntro = (chart) => {
     const country = countries.find((c) => c.iso === selectedIso);
-    
+
     // #NFS (Nested Flex Solution): nested boxes share the intro line on md+
     return (
       <>
@@ -339,8 +347,8 @@ export const Charts = ({
         </Typography>
         <Box
           sx={{
-            // #NFS - intro details are stacked on xs, md, lg 
-            display: { sm: "flex", md: "unset", xl: "flex" }, 
+            // #NFS - intro details are stacked on xs, md, lg
+            display: { sm: "flex", md: "unset", xl: "flex" },
             "& dl:not(:last-child)": { mr: 10 },
             "& dt h2": {
               fontWeight: 100,
@@ -528,8 +536,21 @@ export const Charts = ({
     }
 
     if (type === "table" || type === "table_list") {
+      // table has no data, skip
+      if (!chart.data[0]) return null;
       return (
-        <Box sx={{ flexBasis: "100%", maxWidth: 864, p: 3 }} key={chartId}>
+        <Box
+          sx={{
+            flexBasis: "100%", // never display on same line
+            "& table": {
+              maxWidth: 864,
+            },
+            p: 3,
+            height: "100%",
+            overflowX: "auto",
+          }}
+          key={chartId}
+        >
           <Typography variant="h5" component="h3">
             {name}
           </Typography>
