@@ -263,7 +263,7 @@ function getTableList({
 
         return {
           columnName: cn,
-          columnNamed: true, // always named with the field name
+          columnNamed: colNames.length > 1, // always named with the field name if multiple fields are displayed
           value,
           color: chartColorSetting,
           sheetRow: row,
@@ -443,6 +443,8 @@ function getChart({
     }),
     type: _.get(chartSettings, C.chartType) || "line",
     name: _.get(chartSettings, C.displayName, chartId),
+    sourceLink: _.get(chartSettings, C.sourceLink),
+    sourceName: _.get(chartSettings, C.sourceName),
     hiddenUntilExpand: _.get(chartSettings, C.hiddenUntilExpand),
   };
 

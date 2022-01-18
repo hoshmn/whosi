@@ -35,14 +35,16 @@ export const GID_MAP = {
 export const CONFIG_FIELDS = {
   chartId: "chart_id",
   sourceGid: "source_gid",
+  chartType: "chart_type",
   element: "element",
   displayName: "display_name",
+  sourceLink: "source_link",
+  sourceName: "source_name",
   hiddenUntilExpand: "hidden_until_expand",
   capPercentage: "cap_percentage",
   percentageDecimals: "percentage_decimals",
   coarseIntegerFormatting: "coarse_integer_formatting",
   colorOverride: "color_override",
-  chartType: "chart_type",
   modelled: "modelled",
   formula: "formula",
   hidden: "hidden",
@@ -84,6 +86,7 @@ export const DATA_FIELDS = {
   Supplier: "Supplier",
 
   REGEX: {
+    // match all fields of type "Q1 2022"
     quarter: /Q\d\s\d{4}/,
   },
 };

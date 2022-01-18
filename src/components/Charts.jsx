@@ -22,6 +22,7 @@ import {
   fillIntensity,
   themePrimary,
   themeSecondary,
+  radColors,
 } from "../consts/colors";
 import { displayNumber, displayPercent } from "../utils/display";
 import {
@@ -256,6 +257,8 @@ export const Charts = ({
       </TableRow>
     ));
 
+    const isSingleColumn = firstRow["values"].length === 1;
+
     return (
       <ResponsiveContainer>
         <TableContainer sx={{ pt: 1 }}>
@@ -268,13 +271,15 @@ export const Charts = ({
               // borderRight: `solid 2px ${getRC(themePrimary, 6)}`,
               // },
               "& tbody tr:nth-of-type(odd)": {
-                background: getRC(themePrimary, 5),
+                background: "white",
               },
               "& tbody tr:nth-of-type(even)": {
-                background: getRC(themePrimary, 7),
+                background: getRC(radColors.sand, 3),
+                // background: getRC(themePrimary, 7),
               },
               "& td, & thead th": {
-                textAlign: "right",
+                // single column tables w/o row names get left justified (more like a list)
+                textAlign: isSingleColumn && hideRowNames ? "left" : "right",
               },
               "& th": {
                 fontWeight: "bold",
@@ -403,7 +408,17 @@ export const Charts = ({
     // TODO: simplify
     if (!chart) return null;
 
-    const { type, chartId, name, hiddenUntilExpand } = chart;
+    const { type, chartId, name, hiddenUntilExpand, sourceName, sourceLink } =
+      chart;
+    const source = sourceName && sourceLink && (
+      <Typography variant="body">
+        Source:{" "}
+        <Link target="_blank" rel="noopener noreferrer" href={sourceLink}>
+          {sourceName}
+        </Link>
+      </Typography>
+    );
+
     if (hiddenUntilExpand && !dashExpanded) return null;
 
     if (type === "accordion") {
@@ -561,6 +576,7 @@ export const Charts = ({
           <Typography variant="h5" component="h3">
             {name}
           </Typography>
+          {source}
           {getTable(chart)}
         </Box>
       );
@@ -590,6 +606,7 @@ export const Charts = ({
             >
               {name}
             </Typography>
+            {source}
             {getNested(chart)}
           </Box>
           <Box sx={{ flexBasis: "100%", height: 0 }} />
@@ -615,6 +632,7 @@ export const Charts = ({
         <Typography variant="h5" component="h3">
           {name}
         </Typography>
+        {source}
         {getLineAreaChart(chart)}
       </Box>
     );

@@ -71,7 +71,7 @@ export default function App() {
       elevation={0}
       sx={{
         // keep in sync with index.html background
-        background: getRC(themePrimary, 3),
+        background: getRC(themePrimary, 2),
         color: getRC(themePrimary, 12),
         fontFamily: theme.typography.fontFamily,
         p: { lg: 6 },
@@ -110,10 +110,10 @@ export default function App() {
         <Dictionary dictionary={dictionary} />
       )}
       {SHOW_COLORS &&
-        radColors.map((rc) => (
+        _.map(radColors, (rc) => (
           <>
             <br></br>
-            {_.map(Object.keys(radColors[0]), (meh, idx) => (
+            {_.map(Object.keys(radColors.sand), (meh, idx) => (
               <span
                 style={{
                   background: getRC(rc, idx + 1),
