@@ -237,8 +237,12 @@ export const Charts = ({
       <TableRow key={rowName}>
         {!hideRowNames && (
           <TableCell scope="row" component="th">
-            {iconPath && <img style={{ height: 50, margin: "auto", display: "block" }} src={`assets/${iconPath}.png`} />}
-            <br />
+            {iconPath && (
+              <>
+                <img style={{ height: 50 }} src={`assets/${iconPath}.png`} />
+                <br />
+              </>
+            )}
             {rowName}
           </TableCell>
         )}
@@ -266,17 +270,19 @@ export const Charts = ({
         <TableContainer sx={{ pt: 1 }}>
           <Table
             sx={{
+              background: "white",
+              border: "1px solid rgba(224, 224, 224, 1)",
               // "& tbody th:first-of-type::before": {
               // borderLeft: `solid 2px ${getRC(themePrimary, 6)}`,
               // },
               // "& tbody td:last-of-type::before": {
               // borderRight: `solid 2px ${getRC(themePrimary, 6)}`,
               // },
-              "& tbody tr:nth-of-type(odd)": {
+              "& tbody tr:nth-of-type(even)": {
                 background: "white",
               },
-              "& tbody tr:nth-of-type(even)": {
-                background: getRC(radColors.sand, 3),
+              "& tbody tr:nth-of-type(odd)": {
+                background: getRC(radColors.sand, 2),
                 // background: getRC(themePrimary, 7),
               },
               "& td, & thead th": {

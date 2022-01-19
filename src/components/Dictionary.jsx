@@ -10,7 +10,7 @@ export const Dictionary = ({ dictionary }) => {
     <Box
       sx={{
         px: { xs: 3, lg: 10 },
-        mx: { lg: 5 },
+        mx: { lg: 3 },
         mb: { lg: 5 },
         py: 9,
         mt: 9,
