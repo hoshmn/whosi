@@ -17,7 +17,7 @@ import { transformLink } from "../utils/display";
 import { HomePage } from "./HomePage";
 import { Dictionary } from "./Dictionary";
 
-const SHOW_COLORS = false;
+const SHOW_COLORS = true;
 
 export default function App() {
   const [selectedIso, setIso] = React.useState(null);
@@ -75,6 +75,9 @@ export default function App() {
         color: getRC(themePrimary, 12),
         fontFamily: theme.typography.fontFamily,
         p: { lg: 6 },
+        "& .themedLink": {
+          color: getRC(themePrimary, 11),
+        }
       }}
     >
       <Header

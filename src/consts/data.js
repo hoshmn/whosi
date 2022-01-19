@@ -40,6 +40,7 @@ export const CONFIG_FIELDS = {
   displayName: "display_name",
   sourceLink: "source_link",
   sourceName: "source_name",
+  iconPath: "icon_path",
   hiddenUntilExpand: "hidden_until_expand",
   capPercentage: "cap_percentage",
   percentageDecimals: "percentage_decimals",

@@ -30,10 +30,10 @@ import {
 } from "@radix-ui/colors";
 
 // keep in sync with index.html background
-export const themePrimary = green;
+export const themePrimary = cyan;
 // export const themePrimary = sand;
-export const themeSecondary = indigo;
-export const headerColor = teal;
+export const themeSecondary = tomato;
+export const headerColor = sky;
 // export const headerColor = amber;
 export const coreColors = [orange, grass, plum];
 export const altColors = [tomato, indigo, gold];

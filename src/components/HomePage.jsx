@@ -3,6 +3,7 @@ import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
 import { CMS_FIELDS } from "../consts/data";
 import { transformLink } from "../utils/display";
+import { getRC, radColors } from "../consts/colors";
 
 export const HomePage = ({ homeCopy }) => {
   if (!homeCopy || !homeCopy.length) return null; // TODO: spinner
@@ -16,7 +17,7 @@ export const HomePage = ({ homeCopy }) => {
       <Box
         key={f}
         sx={{
-          background: "#f2c2b4",
+          background: getRC(radColors.tomato, 7),
           p: 1,
           m: 1,
           borderRadius: "8px",

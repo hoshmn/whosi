@@ -47,4 +47,7 @@ export const displayNumber = (v, options = {}) => {
 };
 
 export const transformLink = (t) =>
-  t.replaceAll("<a ", "<a target='_blank' rel='noopener noreferrer'");
+  t.replaceAll(
+    "<a ",
+    "<a class='themedLink' target='_blank' rel='noopener noreferrer'"
+  );

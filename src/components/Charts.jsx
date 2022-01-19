@@ -233,10 +233,12 @@ export const Charts = ({
         </TableCell>
       ));
 
-    const rows = data.map(({ rowName, values }) => (
+    const rows = data.map(({ rowName, values, iconPath }) => (
       <TableRow key={rowName}>
         {!hideRowNames && (
           <TableCell scope="row" component="th">
+            {iconPath && <img style={{ height: 50, margin: "auto", display: "block" }} src={`assets/${iconPath}.png`} />}
+            <br />
             {rowName}
           </TableCell>
         )}

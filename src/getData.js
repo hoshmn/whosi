@@ -321,6 +321,11 @@ function getTable({
 
   const data = rowNames.map((rn) => ({
     rowName: _.get(chartConfig, [`${S._key_}${rn}`, 0, C.displayName], rn),
+    iconPath: getField({
+      chartConfig,
+      element: `${S._key_}${rn}`,
+      field: C.iconPath,
+    }),
     values: colNames.map((cn) => ({
       columnName: _.get(chartConfig, [`${S._key_}${cn}`, 0, C.displayName], cn),
       columnNamed: _.get(
