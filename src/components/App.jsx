@@ -17,7 +17,7 @@ import { transformLink } from "../utils/display";
 import { HomePage } from "./HomePage";
 import { Dictionary } from "./Dictionary";
 
-const SHOW_COLORS = true;
+const SHOW_COLORS = false;
 
 export default function App() {
   const [selectedIso, setIso] = React.useState(null);
