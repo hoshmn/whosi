@@ -233,13 +233,16 @@ export const Charts = ({
         </TableCell>
       ));
 
-    const rows = data.map(({ rowName, values, iconPath }) => (
+    let hasIcons = false;
+    const rows = data.map(({ rowName, values, iconPath }) => {
+      hasIcons = hasIcons || iconPath;
+      return (
       <TableRow key={rowName}>
         {!hideRowNames && (
           <TableCell scope="row" component="th">
             {iconPath && (
               <>
-                <img style={{ height: 50 }} src={`assets/${iconPath}.png`} />
+                <img className="icon" src={`assets/${iconPath}.png`} />
                 <br />
               </>
             )}
@@ -261,7 +264,7 @@ export const Charts = ({
           </TableCell>
         ))}
       </TableRow>
-    ));
+    )});
 
     const isSingleColumn = firstRow["values"].length === 1;
 
@@ -282,7 +285,7 @@ export const Charts = ({
                 background: "white",
               },
               "& tbody tr:nth-of-type(odd)": {
-                background: getRC(radColors.sand, 2),
+                background: hasIcons ? "white" : getRC(radColors.sand, 2),
                 // background: getRC(themePrimary, 7),
               },
               "& td, & thead th": {
@@ -292,6 +295,15 @@ export const Charts = ({
               "& th": {
                 fontWeight: "bold",
                 minWidth: "60px",
+              },
+              "& img.icon": {
+                pb: 1,
+                pl: 1,
+                width: {
+                  xs: 75,
+                  sm: 100,
+                  md: 125,
+                },
               },
             }}
           >
