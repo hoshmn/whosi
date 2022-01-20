@@ -237,34 +237,35 @@ export const Charts = ({
     const rows = data.map(({ rowName, values, iconPath }) => {
       hasIcons = hasIcons || iconPath;
       return (
-      <TableRow key={rowName}>
-        {!hideRowNames && (
-          <TableCell scope="row" component="th">
-            {iconPath && (
-              <>
-                <img className="icon" src={`assets/${iconPath}.png`} />
-                <br />
-              </>
-            )}
-            {rowName}
-          </TableCell>
-        )}
-        {values.map(({ value, columnName, sheetRow, color }) => (
-          <TableCell
-            key={columnName}
-            sx={{
-              background: color,
-            }}
-          >
-            {/*  */}
-            {/* {_.get(sheetRow, G.DISPLAY_VALUE, value) || "N/A"} (move to getData?) */}
-            {/* to not overwrite "" with "N/A":  */}
-            {_.get(sheetRow, G.DISPLAY_VALUE, _.get([value], 0, "N/A"))}
-            {/* {(value && (sheetRow && sheetRow[G.DISPLAY_VALUE] || value)) || "N/A"} */}
-          </TableCell>
-        ))}
-      </TableRow>
-    )});
+        <TableRow key={rowName}>
+          {!hideRowNames && (
+            <TableCell scope="row" component="th">
+              {iconPath && (
+                <>
+                  <img className="icon" src={`assets/${iconPath}.png`} />
+                  <br />
+                </>
+              )}
+              {rowName}
+            </TableCell>
+          )}
+          {values.map(({ value, columnName, sheetRow, color }) => (
+            <TableCell
+              key={columnName}
+              sx={{
+                background: color,
+              }}
+            >
+              {/*  */}
+              {/* {_.get(sheetRow, G.DISPLAY_VALUE, value) || "N/A"} (move to getData?) */}
+              {/* to not overwrite "" with "N/A":  */}
+              {_.get(sheetRow, G.DISPLAY_VALUE, _.get([value], 0, "N/A"))}
+              {/* {(value && (sheetRow && sheetRow[G.DISPLAY_VALUE] || value)) || "N/A"} */}
+            </TableCell>
+          ))}
+        </TableRow>
+      );
+    });
 
     const isSingleColumn = firstRow["values"].length === 1;
 
@@ -299,10 +300,10 @@ export const Charts = ({
               "& img.icon": {
                 pb: 1,
                 pl: 1,
-                width: {
-                  xs: 75,
-                  sm: 100,
-                  md: 125,
+                height: {
+                  xs: 60,
+                  sm: 80,
+                  md: 100,
                 },
               },
             }}

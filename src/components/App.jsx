@@ -75,7 +75,8 @@ export default function App() {
         color: getRC(themePrimary, 12),
         fontFamily: theme.typography.fontFamily,
         p: { lg: 6 },
-        "& .themedLink": { // give <a> tags a color as if they were themed <Link>s
+        "& .themedLink": {
+          // give <a> tags a color as if they were themed <Link>s
           color: getRC(themePrimary, 11),
         },
       }}
