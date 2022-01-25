@@ -3,23 +3,19 @@ import React from "react";
 import _ from "lodash";
 import { getSiteData, getChartData } from "../getData";
 import { themePrimary, radColors, getRC } from "../consts/colors";
-import {
-  CircularProgress,
-  Container,
-  Paper,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { CircularProgress, Paper, Typography, useTheme } from "@mui/material";
 import { Header } from "./Header";
 import { Charts } from "./Charts";
 import { Box } from "@mui/system";
-import { transformLink } from "../utils/display";
 import { HomePage } from "./HomePage";
 import { Dictionary } from "./Dictionary";
+import { Login } from "./Login";
 
 const SHOW_COLORS = false;
 
 export default function App() {
+  const [entered, setEntered] = React.useState(false);
+
   const [selectedIso, setIso] = React.useState(null);
   const [chartData, setChartData] = React.useState([]);
 
@@ -61,6 +57,7 @@ export default function App() {
 
   // console.log("*", chartData);
   const loading =
+    !entered ||
     !homeCopy.length ||
     (selectedIso &&
       !_.some(chartData, (c) => c && c.countryIso === selectedIso));
@@ -81,6 +78,7 @@ export default function App() {
         },
       }}
     >
+      <Login open={!entered} setEntered={setEntered} />
       <Header
         countries={countries}
         handleCountryChange={updateCountry}
