@@ -17,9 +17,10 @@ import { encrypter } from "../utils/display";
 export const Login = ({ open, setEntered }) => {
   const [errored, setErrored] = React.useState(false);
   const [password, setPassword] = React.useState("");
-  
+
   const handleSubmit = () => {
-    const correct = encrypter(password) === "0905030a0d021d5c";
+    // alert(encrypter(password))
+    const correct = encrypter(password) === "130c0b0017001555";
     setErrored(!correct);
     setPassword("");
     if (correct) setEntered(true);
