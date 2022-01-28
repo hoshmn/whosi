@@ -375,16 +375,16 @@ export const Charts = ({
             fontSize: 32,
             maxWidth: { lg: 760, xl: "100%" },
             mb: { sm: 1, lg: 2 },
-            "& span": {
+            "& div": {
               color: getRC(themeSecondary, 11),
               fontWeight: "200",
               fontSize: "smaller",
-              pl: 2,
+              pt: 1,
             },
           }}
         >
           {country.name}
-          {!country.approved && <span>DRAFT</span>}
+          {!country.approved && <div>Pending review</div>}
         </Typography>
         <Box
           sx={{
@@ -484,7 +484,7 @@ export const Charts = ({
       const element = chart;
 
       const url = _.get(country, element.elementId);
-      console.log(chart);
+      // console.log(chart);
       if (!url) return null;
       return (
         <Box
