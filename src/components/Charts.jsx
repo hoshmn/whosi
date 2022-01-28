@@ -113,6 +113,9 @@ export const Charts = ({
 }) => {
   const [hiddenElements, setHiddenElements] = React.useState({});
 
+  const country = countries.find((c) => c.iso === selectedIso);
+  if (!country) return null;
+
   const getLineAreaChart = (chart) => {
     const {
       data,
@@ -361,8 +364,6 @@ export const Charts = ({
   };
 
   const getIntro = (chart) => {
-    const country = countries.find((c) => c.iso === selectedIso);
-
     // #NFS (Nested Flex Solution): nested boxes share the intro line on md+
     return (
       <>
@@ -374,15 +375,22 @@ export const Charts = ({
             fontSize: 32,
             maxWidth: { lg: 760, xl: "100%" },
             mb: { sm: 1, lg: 2 },
+            "& span": {
+              color: getRC(themeSecondary, 11),
+              fontWeight: "200",
+              fontSize: "smaller",
+              pl: 2,
+            },
           }}
         >
-          {country && country.name}
+          {country.name}
+          {!country.approved && <span>DRAFT</span>}
         </Typography>
         <Box
           sx={{
             // #NFS - intro details are stacked on xs, md, lg
             display: { sm: "flex", md: "unset", xl: "flex" },
-            "& dl:not(:last-child)": { mr: 10 },
+            "& dl:not(:last-child)": { mr: 3 },
             "& dt h2": {
               fontWeight: 100,
               letterSpacing: ".8px",
@@ -474,7 +482,6 @@ export const Charts = ({
     if (type === "link") {
       // for clarity...
       const element = chart;
-      const country = countries.find((c) => c.iso === selectedIso);
 
       const url = _.get(country, element.elementId);
       console.log(chart);
@@ -528,7 +535,7 @@ export const Charts = ({
           sx={{
             // background: { xs: "red", sm: "blue", md: "green", lg: "yellow", xl: "purple" },
             // #NFS - designate intro section width to make room for boxes
-            flexBasis: { xs: "100%", md: 220, lg: 400, xl: 425 },
+            flexBasis: { xs: "100%", md: 290, lg: 400, xl: 425 },
             flexGrow: { xl: 0 },
             p: 3,
             // display: {md: "flex"},
