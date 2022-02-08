@@ -10,11 +10,15 @@ import { Box } from "@mui/system";
 import { HomePage } from "./HomePage";
 import { Dictionary } from "./Dictionary";
 import { Login } from "./Login";
+import { Resources } from "./Resources";
 
 const SHOW_COLORS = false;
 
 export default function App() {
-  const [entered, setEntered] = React.useState(false);
+  const [entered, setEntered] = React.useState(true);
+  const [viewingResources, setViewingResources] = React.useState(false);
+  const closeResources = () => setViewingResources(false);
+  const openResources = () => setViewingResources(true);
 
   const [selectedIso, setIso] = React.useState(null);
   const [chartData, setChartData] = React.useState([]);
@@ -22,6 +26,11 @@ export default function App() {
   const [dictionary, setDictionary] = React.useState([]);
   const [countries, setCountries] = React.useState([]);
   const [homeCopy, setHomeCopy] = React.useState([]);
+
+  const [publications, setPublications] = React.useState([]);
+  const [webinars, setWebinars] = React.useState([]);
+  const [resourceNameMap, setResourceNameMap] = React.useState({});
+
   const [chartIds, setChartIds] = React.useState([]);
   const [chartConfigsMap, setChartConfigsMap] = React.useState(null);
 
@@ -34,6 +43,11 @@ export default function App() {
       setDictionary(result.dictionary.filter((d) => d.term && d.definition));
       setCountries(result.countries.filter((c) => c.iso && c.name));
       setHomeCopy(result.homecopy);
+
+      setPublications(result.publications);
+      setWebinars(result.webinars);
+      setResourceNameMap(result.resourcenamemap);
+
       setChartIds(result.chartIds);
       setChartConfigsMap(result.chartConfigsMap);
     });
@@ -79,10 +93,19 @@ export default function App() {
       }}
     >
       <Login open={!entered} setEntered={setEntered} />
+      <Resources
+        open={viewingResources}
+        close={closeResources}
+        publications={publications}
+        webinars={webinars}
+        resourceNameMap={resourceNameMap}
+      />
       <Header
         countries={countries}
         handleCountryChange={updateCountry}
         selectedIso={selectedIso}
+        viewingResources={viewingResources}
+        openResources={openResources}
       />
       <br />
 

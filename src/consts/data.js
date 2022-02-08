@@ -5,7 +5,14 @@ export const TABLE_DELIN = "__";
 export const MULTI_LINE_TEXT_DELIN = "__";
 
 // sheets we can just grab copy directly from
-export const CMS_SHEETS = ["dictionary", "countries", "homecopy"];
+export const CMS_SHEETS = [
+  "dictionary",
+  "countries",
+  "homecopy",
+  "publications",
+  "webinars",
+  "resourcenamemap",
+];
 // these are set in the home sheet for version controlability
 export const CONFIGURABLE_GID_NAMES = ["configs", ...CMS_SHEETS];
 // gids pointing to Sheet tabs
@@ -113,6 +120,15 @@ export const CMS_FIELDS = {
   // homecopy
   blurb: "blurb",
   TAP: "_TAP_", // prefix to fields for the Technical Assistance Provider fields
+};
+
+// RESOURCE FIELDS - fields we add for the app
+export const RESOURCE_FIELDS = {
+  // we use UPPER_CASE to distinguish from actual "database" fields from the Sheet
+  DISPLAY_NAME: "DISPLAY_NAME",
+  DISPLAY_VALUE: "DISPLAY_VALUE",
+  DISPLAY_VALUE_LOWER: `DISPLAY_${DATA_FIELDS.value_lower.toUpperCase()}`,
+  DISPLAY_VALUE_UPPER: `DISPLAY_${DATA_FIELDS.value_upper.toUpperCase()}`,
 };
 
 // GENERATED FIELDS - fields we add for the app
