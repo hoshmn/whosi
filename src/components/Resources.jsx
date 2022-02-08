@@ -111,9 +111,10 @@ export const Resources = ({
   };
 
   const filteredData = React.useMemo(() => {
+    if (_.isEmpty(filterSelections)) return publications;
     return publications.filter((d) => {
       return _.every(filterSelections, (values, key) => {
-        // console.log(values, key, d[key]);
+        console.log(values, key, d[key]);
         return (
           !values.length || _.some(values, (v) => d[key] && d[key].includes(v))
         );
@@ -158,10 +159,11 @@ export const Resources = ({
             <ToggleButton />
             </ToggleButtonGroup> */}
             {filterTerms.map((term) => {
-              const options = filterOptions[term];
+              const options = filterOptions[term] || [];
               // console.log(options);
               return (
                 <Autocomplete
+                  key={term}
                   sx={{ py: 0.5 }}
                   multiple
                   value={filterSelections[term] || []}
