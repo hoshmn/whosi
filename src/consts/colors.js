@@ -43,6 +43,8 @@ export const colorGroups = [coreColors, altColors, alt2Colors];
 export const fillIntensity = 8;
 export const strokeIntensity = 11;
 
+export const inactiveText = "rgba(0, 0, 0, 0.54)";
+
 export const radColors = {
   tomato,
   red,

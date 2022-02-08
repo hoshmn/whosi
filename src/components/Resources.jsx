@@ -11,10 +11,14 @@ import {
   TextField,
   ToggleButton,
   ToggleButtonGroup,
+  Accordion,
+  AccordionSummary as MuiAccordionSummary,
+  AccordionDetails as MuiAccordionDetails,
 } from "@mui/material";
-import { getRC, themePrimary, themeSecondary } from "../consts/colors";
-import { Close } from "@mui/icons-material";
+import { getRC, inactiveText, themePrimary } from "../consts/colors";
+import { Close, ArrowForwardIosSharp } from "@mui/icons-material";
 import { RESOURCE_FIELDS } from "../consts/data";
+import { styled } from "@mui/system";
 
 // TODO: spell out, move?
 const filterTermsMap = {
@@ -27,6 +31,26 @@ const filterTermsMap = {
   ],
   webinars: ["authors/collaborators", "tags", "country", "region", "language"],
 };
+
+const AccordionSummary = styled((props) => (
+  <MuiAccordionSummary
+    expandIcon={<ArrowForwardIosSharp sx={{ fontSize: "0.9rem" }} />}
+    {...props}
+  />
+))(({ theme }) => ({
+  flexDirection: "row-reverse",
+  "& .MuiAccordionSummary-expandIconWrapper.Mui-expanded": {
+    transform: "rotate(90deg)",
+  },
+  "& .MuiAccordionSummary-content": {
+    marginLeft: theme.spacing(1),
+  },
+}));
+
+const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
+  padding: theme.spacing(2),
+  borderTop: "1px solid rgba(0, 0, 0, .125)",
+}));
 
 const Publication = (resource) => {
   const {
@@ -113,7 +137,7 @@ const Webinar = (resource) => {
     if (!link) return null;
 
     return (
-      <Link href={link} target="__blank">
+      <Link href={link} target="__blank" key={link}>
         <Typography
           variant="body2"
           dangerouslySetInnerHTML={{
@@ -173,11 +197,10 @@ export const Resources = ({
   webinars,
   resourceNameMap,
 }) => {
-  // console.log(publications);
-  // console.log(webinars);
-  // console.log(resourceNameMap);
   const [filterSelections, setFilterSelections] = React.useState({});
   const [resourceType, setResourceType] = React.useState("publications");
+  const [viewingFilters, setViewingFilters] = React.useState(true);
+  const toggleViewingFilters = () => setViewingFilters(!viewingFilters);
 
   const RNM = React.useMemo(() => {
     return resourceNameMap.reduce((accum, row) => {
@@ -227,7 +250,7 @@ export const Resources = ({
     // if (_.isEmpty(filterSelections)) return resourceData;
     return resourceData.filter((d) => {
       return _.every(filterSelections, (values, key) => {
-        console.log(values, key, d[key]);
+        // console.log(values, key, d[key]);
         return (
           !values.length || _.some(values, (v) => d[key] && d[key].includes(v))
         );
@@ -245,48 +268,68 @@ export const Resources = ({
   const handleTypeChange = (event) =>
     setResourceType(event.target.value.toLowerCase());
 
+  const clearFilters = (e) => {
+    e.stopPropagation(); // don't toggle accordion
+    setFilterSelections({});
+  };
+
   const theme = useTheme();
+  const filtered = _.some(filterSelections, (val) => !!val.length);
   return (
     <Modal
       open={open}
       onBackdropClick={close}
       sx={{
         p: 1,
-        maxWidth: 700,
+        maxWidth: { xs: 700, md: 800, lg: 930 },
         m: "auto",
         "& .MuiPaper-root": {
           height: "100%",
           overflow: "auto",
         },
         "& .contents": {
-          p: 4,
-          pr: 6,
+          p: { xs: 2, sm: 4, md: 6 },
+          pr: { sm: 6, md: 7 },
           position: "relative",
         },
-        // "& .MuiButtonBase-root":
+        "& .close-button": {
+          position: "absolute",
+          zIndex: 10,
+          right: { xs: theme.spacing(3), md: theme.spacing(4) },
+          top: { xs: theme.spacing(3), sm: theme.spacing(4) },
+          background: "rgba(250,250,250,.8)",
+          "&:hover": {
+            background: "rgba(240,240,240,.9)",
+          },
+        },
         "& .MuiToggleButton-root": {
           // height: '30px'
-          mb: 3,
+          // mb: 3,
           "&.Mui-selected": {
             background: getRC(themePrimary, 2),
             color: getRC(themePrimary, 11),
             borderColor: getRC(themePrimary, 11),
-            borderWidth: 2,
-          }
+            borderWidth: 1,
+            // ml: "-2px"
+          },
+        },
+        "& .MuiAccordion-root": {
+          boxShadow: "none",
+        },
+        "& .MuiAccordionSummary-root": {
+          background: "none",
+          p: 0,
+          "&:not(.filtered)": {
+            color: inactiveText,
+          },
+          "&.filtered": {
+            // color: getRC(themePrimary, 11),
+          },
         },
       }}
     >
       <Paper>
-        <IconButton
-          onClick={close}
-          sx={{
-            position: "absolute",
-            zIndex: 10,
-            right: theme.spacing(4),
-            top: theme.spacing(4),
-          }}
-        >
-          {/* ✕ */}
+        <IconButton onClick={close} className="close-button">
           <Close />
         </IconButton>
         <Box className="contents">
@@ -305,30 +348,59 @@ export const Resources = ({
               </ToggleButton>
             ))}
           </ToggleButtonGroup>
-          {filterTerms.map((term) => {
-            const options = filterOptions[term] || [];
-            // console.log(options);
-            return (
-              <Autocomplete
-                key={term}
-                sx={{ py: 0.5 }}
-                multiple
-                value={filterSelections[term] || []}
-                onChange={handleFilterChange.bind(null, term)}
-                id="tags-outlined"
-                options={options}
-                getOptionLabel={(option) => RNM[option] || option}
-                filterSelectedOptions
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={term}
-                    // placeholder={t}
-                  />
+
+          <Accordion
+            disableGutters
+            expanded={viewingFilters}
+            onChange={toggleViewingFilters}
+          >
+            <AccordionSummary
+              className={filtered ? "filtered" : ""}
+              aria-controls="panel1d-content"
+              id="panel1d-header"
+            >
+              <Typography variant="body1" component="body1">
+                Filters
+                {filtered && (
+                  <>
+                    {" "}
+                    (
+                    <Link href={null} onClick={clearFilters}>
+                      clear
+                    </Link>
+                    )
+                  </>
                 )}
-              />
-            );
-          })}
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              {filterTerms.map((term) => {
+                const options = filterOptions[term] || [];
+                // console.log(options);
+                return (
+                  <Autocomplete
+                    key={term}
+                    sx={{ py: 0.5 }}
+                    multiple
+                    value={filterSelections[term] || []}
+                    onChange={handleFilterChange.bind(null, term)}
+                    id="tags-outlined"
+                    options={options}
+                    getOptionLabel={(option) => RNM[option] || option}
+                    filterSelectedOptions
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label={term}
+                        // placeholder={t}
+                      />
+                    )}
+                  />
+                );
+              })}
+            </AccordionDetails>
+          </Accordion>
+
           {filteredData.map((resource, i) => (
             <ResourceComponent key={i} {...resource} />
           ))}
