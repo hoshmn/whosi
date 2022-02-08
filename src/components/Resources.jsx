@@ -301,8 +301,7 @@ export const Resources = ({
           "&.Mui-selected": {
             background: getRC(themePrimary, 2),
             color: getRC(themePrimary, 11),
-            borderColor: getRC(themePrimary, 11),
-            borderWidth: 1,
+            border: `1px ${getRC(themePrimary, 11)} solid !important`,
             // ml: "-2px"
           },
         },
