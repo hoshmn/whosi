@@ -134,6 +134,7 @@ export const Resources = ({
         },
         "& .contents": {
           p: 4,
+          pr: 6,
           position: "relative",
         },
         // "& .MuiButtonBase-root": 
