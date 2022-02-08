@@ -68,7 +68,6 @@ const Publication = (resource) => {
     <Box mt={2}>
       <Link href={title_link} target="__blank">
         <Typography
-          // mt={1}
           variant="body1"
           dangerouslySetInnerHTML={{
             __html: title,
@@ -76,7 +75,6 @@ const Publication = (resource) => {
         />
       </Link>
       <Typography
-        // mt={1}
         variant="body2"
         sx={{ fontWeight: "bolder" }}
         dangerouslySetInnerHTML={{
@@ -85,7 +83,6 @@ const Publication = (resource) => {
       />
       {journal && (
         <Typography
-          // mt={1}
           variant="body2"
           sx={{ display: "inline" }}
           dangerouslySetInnerHTML={{
@@ -95,7 +92,6 @@ const Publication = (resource) => {
       )}
       {volume_page && (
         <Typography
-          // mt={1}
           variant="body2"
           sx={{ display: "inline" }}
           dangerouslySetInnerHTML={{
@@ -105,7 +101,6 @@ const Publication = (resource) => {
       )}
       {date && (
         <Typography
-          // mt={1}
           variant="body2"
           sx={{ display: "inline" }}
           dangerouslySetInnerHTML={{
@@ -151,14 +146,12 @@ const Webinar = (resource) => {
   return (
     <Box mt={2}>
       <Typography
-        // mt={1}
         variant="body1"
         dangerouslySetInnerHTML={{
           __html: title,
         }}
       />
       <Typography
-        // mt={1}
         variant="body2"
         sx={{ fontWeight: "bolder" }}
         dangerouslySetInnerHTML={{
@@ -167,7 +160,6 @@ const Webinar = (resource) => {
       />
       {description && (
         <Typography
-          // mt={1}
           variant="body2"
           sx={{ display: "inline" }}
           dangerouslySetInnerHTML={{
@@ -177,7 +169,6 @@ const Webinar = (resource) => {
       )}
       {date && (
         <Typography
-          // mt={1}
           variant="body2"
           sx={{ display: "inline" }}
           dangerouslySetInnerHTML={{
@@ -281,6 +272,7 @@ export const Resources = ({
       onBackdropClick={close}
       sx={{
         p: 1,
+        py: { md: 2 },
         maxWidth: { xs: 700, md: 800, lg: 930 },
         m: "auto",
         "& .MuiPaper-root": {
@@ -326,6 +318,10 @@ export const Resources = ({
           "&.filtered": {
             // color: getRC(themePrimary, 11),
           },
+        },
+        "& .MuiAutocomplete-root": {
+          py: .5,
+          maxWidth: 520,
         },
       }}
     >
@@ -381,8 +377,8 @@ export const Resources = ({
                 return (
                   <Autocomplete
                     key={term}
-                    sx={{ py: 0.5 }}
                     multiple
+                    disableCloseOnSelect
                     value={filterSelections[term] || []}
                     onChange={handleFilterChange.bind(null, term)}
                     id="tags-outlined"
