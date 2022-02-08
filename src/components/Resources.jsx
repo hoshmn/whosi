@@ -9,12 +9,15 @@ import {
   Link,
   Autocomplete,
   TextField,
+  ToggleButton,
+  ToggleButtonGroup,
 } from "@mui/material";
 import { getRC, themePrimary } from "../consts/colors";
 import { Close } from "@mui/icons-material";
 import { RESOURCE_FIELDS } from "../consts/data";
 
-const filterTerms = ["authors", "tags", "country", "region", "type"];
+// TODO: spell out, move?
+const filterTerms = ["authors", "tags", "country", "region"];
 
 const Publication = (p) => {
   const {
@@ -149,15 +152,19 @@ export const Resources = ({
         <Box className="contents">
           <Typography variant="h6" component="h1">
             Resources
-            {filterTerms.map((t) => {
-              const options = filterOptions[t];
+            {/* <ToggleButtonGroup>
+          
+            <ToggleButton />
+            </ToggleButtonGroup> */}
+            {filterTerms.map((term) => {
+              const options = filterOptions[term];
               // console.log(options);
               return (
                 <Autocomplete
                   sx={{ py: 0.5 }}
                   multiple
-                  value={filterSelections[t] || []}
-                  onChange={handleChange.bind(null, t)}
+                  value={filterSelections[term] || []}
+                  onChange={handleChange.bind(null, term)}
                   id="tags-outlined"
                   options={options}
                   getOptionLabel={(option) => RNM[option] || option}
@@ -165,7 +172,7 @@ export const Resources = ({
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label={t}
+                      label={term}
                       // placeholder={t}
                     />
                   )}
