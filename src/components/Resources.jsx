@@ -199,7 +199,7 @@ export const Resources = ({
 }) => {
   const [filterSelections, setFilterSelections] = React.useState({});
   const [resourceType, setResourceType] = React.useState("publications");
-  const [viewingFilters, setViewingFilters] = React.useState(true);
+  const [viewingFilters, setViewingFilters] = React.useState(false);
   const toggleViewingFilters = () => setViewingFilters(!viewingFilters);
 
   const RNM = React.useMemo(() => {
@@ -290,13 +290,14 @@ export const Resources = ({
         "& .contents": {
           p: { xs: 2, sm: 4, md: 6 },
           pr: { sm: 6, md: 7 },
+          px: { lg: 8 },
           position: "relative",
         },
         "& .close-button": {
           position: "absolute",
           zIndex: 10,
           right: { xs: theme.spacing(3), md: theme.spacing(4) },
-          top: { xs: theme.spacing(3), sm: theme.spacing(4) },
+          top: { xs: theme.spacing(3), sm: theme.spacing(4), md: theme.spacing(6) },
           background: "rgba(250,250,250,.8)",
           "&:hover": {
             background: "rgba(240,240,240,.9)",
