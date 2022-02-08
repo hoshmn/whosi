@@ -29,7 +29,7 @@ export default function App() {
 
   const [publications, setPublications] = React.useState([]);
   const [webinars, setWebinars] = React.useState([]);
-  const [resourceNameMap, setResourceNameMap] = React.useState({});
+  const [resourceNameMap, setResourceNameMap] = React.useState([]);
 
   const [chartIds, setChartIds] = React.useState([]);
   const [chartConfigsMap, setChartConfigsMap] = React.useState(null);
