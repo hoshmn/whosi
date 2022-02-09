@@ -28,8 +28,18 @@ const filterTermsMap = {
     "country",
     "region",
     "language",
+    "type",
+    "year",
   ],
-  webinars: ["authors/collaborators", "tags", "country", "region", "language"],
+  webinars: [
+    "authors/collaborators",
+    "tags",
+    "country",
+    "region",
+    "language",
+    "type",
+    "year",
+  ],
 };
 
 const AccordionSummary = styled((props) => (
@@ -64,16 +74,24 @@ const Publication = (resource) => {
 
   if (!title) return null;
 
+  const Title = (
+    <Typography
+      variant="body1"
+      dangerouslySetInnerHTML={{
+        __html: title,
+      }}
+    />
+  );
+  const TitleComp = title_link ? (
+    <Link href={title_link} target="__blank">
+      {Title}
+    </Link>
+  ) : (
+    Title
+  );
   return (
     <Box mt={2}>
-      <Link href={title_link} target="__blank">
-        <Typography
-          variant="body1"
-          dangerouslySetInnerHTML={{
-            __html: title,
-          }}
-        />
-      </Link>
+      {TitleComp}
       <Typography
         variant="body2"
         sx={{ fontWeight: "bolder" }}
@@ -122,12 +140,12 @@ const Webinar = (resource) => {
 
   if (!title) return null;
 
-  const Links = _.range(1, 10).map((i) => {
-    const lString = `link_${i}`;
-    const tString = `link_${i}_title`;
+  const genericTitle = RESOURCE_FIELDS.link_n_title;
+  const genericLink = RESOURCE_FIELDS.link_n;
+  const Links = _.range(1, 20).map((i) => {
     const {
-      [RESOURCE_FIELDS[tString]]: title,
-      [RESOURCE_FIELDS[lString]]: link,
+      [genericTitle.replace("{n}", i)]: title,
+      [genericLink.replace("{n}", i)]: link,
     } = resource;
     if (!link) return null;
 
@@ -229,11 +247,12 @@ export const Resources = ({
           const allTerms = result[term] || [];
           result[term] = _.chain([...allTerms, ...newTerms])
             .uniq()
-            .sort((a, b) => (a > b ? 1 : -1))
+            .sort((a, b) => (a.toLowerCase() > b.toLowerCase() ? 1 : -1))
             .value();
         }
       });
     });
+    // console.log("******", result);
     return result;
   }, [filterTerms, resourceData]);
 
@@ -289,7 +308,11 @@ export const Resources = ({
           position: "absolute",
           zIndex: 10,
           right: { xs: theme.spacing(3), md: theme.spacing(4) },
-          top: { xs: theme.spacing(3), sm: theme.spacing(4), md: theme.spacing(6) },
+          top: {
+            xs: theme.spacing(3),
+            sm: theme.spacing(4),
+            md: theme.spacing(6),
+          },
           background: "rgba(250,250,250,.8)",
           "&:hover": {
             background: "rgba(240,240,240,.9)",
@@ -319,7 +342,7 @@ export const Resources = ({
           },
         },
         "& .MuiAutocomplete-root": {
-          py: .5,
+          py: 0.5,
           maxWidth: 520,
         },
       }}
