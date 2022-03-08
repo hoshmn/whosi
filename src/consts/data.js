@@ -119,6 +119,8 @@ export const CMS_FIELDS = {
   name: "name",
   // homecopy
   blurb: "blurb",
+  // resources_name: "resources_name",
+  resources_intro: "resources_intro",
   TAP: "_TAP_", // prefix to fields for the Technical Assistance Provider fields
 };
 

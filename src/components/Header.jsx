@@ -23,7 +23,7 @@ export const Header = ({
             selectedIso={selectedIso}
           />
           <Link href={null} onClick={openResources} sx={{ cursor: "pointer" }}>
-            Resources
+            DSD testing, treatment and AHD Resources Hub
           </Link>
         </Toolbar>
       </AppBar>

@@ -260,9 +260,10 @@ function getTableList({
           chartWideFieldVal.replace(S._color_by_, "");
         // use the above described map to _.get, eg, ["status", "complete"]
         const chartColorSetting = _.get(colorMap, [chartWideFieldVal, LCVal]);
-
+        const key = `${S._key_}${cn}`;
+        const columnName = _.get(chartConfig, [key, 0, C.displayName], cn);
         return {
-          columnName: cn,
+          columnName,
           columnNamed: colNames.length > 1, // always named with the field name if multiple fields are displayed
           value,
           color: chartColorSetting,

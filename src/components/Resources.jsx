@@ -17,8 +17,9 @@ import {
 } from "@mui/material";
 import { getRC, inactiveText, themePrimary } from "../consts/colors";
 import { Close, ArrowForwardIosSharp } from "@mui/icons-material";
-import { RESOURCE_FIELDS } from "../consts/data";
+import { CMS_FIELDS, RESOURCE_FIELDS } from "../consts/data";
 import { styled } from "@mui/system";
+import { transformLink } from "../utils/display";
 
 // TODO: spell out, move?
 const filterTermsMap = {
@@ -205,6 +206,7 @@ export const Resources = ({
   publications,
   webinars,
   resourceNameMap,
+  homeCopy = [],
 }) => {
   const [filterSelections, setFilterSelections] = React.useState({});
   const [resourceType, setResourceType] = React.useState("publications");
@@ -355,6 +357,26 @@ export const Resources = ({
           {/* <Typography variant="h6" component="h1">
             Resources
           </Typography> */}
+          <Box>
+            {homeCopy.map(
+              (row, i) =>
+                !!row[CMS_FIELDS.resources_intro] && (
+                  <Typography
+                    variant="body1"
+                    key={i}
+                    sx={{
+                      fontSize: { sm: "smaller", md: "unset" },
+                    }}
+                    // sx={{ maxWidth: 600, margin: "auto" }}
+                    pb={1}
+                    // px={3}
+                    dangerouslySetInnerHTML={{
+                      __html: transformLink(row[CMS_FIELDS.resources_intro]),
+                    }}
+                  />
+                )
+            )}
+          </Box>
 
           <ToggleButtonGroup exclusive onChange={handleTypeChange}>
             {["Publications", "Webinars"].map((type) => (
@@ -378,7 +400,7 @@ export const Resources = ({
               aria-controls="panel1d-content"
               id="panel1d-header"
             >
-              <Typography variant="body1" component="body1">
+              <Typography variant="body1">
                 Filters
                 {filtered && (
                   <>

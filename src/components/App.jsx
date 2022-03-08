@@ -15,8 +15,8 @@ import { Resources } from "./Resources";
 const SHOW_COLORS = false;
 
 export default function App() {
-  const [entered, setEntered] = React.useState(false);
-  const [viewingResources, setViewingResources] = React.useState(false);
+  const [entered, setEntered] = React.useState(true);
+  const [viewingResources, setViewingResources] = React.useState(true);
   const closeResources = () => setViewingResources(false);
   const openResources = () => setViewingResources(true);
 
@@ -99,6 +99,7 @@ export default function App() {
         publications={publications}
         webinars={webinars}
         resourceNameMap={resourceNameMap}
+        homeCopy={homeCopy}
       />
       <Header
         countries={countries}
