@@ -327,3 +327,27 @@ export const getCalculatedDataPoint = ({
     element,
   });
 };
+
+// TODO: logic is specific to DELIVERABLE chart. make universal.
+export const findLeastUpdatedDeliverableCell = (groupData, col) => {
+  const { columnName } = col;
+  // ordered least to most complete
+  const statuses = ["Delayed", "Planned", "Started", "Ongoing", "Completed"];
+  let i = 0;
+
+  let someCell = {};
+  let theCell = null;
+  while (i < statuses.length) {
+    // TODO: refactor for clarity
+    groupData.find((r) => {
+      someCell = r.values.find((v) => v.sourceColumnName === columnName);
+      if (_.get(someCell, "value") === statuses[i]) {
+        theCell = someCell;
+        return true;
+      }
+    });
+    if (theCell) return theCell;
+    i++;
+  }
+  return someCell;
+};

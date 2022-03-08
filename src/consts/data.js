@@ -48,6 +48,7 @@ export const CONFIG_FIELDS = {
   sourceLink: "source_link",
   sourceName: "source_name",
   iconPath: "icon_path",
+  collapsibleTL: "collapsible_table_list",
   hiddenUntilExpand: "hidden_until_expand",
   capPercentage: "cap_percentage",
   percentageDecimals: "percentage_decimals",
