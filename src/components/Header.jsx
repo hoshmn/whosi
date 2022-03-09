@@ -5,6 +5,7 @@ import Toolbar from "@mui/material/Toolbar";
 import { CountrySelect } from "./CountrySelect";
 import { getRC, headerColor } from "../consts/colors";
 import { Link } from "@mui/material";
+import { CMS_FIELDS as C } from "../consts/data";
 
 export const Header = ({
   selectedIso,
@@ -12,6 +13,7 @@ export const Header = ({
   countries,
   viewingResources,
   openResources,
+  siteCopy,
 }) => {
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -23,7 +25,7 @@ export const Header = ({
             selectedIso={selectedIso}
           />
           <Link href={null} onClick={openResources} sx={{ cursor: "pointer" }}>
-            DSD testing, treatment and AHD Resources Hub
+            {_.get(siteCopy, [C.resources_title, "value"])}
           </Link>
         </Toolbar>
       </AppBar>

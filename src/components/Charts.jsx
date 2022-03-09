@@ -249,10 +249,10 @@ export const Charts = ({
         // TODO: logic is specific to DELIVERABLE chart. make universal.
         collapsedRow.values = collapsedRow.values.map((c) => {
           if (c.sourceColumnName === D.Supplier) {
-            c.value = `<b>${group}</b> <span class="item-count">(${groupData.length} items)</span>`;
+            c.value = `<b>${group}</b>`;
             return c;
           } else if (c.sourceColumnName === D.Deliverable) {
-            c.value = `<em>click to expand</em>`;
+            c.value = `<em>${groupData.length} items (click to view)</em>`;
             return c;
           } else if (D.REGEX.quarter.test(c.sourceColumnName)) {
             const ludr = findLeastUpdatedDeliverableCell(groupData, c);
@@ -322,9 +322,9 @@ export const Charts = ({
             onClick={clickHandler}
             sx={{
               cursor: expandible && "pointer",
-              "& .item-count": {
-                whiteSpace: "nowrap"
-              }
+              // "& .item-count": {
+              //   whiteSpace: "nowrap",
+              // },
             }}
           >
             {!hideRowNames && (

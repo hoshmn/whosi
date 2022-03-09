@@ -11,6 +11,8 @@ export const CMS_SHEETS = [
   "homecopy",
   "publications",
   "webinars",
+  "events",
+  "sitecopy",
   "resourcenamemap",
 ];
 // these are set in the home sheet for version controlability
@@ -120,8 +122,11 @@ export const CMS_FIELDS = {
   name: "name",
   // homecopy
   blurb: "blurb",
-  // resources_name: "resources_name",
+  resources_title: "resources_title",
   resources_intro: "resources_intro",
+  highlighted_desc_: "highlighted_desc_",
+  highlighted_desc_publications: "highlighted_desc_publications",
+  highlighted_desc_webinars: "highlighted_desc_webinars",
   TAP: "_TAP_", // prefix to fields for the Technical Assistance Provider fields
 };
 
@@ -133,6 +138,7 @@ export const RESOURCE_FIELDS = {
   authors: "authors/collaborators",
   journal: "journal",
   volume_page: "volume_page",
+  highlighted: "highlighted",
   tags: "tags",
   type: "type",
   country: "country",

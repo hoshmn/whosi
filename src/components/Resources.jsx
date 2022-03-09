@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import { getRC, inactiveText, themePrimary } from "../consts/colors";
 import { Close, ArrowForwardIosSharp } from "@mui/icons-material";
-import { CMS_FIELDS, RESOURCE_FIELDS } from "../consts/data";
+import { CMS_FIELDS as C, RESOURCE_FIELDS as R } from "../consts/data";
 import { styled } from "@mui/system";
 import { transformLink } from "../utils/display";
 
@@ -41,6 +41,7 @@ const filterTermsMap = {
     "type",
     "year",
   ],
+  events: [],
 };
 
 const AccordionSummary = styled((props) => (
@@ -65,12 +66,12 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
 
 const Publication = (resource) => {
   const {
-    [RESOURCE_FIELDS.title]: title,
-    [RESOURCE_FIELDS.title_link]: title_link,
-    [RESOURCE_FIELDS.authors]: authors,
-    [RESOURCE_FIELDS.journal]: journal,
-    [RESOURCE_FIELDS.volume_page]: volume_page,
-    [RESOURCE_FIELDS.date]: date,
+    [R.title]: title,
+    [R.title_link]: title_link,
+    [R.authors]: authors,
+    [R.journal]: journal,
+    [R.volume_page]: volume_page,
+    [R.date]: date,
   } = resource;
 
   if (!title) return null;
@@ -133,16 +134,85 @@ const Publication = (resource) => {
 
 const Webinar = (resource) => {
   const {
-    [RESOURCE_FIELDS.title]: title,
-    [RESOURCE_FIELDS.authors]: authors,
-    [RESOURCE_FIELDS.description]: description,
-    [RESOURCE_FIELDS.date]: date,
+    [R.title]: title,
+    [R.authors]: authors,
+    [R.description]: description,
+    [R.date]: date,
   } = resource;
 
   if (!title) return null;
 
-  const genericTitle = RESOURCE_FIELDS.link_n_title;
-  const genericLink = RESOURCE_FIELDS.link_n;
+  const genericTitle = R.link_n_title;
+  const genericLink = R.link_n;
+  const Links = _.range(1, 20).map((i) => {
+    const {
+      [genericTitle.replace("{n}", i)]: title,
+      [genericLink.replace("{n}", i)]: link,
+    } = resource;
+    if (!link) return null;
+
+    return (
+      <Link href={link} target="__blank" key={link}>
+        <Typography
+          variant="body2"
+          dangerouslySetInnerHTML={{
+            __html: title || link,
+          }}
+        />
+      </Link>
+    );
+  });
+
+  return (
+    <Box mt={2}>
+      <Typography
+        variant="body1"
+        dangerouslySetInnerHTML={{
+          __html: title,
+        }}
+      />
+      <Typography
+        variant="body2"
+        sx={{ fontWeight: "bolder" }}
+        dangerouslySetInnerHTML={{
+          __html: authors,
+        }}
+      />
+      {description && (
+        <Typography
+          variant="body2"
+          sx={{ display: "inline" }}
+          dangerouslySetInnerHTML={{
+            __html: description + ". ",
+          }}
+        />
+      )}
+      {date && (
+        <Typography
+          variant="body2"
+          sx={{ display: "inline" }}
+          dangerouslySetInnerHTML={{
+            __html: date + ". ",
+          }}
+        />
+      )}
+      {Links}
+    </Box>
+  );
+};
+
+const Event = (resource) => {
+  const {
+    [R.title]: title,
+    [R.authors]: authors,
+    [R.description]: description,
+    [R.date]: date,
+  } = resource;
+
+  if (!title) return null;
+
+  const genericTitle = R.link_n_title;
+  const genericLink = R.link_n;
   const Links = _.range(1, 20).map((i) => {
     const {
       [genericTitle.replace("{n}", i)]: title,
@@ -205,13 +275,17 @@ export const Resources = ({
   close,
   publications,
   webinars,
+  events,
   resourceNameMap,
+  siteCopy,
   homeCopy = [],
 }) => {
   const [filterSelections, setFilterSelections] = React.useState({});
   const [resourceType, setResourceType] = React.useState("publications");
   const [viewingFilters, setViewingFilters] = React.useState(false);
   const toggleViewingFilters = () => setViewingFilters(!viewingFilters);
+
+  console.log("ST: ", siteCopy);
 
   const RNM = React.useMemo(() => {
     return resourceNameMap.reduce((accum, row) => {
@@ -224,9 +298,10 @@ export const Resources = ({
     const rMap = {
       publications,
       webinars,
+      events,
     };
     return rMap[resourceType];
-  }, [resourceType, publications.length, webinars.length]);
+  }, [resourceType, publications.length, webinars.length, events.length]);
 
   const filterTerms = React.useMemo(() => {
     return filterTermsMap[resourceType];
@@ -236,6 +311,7 @@ export const Resources = ({
     const rMap = {
       publications: Publication,
       webinars: Webinar,
+      events: Event,
     };
     return rMap[resourceType];
   }, [resourceType]);
@@ -285,6 +361,92 @@ export const Resources = ({
     setFilterSelections({});
   };
 
+  const getHighlightedSection = () => {
+    const highlighted = filteredData.filter((d) => d[R.highlighted]);
+    if (!highlighted.length) return;
+    return (
+      <Box className="highlighted-section">
+        <Typography
+          variant="body1"
+          dangerouslySetInnerHTML={{
+            __html: siteCopy[`${C.highlighted_desc_}${resourceType}`].value,
+          }}
+        />
+        {highlighted.map((resource, i) => (
+          <ResourceComponent key={i} {...resource} />
+        ))}
+      </Box>
+    );
+  };
+
+  const getFilterSection = () => {
+    if (!filterTerms.length) return;
+    // const isFiltered = filteredData.length !== resourceData.length;
+    const text = `showing ${filteredData.length} of ${resourceData.length} items`;
+
+    return (
+      <>
+        <Accordion
+          disableGutters
+          expanded={viewingFilters}
+          onChange={toggleViewingFilters}
+        >
+          <AccordionSummary
+            className={filtered ? "filtered" : ""}
+            aria-controls="panel1d-content"
+            id="panel1d-header"
+          >
+            <Typography variant="body1">
+              Filters
+              {filtered && (
+                <>
+                  {" "}
+                  (
+                  <Link href={null} onClick={clearFilters}>
+                    clear
+                  </Link>
+                  )
+                </>
+              )}
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            {filterTerms.map((term) => {
+              const options = filterOptions[term] || [];
+              // console.log(options);
+              return (
+                <Autocomplete
+                  key={term}
+                  multiple
+                  disableCloseOnSelect
+                  value={filterSelections[term] || []}
+                  onChange={handleFilterChange.bind(null, term)}
+                  id="tags-outlined"
+                  options={options}
+                  getOptionLabel={(option) => RNM[option] || option}
+                  filterSelectedOptions
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label={term}
+                      // placeholder={t}
+                    />
+                  )}
+                />
+              );
+            })}
+          </AccordionDetails>
+        </Accordion>
+        <Typography
+          variant="body2"
+          dangerouslySetInnerHTML={{
+            __html: text,
+          }}
+        />
+      </>
+    );
+  };
+
   const theme = useTheme();
   const filtered = _.some(filterSelections, (val) => !!val.length);
   return (
@@ -299,6 +461,13 @@ export const Resources = ({
         "& .MuiPaper-root": {
           height: "100%",
           overflow: "auto",
+        },
+        "& .highlighted-section": {
+          p: { xs: 0, sm: 2, md: 3 },
+          my: 2,
+          border: { sm: `2px solid ${getRC(themePrimary, 11)}` },
+          // pr: { sm: 6, md: 7 },
+          // px: { lg: 8 },
         },
         "& .contents": {
           p: { xs: 2, sm: 4, md: 6 },
@@ -357,21 +526,23 @@ export const Resources = ({
           {/* <Typography variant="h6" component="h1">
             Resources
           </Typography> */}
-          <Box>
+          <Typography
+            variant="h5"
+            component="h2"
+            dangerouslySetInnerHTML={{
+              __html: _.get(siteCopy, [C.resources_title, "value"]),
+            }}
+          />
+          <Box my={2}>
             {homeCopy.map(
               (row, i) =>
-                !!row[CMS_FIELDS.resources_intro] && (
+                !!row[C.resources_intro] && (
                   <Typography
                     variant="body1"
                     key={i}
-                    sx={{
-                      fontSize: { sm: "smaller", md: "unset" },
-                    }}
-                    // sx={{ maxWidth: 600, margin: "auto" }}
                     pb={1}
-                    // px={3}
                     dangerouslySetInnerHTML={{
-                      __html: transformLink(row[CMS_FIELDS.resources_intro]),
+                      __html: transformLink(row[C.resources_intro]),
                     }}
                   />
                 )
@@ -379,7 +550,7 @@ export const Resources = ({
           </Box>
 
           <ToggleButtonGroup exclusive onChange={handleTypeChange}>
-            {["Publications", "Webinars"].map((type) => (
+            {["Publications", "Webinars", "Events"].map((type) => (
               <ToggleButton
                 selected={type.toLowerCase() === resourceType}
                 value={type}
@@ -390,57 +561,8 @@ export const Resources = ({
             ))}
           </ToggleButtonGroup>
 
-          <Accordion
-            disableGutters
-            expanded={viewingFilters}
-            onChange={toggleViewingFilters}
-          >
-            <AccordionSummary
-              className={filtered ? "filtered" : ""}
-              aria-controls="panel1d-content"
-              id="panel1d-header"
-            >
-              <Typography variant="body1">
-                Filters
-                {filtered && (
-                  <>
-                    {" "}
-                    (
-                    <Link href={null} onClick={clearFilters}>
-                      clear
-                    </Link>
-                    )
-                  </>
-                )}
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              {filterTerms.map((term) => {
-                const options = filterOptions[term] || [];
-                // console.log(options);
-                return (
-                  <Autocomplete
-                    key={term}
-                    multiple
-                    disableCloseOnSelect
-                    value={filterSelections[term] || []}
-                    onChange={handleFilterChange.bind(null, term)}
-                    id="tags-outlined"
-                    options={options}
-                    getOptionLabel={(option) => RNM[option] || option}
-                    filterSelectedOptions
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label={term}
-                        // placeholder={t}
-                      />
-                    )}
-                  />
-                );
-              })}
-            </AccordionDetails>
-          </Accordion>
+          {getHighlightedSection(filteredData)}
+          {getFilterSection()}
 
           {filteredData.map((resource, i) => (
             <ResourceComponent key={i} {...resource} />
