@@ -2,7 +2,7 @@ import React from "react";
 import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
 import { CMS_FIELDS } from "../consts/data";
-import { transformLink } from "../utils/display";
+import { transformImg, transformLink } from "../utils/display";
 import { getRC, radColors } from "../consts/colors";
 
 export const HomePage = ({ homeCopy }) => {
@@ -86,12 +86,26 @@ export const HomePage = ({ homeCopy }) => {
                 key={i}
                 sx={{
                   fontSize: { sm: "smaller", md: "unset" },
+                  // <img class='inserted-img left' src='assets/intro3.jpg' />
+                  "& img": {
+                    //   "&.left": {
+                    //   float: 'left'
+                    // },
+                    // "&.right": {
+                    //   marginLeft: "auto",
+                    // },
+                    mx: "auto",
+                    my: 2,
+                    display: "block",
+                    width: "100%",
+                    maxWidth: 500,
+                  },
                 }}
                 // sx={{ maxWidth: 600, margin: "auto" }}
                 pt={1}
                 // px={3}
                 dangerouslySetInnerHTML={{
-                  __html: transformLink(row[CMS_FIELDS.blurb]),
+                  __html: transformLink(transformImg(row[CMS_FIELDS.blurb])),
                 }}
               />
             )
