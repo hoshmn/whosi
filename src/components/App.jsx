@@ -15,7 +15,7 @@ import { Resources } from "./Resources";
 const SHOW_COLORS = false;
 
 export default function App() {
-  const [entered, setEntered] = React.useState(true);
+  const [entered, setEntered] = React.useState(false);
   const [viewingResources, setViewingResources] = React.useState(false);
   const closeResources = () => setViewingResources(false);
   const openResources = () => setViewingResources(true);

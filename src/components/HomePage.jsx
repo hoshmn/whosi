@@ -86,7 +86,7 @@ export const HomePage = ({ homeCopy }) => {
                 key={i}
                 sx={{
                   fontSize: { sm: "smaller", md: "unset" },
-                  // <img class='inserted-img left' src='assets/intro3.jpg' />
+                  // <img style="display:none;" class='inserted-img left' src='assets/intro3.jpg' />
                   "& img": {
                     //   "&.left": {
                     //   float: 'left'
@@ -96,9 +96,9 @@ export const HomePage = ({ homeCopy }) => {
                     // },
                     mx: "auto",
                     my: 2,
-                    display: "block",
+                    display: "block !important",
                     width: "100%",
-                    maxWidth: 500,
+                    // maxWidth: 860,
                   },
                 }}
                 // sx={{ maxWidth: 600, margin: "auto" }}

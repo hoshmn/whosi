@@ -124,18 +124,18 @@ async function getPageElement({ chartConfigsMap, chartId }) {
 }
 
 async function getChartOrTable({ chartConfigsMap, chartId, selectedIso }) {
-  if (
-    ![
-      "deliverables",
-      // "p95",
-      // "interventions",
-      // "priorities",
-      // "policy",
-      // "commun_deliv",
-      // "late_hiv"
-    ].includes(chartId)
-  )
-    return;
+  // if (
+  //   ![
+  //     "deliverables",
+  //     // "p95",
+  //     // "interventions",
+  //     // "priorities",
+  //     // "policy",
+  //     // "commun_deliv",
+  //     // "late_hiv"
+  //   ].includes(chartId)
+  // )
+  //   return;
   // console.log("creating : ", chartId);
   const chartConfig = chartConfigsMap[chartId];
   // the chart settings are the values on the chart config where element === S.all ("all")
