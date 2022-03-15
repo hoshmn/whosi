@@ -362,7 +362,7 @@ export const Resources = ({
   };
 
   const getHighlightedSection = () => {
-    const highlighted = filteredData.filter((d) => d[R.highlighted]);
+    const highlighted = resourceData.filter((d) => d[R.highlighted]);
     if (!highlighted.length) return;
     return (
       <Box className="highlighted-section">
