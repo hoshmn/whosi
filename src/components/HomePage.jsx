@@ -77,22 +77,20 @@ export const HomePage = ({ homeCopy }) => {
           // <img class='inserted-img left' src='assets/intro3.jpg' />
           pt: "calc(72px - 16px)", // TODO constify header height
           "& .images-wrapper": {
-            display: { sm: "flex !important" },
+            display: { xs: "none", sm: "flex" },
             // width: '100vw',
             overflow: "hidden",
             position: "relative",
-            m: { lg: -6 },
-            mb: "0 !important",
-            // "& .img-wrapper p": {
-            // },
+            mt: { lg: -6 },
+            mx: { lg: -6 },
+
             "& p": {
               position: "absolute",
               bottom: 8,
               right: 10,
-              color: getRC(themePrimary, 7),
-
               m: 0,
               fontSize: { xs: "10px", md: "12px" },
+              color: getRC(themePrimary, 7),
             },
             "& img": {
               // flex: "10px 1 1",
