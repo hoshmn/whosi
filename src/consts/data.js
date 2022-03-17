@@ -122,6 +122,7 @@ export const CMS_FIELDS = {
   name: "name",
   // homecopy
   blurb: "blurb",
+  images: "images",
   resources_title: "resources_title",
   resources_intro: "resources_intro",
   highlighted_desc_: "highlighted_desc_",

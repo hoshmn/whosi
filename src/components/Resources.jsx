@@ -96,7 +96,7 @@ const Publication = (resource) => {
       {TitleComp}
       <Typography
         variant="body2"
-        sx={{ fontWeight: "bolder" }}
+        sx={{ fontWeight: "600" }}
         dangerouslySetInnerHTML={{
           __html: authors,
         }}
@@ -173,7 +173,7 @@ const Webinar = (resource) => {
       />
       <Typography
         variant="body2"
-        sx={{ fontWeight: "bolder" }}
+        sx={{ fontWeight: "600" }}
         dangerouslySetInnerHTML={{
           __html: authors,
         }}
@@ -242,7 +242,7 @@ const Event = (resource) => {
       />
       <Typography
         variant="body2"
-        sx={{ fontWeight: "bolder" }}
+        sx={{ fontWeight: "600" }}
         dangerouslySetInnerHTML={{
           __html: authors,
         }}
@@ -284,8 +284,6 @@ export const Resources = ({
   const [resourceType, setResourceType] = React.useState("publications");
   const [viewingFilters, setViewingFilters] = React.useState(false);
   const toggleViewingFilters = () => setViewingFilters(!viewingFilters);
-
-  console.log("ST: ", siteCopy);
 
   const RNM = React.useMemo(() => {
     return resourceNameMap.reduce((accum, row) => {
@@ -367,7 +365,9 @@ export const Resources = ({
     return (
       <Box className="highlighted-section">
         <Typography
-          variant="body1"
+          // component="h3"
+          variant="h3"
+          // className="highlighted-description"
           dangerouslySetInnerHTML={{
             __html: siteCopy[`${C.highlighted_desc_}${resourceType}`].value,
           }}
@@ -463,11 +463,17 @@ export const Resources = ({
           overflow: "auto",
         },
         "& .highlighted-section": {
-          p: { xs: 0, sm: 2, md: 3 },
+          p: { xs: 1, sm: 2, md: 3 },
           my: 2,
-          border: { sm: `2px solid ${getRC(themePrimary, 11)}` },
+          // border: { sm: `2px solid ${getRC(themePrimary, 11)}` },
+          border: `1px solid ${getRC(themePrimary, 11)}`,
+          borderWidth: { sm: 2 },
+          background: getRC(themePrimary, 2),
           // pr: { sm: 6, md: 7 },
           // px: { lg: 8 },
+          //   "& .highlighted-description": {
+          //     fontWeight: '500',
+          // },
         },
         "& .contents": {
           p: { xs: 2, sm: 4, md: 6 },
@@ -527,8 +533,8 @@ export const Resources = ({
             Resources
           </Typography> */}
           <Typography
-            variant="h5"
-            component="h2"
+            variant="h2"
+            // component="h2"
             dangerouslySetInnerHTML={{
               __html: _.get(siteCopy, [C.resources_title, "value"]),
             }}

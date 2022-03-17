@@ -24,8 +24,13 @@ export const Header = ({
             handleCountryChange={handleCountryChange}
             selectedIso={selectedIso}
           />
-          <Link href={null} onClick={openResources} sx={{ cursor: "pointer" }}>
-            {_.get(siteCopy, [C.resources_title, "value"])}
+          <Link
+            pl={4}
+            href={null}
+            onClick={openResources}
+            sx={{ cursor: "pointer" }}
+          >
+            {_.get(siteCopy, [C.resources_title, "value"], "Resources")}
           </Link>
         </Toolbar>
       </AppBar>

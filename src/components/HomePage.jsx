@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
 import { CMS_FIELDS } from "../consts/data";
 import { transformImg, transformLink } from "../utils/display";
-import { getRC, radColors } from "../consts/colors";
+import { getRC, radColors, themePrimary } from "../consts/colors";
 
 export const HomePage = ({ homeCopy }) => {
   if (!homeCopy || !homeCopy.length) return null; // TODO: spinner
@@ -28,11 +28,11 @@ export const HomePage = ({ homeCopy }) => {
         {/* <b>{f.replace(CMS_FIELDS.TAP, "")}</b> */}
         <Typography
           variant="body1"
-          sx={{
-            fontSize: { sm: "smaller", md: "unset" },
-          }}
-          variant="h7"
-          component="h3"
+          sx={
+            {
+              // fontSize: { xs: "smaller", md: "unset" },
+            }
+          }
           dangerouslySetInnerHTML={{
             __html: f.replace(CMS_FIELDS.TAP, ""),
           }}
@@ -52,9 +52,11 @@ export const HomePage = ({ homeCopy }) => {
                     key={i}
                     // sx={{ maxWidth: 600, margin: "auto" }}
                     // pt={2}
-                    sx={{
-                      fontSize: { sm: "smaller", md: "unset" },
-                    }}
+                    sx={
+                      {
+                        // fontSize: { xs: "smaller", md: "unset" },
+                      }
+                    }
                     // px={3}
                     dangerouslySetInnerHTML={{
                       __html: row[f],
@@ -69,63 +71,97 @@ export const HomePage = ({ homeCopy }) => {
   };
 
   return (
-    <Box
-      sx={{
-        pt: "72px", // TODO constify header height
-        px: 3,
-        maxWidth: "900px", // TODO replace with M breakpoint
-        m: "auto",
-      }}
-    >
-      <Box>
-        {homeCopy.map(
-          (row, i) =>
-            !!row[CMS_FIELDS.blurb] && (
-              <Typography
-                variant="body1"
-                key={i}
-                sx={{
-                  fontSize: { sm: "smaller", md: "unset" },
-                  // <img style="display:none;" class='inserted-img left' src='assets/intro3.jpg' />
-                  "& img": {
-                    //   "&.left": {
-                    //   float: 'left'
-                    // },
-                    // "&.right": {
-                    //   marginLeft: "auto",
-                    // },
-                    mx: "auto",
-                    my: 2,
-                    display: "block !important",
-                    width: "100%",
-                    // maxWidth: 860,
-                  },
-                }}
-                // sx={{ maxWidth: 600, margin: "auto" }}
-                pt={1}
-                // px={3}
-                dangerouslySetInnerHTML={{
-                  __html: transformLink(transformImg(row[CMS_FIELDS.blurb])),
-                }}
-              />
-            )
-        )}
-      </Box>
-      <Box py={5} className="tap-lists-container">
-        <Typography
-          variant="h6"
-          component="h2"
-          dangerouslySetInnerHTML={{
-            __html: "Technical Assistance Providers",
-          }}
-        />
-        <Box
-          className="tap-lists"
-          sx={{
-            display: { sm: "flex" },
-          }}
-        >
-          {tapFields.map((f) => getTapList(f))}
+    <Box>
+      <Box
+        sx={{
+          // fontSize: { xs: "smaller", md: "unset" },
+          // <img class='inserted-img left' src='assets/intro3.jpg' />
+          pt: "calc(72px - 16px)", // TODO constify header height
+          "& .images-wrapper": {
+            display: { sm: "flex !important" },
+            // width: '100vw',
+            overflow: "hidden",
+            position: "relative",
+            m: { lg: -6},
+            mb: '0 !important',
+            // "& .img-wrapper p": {
+            // },
+            "& p": {
+              position: "absolute",
+              bottom: 8,
+              right: 10,
+              color: getRC(themePrimary, 6),
+
+              m: 0,
+              fontSize: { xs: '10px', md: '12px' },
+              // display: "flex !important",
+              // width: '100%',
+              // m: -3,
+            },
+            "& img": {
+              // flex: "10px 1 1",
+              maxWidth: "33.33%",
+              // maxWidth: '33.33vw',
+              // maxHeight: "24vw", // based on aspect ratio 191/265 * 33.33
+              objectFit: "cover",
+              //   "&.left": {
+              //   float: 'left'
+              // },
+              // "&.right": {
+              //   marginLeft: "auto",
+              // },
+              // mx: "auto",
+              // my: 2,
+              // width: "100%",
+              // maxWidth: 860,
+            },
+          },
+        }}
+        dangerouslySetInnerHTML={{
+          __html: transformImg(homeCopy[0][CMS_FIELDS.images]),
+        }}
+      />
+      <Box
+        sx={{
+          px: 3,
+          maxWidth: "900px", // TODO replace with M breakpoint
+          m: "auto",
+        }}
+      >
+        <Box>
+          {homeCopy.map(
+            (row, i) =>
+              !!row[CMS_FIELDS.blurb] && (
+                <Typography
+                  variant="body1"
+                  key={i}
+                  sx={{}}
+                  // sx={{ maxWidth: 600, margin: "auto" }}
+                  pt={1}
+                  // px={3}
+                  dangerouslySetInnerHTML={{
+                    __html: transformLink(row[CMS_FIELDS.blurb]),
+                  }}
+                />
+              )
+          )}
+        </Box>
+        <Box py={5} className="tap-lists-container">
+          <Typography
+            variant="h6"
+            component="h2"
+            dangerouslySetInnerHTML={{
+              __html: "Technical Assistance Providers",
+            }}
+          />
+          <Box
+            className="tap-lists"
+            sx={{
+              display: { sm: "flex" },
+            }}
+          >
+            {tapFields.map((f) => getTapList(f))}
+          </Box>
         </Box>
       </Box>
     </Box>

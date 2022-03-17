@@ -466,13 +466,13 @@ export const Charts = ({
           sx={{
             fontWeight: 500,
             lineHeight: 1,
-            fontSize: 32,
+            // fontSize: 32,
             maxWidth: { lg: 760, xl: "100%" },
             mb: { sm: 1, lg: 2 },
             "& div": {
               color: getRC(themeSecondary, 11),
               fontWeight: "200",
-              fontSize: "smaller",
+              fontSize: "20px",
               pt: 1,
             },
           }}
