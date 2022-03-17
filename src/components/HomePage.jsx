@@ -74,7 +74,6 @@ export const HomePage = ({ homeCopy }) => {
     <Box>
       <Box
         sx={{
-          // fontSize: { xs: "smaller", md: "unset" },
           // <img class='inserted-img left' src='assets/intro3.jpg' />
           pt: "calc(72px - 16px)", // TODO constify header height
           "& .images-wrapper": {
@@ -82,8 +81,8 @@ export const HomePage = ({ homeCopy }) => {
             // width: '100vw',
             overflow: "hidden",
             position: "relative",
-            m: { lg: -6},
-            mb: '0 !important',
+            m: { lg: -6 },
+            mb: "0 !important",
             // "& .img-wrapper p": {
             // },
             "& p": {
@@ -93,27 +92,12 @@ export const HomePage = ({ homeCopy }) => {
               color: getRC(themePrimary, 6),
 
               m: 0,
-              fontSize: { xs: '10px', md: '12px' },
-              // display: "flex !important",
-              // width: '100%',
-              // m: -3,
+              fontSize: { xs: "10px", md: "12px" },
             },
             "& img": {
               // flex: "10px 1 1",
               maxWidth: "33.33%",
-              // maxWidth: '33.33vw',
-              // maxHeight: "24vw", // based on aspect ratio 191/265 * 33.33
               objectFit: "cover",
-              //   "&.left": {
-              //   float: 'left'
-              // },
-              // "&.right": {
-              //   marginLeft: "auto",
-              // },
-              // mx: "auto",
-              // my: 2,
-              // width: "100%",
-              // maxWidth: 860,
             },
           },
         }}

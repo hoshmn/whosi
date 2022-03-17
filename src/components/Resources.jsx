@@ -465,15 +465,9 @@ export const Resources = ({
         "& .highlighted-section": {
           p: { xs: 1, sm: 2, md: 3 },
           my: 2,
-          // border: { sm: `2px solid ${getRC(themePrimary, 11)}` },
           border: `1px solid ${getRC(themePrimary, 11)}`,
           borderWidth: { sm: 2 },
           background: getRC(themePrimary, 2),
-          // pr: { sm: 6, md: 7 },
-          // px: { lg: 8 },
-          //   "& .highlighted-description": {
-          //     fontWeight: '500',
-          // },
         },
         "& .contents": {
           p: { xs: 2, sm: 4, md: 6 },
@@ -529,12 +523,8 @@ export const Resources = ({
           <Close />
         </IconButton>
         <Box className="contents">
-          {/* <Typography variant="h6" component="h1">
-            Resources
-          </Typography> */}
           <Typography
             variant="h2"
-            // component="h2"
             dangerouslySetInnerHTML={{
               __html: _.get(siteCopy, [C.resources_title, "value"]),
             }}
