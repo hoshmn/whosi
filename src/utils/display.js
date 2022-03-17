@@ -65,6 +65,6 @@ export const transformLink = (t) =>
     "<a class='themedLink' target='_blank' rel='noopener noreferrer'"
   );
 
-// TODO: figure out why 'class' gets converted to 'classname'
-export const transformImg = (t) =>
-  t.replaceAll("<img classname=", "<img class=");
+// // TODO: figure out why 'class' gets converted to 'classname'
+// export const transformImg = (t) =>
+//   t.replaceAll("<img classname=", "<img class=");

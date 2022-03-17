@@ -2,7 +2,7 @@ import React from "react";
 import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
 import { CMS_FIELDS } from "../consts/data";
-import { transformImg, transformLink } from "../utils/display";
+import { transformLink } from "../utils/display";
 import { getRC, radColors, themePrimary } from "../consts/colors";
 
 export const HomePage = ({ homeCopy }) => {
@@ -102,7 +102,7 @@ export const HomePage = ({ homeCopy }) => {
           },
         }}
         dangerouslySetInnerHTML={{
-          __html: transformImg(homeCopy[0][CMS_FIELDS.images]),
+          __html: homeCopy[0][CMS_FIELDS.images],
         }}
       />
       <Box
