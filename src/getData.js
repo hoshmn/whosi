@@ -124,17 +124,18 @@ async function getPageElement({ chartConfigsMap, chartId }) {
 }
 
 async function getChartOrTable({ chartConfigsMap, chartId, selectedIso }) {
-  if (
-    [
-      // "deliverables",
-      // "interventions",
-      // "priorities",
-      // "policy",
-      // "commun_deliv",
-      // "late_hiv"
-    ].includes(chartId)
-  )
-    return;
+  // if (
+  //   ![
+  //     "deliverables",
+  //     // "p95",
+  //     // "interventions",
+  //     // "priorities",
+  //     // "policy",
+  //     // "commun_deliv",
+  //     // "late_hiv"
+  //   ].includes(chartId)
+  // )
+  //   return;
   // console.log("creating : ", chartId);
   const chartConfig = chartConfigsMap[chartId];
   // the chart settings are the values on the chart config where element === S.all ("all")
@@ -247,9 +248,11 @@ function getTableList({
     );
   }
 
+  const groupByField = _.get(chartSettings, C.collapsibleTL, null);
   const data = chartSourceData.map((row, i) => {
     return {
       rowName: i,
+      groupByGroup: _.get(row, groupByField),
       values: colNames.map((cn) => {
         const value = _.get(row, cn);
         const LCVal = value && value.toLowerCase();
@@ -264,6 +267,7 @@ function getTableList({
         const columnName = _.get(chartConfig, [key, 0, C.displayName], cn);
         return {
           columnName,
+          sourceColumnName: cn,
           columnNamed: colNames.length > 1, // always named with the field name if multiple fields are displayed
           value,
           color: chartColorSetting,
@@ -283,6 +287,8 @@ function getTableList({
     type: _.get(chartSettings, C.chartType),
     name: _.get(chartSettings, C.displayName, chartId),
     hiddenUntilExpand: _.get(chartSettings, C.hiddenUntilExpand),
+    groupByField,
+    collapsibleTL: !!groupByField,
   };
 
   return chart;

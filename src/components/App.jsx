@@ -16,6 +16,7 @@ const SHOW_COLORS = false;
 
 export default function App() {
   const [entered, setEntered] = React.useState(false);
+
   const [viewingResources, setViewingResources] = React.useState(false);
   const closeResources = () => setViewingResources(false);
   const openResources = () => setViewingResources(true);
@@ -26,9 +27,11 @@ export default function App() {
   const [dictionary, setDictionary] = React.useState([]);
   const [countries, setCountries] = React.useState([]);
   const [homeCopy, setHomeCopy] = React.useState([]);
+  const [siteCopy, setSiteCopy] = React.useState([]);
 
   const [publications, setPublications] = React.useState([]);
   const [webinars, setWebinars] = React.useState([]);
+  const [events, setEvents] = React.useState([]);
   const [resourceNameMap, setResourceNameMap] = React.useState([]);
 
   const [chartIds, setChartIds] = React.useState([]);
@@ -43,9 +46,11 @@ export default function App() {
       setDictionary(result.dictionary.filter((d) => d.term && d.definition));
       setCountries(result.countries.filter((c) => c.iso && c.name));
       setHomeCopy(result.homecopy);
+      setSiteCopy(_.keyBy(result.sitecopy, "key"));
 
       setPublications(result.publications);
       setWebinars(result.webinars);
+      setEvents(result.events);
       setResourceNameMap(result.resourcenamemap);
 
       setChartIds(result.chartIds);
@@ -98,8 +103,10 @@ export default function App() {
         close={closeResources}
         publications={publications}
         webinars={webinars}
+        events={events}
         resourceNameMap={resourceNameMap}
         homeCopy={homeCopy}
+        siteCopy={siteCopy}
       />
       <Header
         countries={countries}
@@ -107,6 +114,7 @@ export default function App() {
         selectedIso={selectedIso}
         viewingResources={viewingResources}
         openResources={openResources}
+        siteCopy={siteCopy}
       />
       <br />
 

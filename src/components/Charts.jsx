@@ -42,6 +42,7 @@ import {
   TableRow,
   useMediaQuery,
 } from "@mui/material";
+import { findLeastUpdatedDeliverableCell } from "../utils/data";
 
 // TODO: standardize / create sane system for styles
 // TODO: CLEAN / EXTRACt this and other components
@@ -112,6 +113,7 @@ export const Charts = ({
   toggleDashExpanded,
 }) => {
   const [hiddenElements, setHiddenElements] = React.useState({});
+  const [expandedGroupMap, setExpandedGroupMap] = React.useState({});
 
   const country = countries.find((c) => c.iso === selectedIso);
   if (!country) return null;
@@ -216,13 +218,65 @@ export const Charts = ({
     );
   };
 
+  const getCollapsibleTableRows = (chart) => {
+    const { data, groupByField, chartId } = chart;
+    const groups = [];
+    const dataGrouped = _.groupBy(data, (r) => {
+      const v = r.values.find((c) => c.sourceColumnName === groupByField);
+      if (v && v.value) {
+        if (!groups.includes(v.value)) groups.push(v.value);
+        return v.value;
+      } else {
+        console.warn("collapsible table row without groupBy field: ", r);
+        return "__UNKNOWN__";
+      }
+    });
+    const pData = groups.reduce((result, group) => {
+      const groupData = dataGrouped[group];
+      const isExpanded = _.get(expandedGroupMap, [chartId, group], false);
+      const singleRowGroup = groupData.length === 1;
+
+      if (singleRowGroup) {
+        groupData[0].singleRowGroup = 1;
+        result.push(...groupData);
+        return result;
+      } else if (isExpanded) {
+        result.push(...groupData);
+        return result;
+      } else {
+        // create agg row
+        const collapsedRow = _.cloneDeep(groupData[0]);
+        // TODO: logic is specific to DELIVERABLE chart. make universal.
+        collapsedRow.values = collapsedRow.values.map((c) => {
+          if (c.sourceColumnName === D.Supplier) {
+            c.value = `<b>${group}</b>`;
+            return c;
+          } else if (c.sourceColumnName === D.Deliverable) {
+            c.value = `<em>${groupData.length} items (click to view)</em>`;
+            return c;
+          } else if (D.REGEX.quarter.test(c.sourceColumnName)) {
+            const ludr = findLeastUpdatedDeliverableCell(groupData, c);
+            return ludr;
+          } else {
+            return c;
+          }
+        });
+
+        result.push(collapsedRow);
+        return result;
+      }
+    }, []);
+
+    return pData;
+  };
+
   const getTable = (chart) => {
-    const { data, hideRowNames } = chart;
+    const { data, hideRowNames, chartId, collapsibleTL } = chart;
 
     const firstRow = data[0];
 
     if (!firstRow) return null;
-    // const columnsNamed = _.some(data[0]["values"], "columnNamed");
+    // const columnsNamed = _.some(pData[0]["values"], "columnNamed");
     const hasHeaders = firstRow["values"].some(
       ({ columnName, columnNamed }) => columnNamed && columnName
     );
@@ -235,40 +289,81 @@ export const Charts = ({
           {columnNamed && columnName}
         </TableCell>
       ));
+    const pData = collapsibleTL ? getCollapsibleTableRows(chart) : data;
 
     let hasIcons = false;
-    const rows = data.map(({ rowName, values, iconPath }) => {
-      hasIcons = hasIcons || iconPath;
-      return (
-        <TableRow key={rowName}>
-          {!hideRowNames && (
-            <TableCell scope="row" component="th">
-              {iconPath && (
-                <>
-                  <img className="icon" src={`assets/${iconPath}.png`} />
-                  <br />
-                </>
-              )}
-              {rowName}
-            </TableCell>
-          )}
-          {values.map(({ value, columnName, sheetRow, color }) => (
-            <TableCell
-              key={columnName}
-              sx={{
-                background: color,
-              }}
-            >
-              {/*  */}
-              {/* {_.get(sheetRow, G.DISPLAY_VALUE, value) || "N/A"} (move to getData?) */}
-              {/* to not overwrite "" with "N/A":  */}
-              {_.get(sheetRow, G.DISPLAY_VALUE, _.get([value], 0, "N/A"))}
-              {/* {(value && (sheetRow && sheetRow[G.DISPLAY_VALUE] || value)) || "N/A"} */}
-            </TableCell>
-          ))}
-        </TableRow>
-      );
-    });
+    const rows = pData.map(
+      ({ rowName, values, iconPath, groupByGroup, singleRowGroup }) => {
+        hasIcons = hasIcons || iconPath;
+
+        const isExpanded = _.get(
+          expandedGroupMap,
+          [chartId, groupByGroup],
+          false
+        );
+        const clickHandler = () => {
+          if (!collapsibleTL) return;
+
+          const egm = _.cloneDeep(expandedGroupMap);
+          _.set(egm, [chartId, groupByGroup], !isExpanded);
+          setExpandedGroupMap(egm);
+        };
+
+        const expandible = collapsibleTL && !singleRowGroup;
+        const title = !expandible
+          ? ""
+          : isExpanded
+          ? "click to collapse"
+          : "click to expand";
+        return (
+          <TableRow
+            title={title}
+            key={rowName}
+            onClick={clickHandler}
+            sx={{
+              cursor: expandible && "pointer",
+              // "& .item-count": {
+              //   whiteSpace: "nowrap",
+              // },
+            }}
+          >
+            {!hideRowNames && (
+              <TableCell scope="row" component="th">
+                {iconPath && (
+                  <>
+                    <img className="icon" src={`assets/${iconPath}.png`} />
+                    <br />
+                  </>
+                )}
+                {rowName}
+              </TableCell>
+            )}
+            {values.map(({ value, columnName, sheetRow, color }) => (
+              <TableCell
+                key={columnName}
+                sx={{
+                  background: color,
+                }}
+              >
+                {/*  */}
+                {/* {_.get(sheetRow, G.DISPLAY_VALUE, value) || "N/A"} (move to getData?) */}
+                {/* to not overwrite "" with "N/A":  */}
+                <Typography
+                  dangerouslySetInnerHTML={{
+                    __html: _.get(
+                      sheetRow,
+                      G.DISPLAY_VALUE,
+                      _.get([value], 0, "N/A")
+                    ),
+                  }}
+                />
+                {/* {(value && (sheetRow && sheetRow[G.DISPLAY_VALUE] || value)) || "N/A"} */}
+              </TableCell>
+            ))}
+          </TableRow>
+        );
+      }
+    );
 
     const isSingleColumn = firstRow["values"].length === 1;
 
@@ -347,7 +442,6 @@ export const Charts = ({
         <NestedBoxes
           // circle={true}
           // classes={xl ? "xl" : ""}
-          title={"title"}
           bufferRatio={!isSm ? 0.8 : 0.2}
           lineHeight={!isSm ? 1.4 : 1.1}
           textBufferRatio={0.2}
@@ -372,13 +466,13 @@ export const Charts = ({
           sx={{
             fontWeight: 500,
             lineHeight: 1,
-            fontSize: 32,
+            // fontSize: 32,
             maxWidth: { lg: 760, xl: "100%" },
             mb: { sm: 1, lg: 2 },
             "& div": {
               color: getRC(themeSecondary, 11),
               fontWeight: "200",
-              fontSize: "smaller",
+              fontSize: "20px",
               pt: 1,
             },
           }}
