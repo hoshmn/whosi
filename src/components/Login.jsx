@@ -19,8 +19,8 @@ export const Login = ({ open, setEntered }) => {
   const [password, setPassword] = React.useState("");
 
   const handleSubmit = () => {
-    // alert(encrypter(password))
-    const correct = encrypter(password) === "130c0b0017001555";
+    // alert("entered: " + password + " | " + encrypter(password));
+    const correct = encrypter(password) === "130c0b0017001556";
     setErrored(!correct);
     setPassword("");
     if (correct) setEntered(true);

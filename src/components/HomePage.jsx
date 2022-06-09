@@ -71,7 +71,7 @@ export const HomePage = ({ homeCopy }) => {
   };
 
   return (
-    <Box>
+    <Box pb={5}>
       <Box
         sx={{
           // <img class='inserted-img left' src='assets/intro3.jpg' />
@@ -110,7 +110,14 @@ export const HomePage = ({ homeCopy }) => {
           m: "auto",
         }}
       >
-        <Box>
+        <Box
+          sx={{
+            "& img": {
+              display: { xs: "none", sm: "flex" },
+              maxWidth: "100%",
+            },
+          }}
+        >
           {homeCopy.map(
             (row, i) =>
               !!row[CMS_FIELDS.blurb] && (
@@ -128,23 +135,25 @@ export const HomePage = ({ homeCopy }) => {
               )
           )}
         </Box>
-        <Box py={5} className="tap-lists-container">
-          <Typography
-            variant="h6"
-            component="h2"
-            dangerouslySetInnerHTML={{
-              __html: "Technical Assistance Providers",
-            }}
-          />
-          <Box
-            className="tap-lists"
-            sx={{
-              display: { sm: "flex" },
-            }}
-          >
-            {tapFields.map((f) => getTapList(f))}
+        {!!tapFields.length && (
+          <Box className="tap-lists-container">
+            <Typography
+              variant="h6"
+              component="h2"
+              dangerouslySetInnerHTML={{
+                __html: "Technical Assistance Providers",
+              }}
+            />
+            <Box
+              className="tap-lists"
+              sx={{
+                display: { sm: "flex" },
+              }}
+            >
+              {tapFields.map((f) => getTapList(f))}
+            </Box>
           </Box>
-        </Box>
+        )}
       </Box>
     </Box>
   );

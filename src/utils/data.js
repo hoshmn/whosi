@@ -328,6 +328,28 @@ export const getCalculatedDataPoint = ({
   });
 };
 
+const numberIconMap = {
+  1: "1️⃣",
+  2: "2️⃣",
+  3: "3️⃣",
+  4: "4️⃣",
+  5: "5️⃣",
+  6: "6️⃣",
+  7: "7️⃣",
+  8: "8️⃣",
+  9: "9️⃣",
+  0: "0️⃣",
+};
+
+export const insertNumberIcons = (text) =>
+  !_.isString(text)
+    ? text
+    : _.reduce(
+        numberIconMap,
+        (accum, icon, num) => accum.replace(`{#${num}}`, icon),
+        text
+      );
+
 // TODO: logic is specific to DELIVERABLE chart. make universal.
 export const findLeastUpdatedDeliverableCell = (groupData, col) => {
   const { columnName } = col;

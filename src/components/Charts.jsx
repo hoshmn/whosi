@@ -24,7 +24,7 @@ import {
   themeSecondary,
   radColors,
 } from "../consts/colors";
-import { displayNumber, displayPercent } from "../utils/display";
+import { displayNumber, displayPercent, transformLink } from "../utils/display";
 import {
   CONFIG_FIELDS as C,
   DATA_FIELDS as D,
@@ -42,7 +42,11 @@ import {
   TableRow,
   useMediaQuery,
 } from "@mui/material";
-import { findLeastUpdatedDeliverableCell } from "../utils/data";
+import {
+  findLeastUpdatedDeliverableCell,
+  insertNumberIcons,
+} from "../utils/data";
+import clsx from "clsx";
 
 // TODO: standardize / create sane system for styles
 // TODO: CLEAN / EXTRACt this and other components
@@ -108,6 +112,7 @@ const CustomTooltip = ({ active, payload, label, isArea }) => {
 export const Charts = ({
   selectedIso,
   chartData,
+  legendData,
   countries,
   dashExpanded,
   toggleDashExpanded,
@@ -353,7 +358,7 @@ export const Charts = ({
                     __html: _.get(
                       sheetRow,
                       G.DISPLAY_VALUE,
-                      _.get([value], 0, "N/A")
+                      insertNumberIcons(_.get([value], 0, "N/A"))
                     ),
                   }}
                 />
@@ -387,9 +392,12 @@ export const Charts = ({
                 background: hasIcons ? "white" : getRC(radColors.sand, 2),
                 // background: getRC(themePrimary, 7),
               },
-              "& td, & thead th": {
+              // "& td, & thead th": {
+              "& td, & th": {
                 // single column tables w/o row names get left justified (more like a list)
-                textAlign: isSingleColumn && hideRowNames ? "left" : "right",
+                // textAlign: isSingleColumn && hideRowNames ? "left" : "right",
+                textAlign: "left",
+                fontSize: { xs: "small", lg: "smaller" },
               },
               "& th": {
                 fontWeight: "bold",
@@ -511,13 +519,18 @@ export const Charts = ({
                   </Typography>
                 </dt>
                 <dd>
-                  <Typography component="h2">
-                    {_.get(
-                      chart,
-                      ["textValues", `${elem}_row`, G.DISPLAY_VALUE],
-                      chart.textValues[elem]
-                    )}
-                  </Typography>
+                  <Typography
+                    component="h2"
+                    dangerouslySetInnerHTML={{
+                      __html: transformLink(
+                        _.get(
+                          chart,
+                          ["textValues", `${elem}_row`, G.DISPLAY_VALUE],
+                          chart.textValues[elem]
+                        )
+                      ),
+                    }}
+                  />
                 </dd>
               </dl>
             );
@@ -527,12 +540,103 @@ export const Charts = ({
     );
   };
 
+  const getLegend = (chart) => {
+    const { chartId, hiddenUntilExpand } = chart;
+    const legend = legendData[chartId];
+
+    if (!legend || (hiddenUntilExpand && !dashExpanded)) return;
+
+    const sections = [];
+    legend.forEach((row) => {
+      if (!row.text) {
+        sections.push({
+          title: row.heading,
+          items: [],
+        });
+        return;
+      }
+
+      if (!sections.length) {
+        sections.push({ items: [] });
+      }
+      sections[sections.length - 1].items.push(row);
+    });
+    return (
+      <Box
+        sx={{
+          mx: 2,
+          mr: "auto",
+          // mr: 2,
+          // background: "white",
+          // p: { xs: 1, sm: 2, md: 3 },
+          ".legend-sections": {
+            display: { md: "flex" },
+            gap: 3,
+          },
+          ".legend-section:not(:first-child)": {
+            pt: { xs: 1.5, md: "unset" },
+          },
+          "& .MuiTypography-body1": {
+            fontWeight: 500,
+            pb: 1,
+          },
+          "& td": {
+            py: 0.5,
+            border: "none",
+            fontSize: "small",
+            px: 2,
+            py: 0.5,
+          },
+          "& tr:not(.colored)": {
+            "& td": {
+              pl: 0,
+              pb: { xs: 0, md: 0.5 },
+            },
+          },
+        }}
+      >
+        <Typography variant="h3">Legend</Typography>
+        <Box className="legend-sections">
+          {sections.map((section, i) => {
+            return (
+              <Box className="legend-section" key={i}>
+                <Typography variant="body1">{section.title}</Typography>
+                <Table>
+                  {section.items.map((item, j) => (
+                    <TableRow
+                      className={clsx({ colored: !!item.color })}
+                      key={j}
+                    >
+                      <TableCell
+                        scope="col"
+                        sx={{
+                          backgroundColor: item.color,
+                          textAlign: "center",
+                        }}
+                      >
+                        {insertNumberIcons(item.heading)}
+                      </TableCell>
+                      <TableCell>{item.text}</TableCell>
+                    </TableRow>
+                  ))}
+                </Table>
+              </Box>
+            );
+          })}
+        </Box>
+      </Box>
+    );
+  };
+
   const getChart = (chart) => {
     // TODO: simplify
     if (!chart) return null;
 
     const { type, chartId, name, hiddenUntilExpand, sourceName, sourceLink } =
       chart;
+
+    if (hiddenUntilExpand && !dashExpanded) return null;
+
     const source = sourceName && sourceLink && (
       <Typography variant="body">
         Source:{" "}
@@ -541,8 +645,6 @@ export const Charts = ({
         </Link>
       </Typography>
     );
-
-    if (hiddenUntilExpand && !dashExpanded) return null;
 
     if (type === "accordion") {
       // for clarity...
@@ -769,7 +871,13 @@ export const Charts = ({
         justifyContent: { xs: "space-evenly", md: "space-between" },
       }}
     >
-      {chartData.map(getChart)}
+      {/* TODO: add key */}
+      {chartData.map((cd, i) => (
+        <>
+          {getChart(cd)}
+          {getLegend(cd)}
+        </>
+      ))}
     </Box>
   );
 };

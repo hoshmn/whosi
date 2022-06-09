@@ -14,6 +14,7 @@ export const CMS_SHEETS = [
   "events",
   "sitecopy",
   "resourcenamemap",
+  "legends",
 ];
 // these are set in the home sheet for version controlability
 export const CONFIGURABLE_GID_NAMES = ["configs", ...CMS_SHEETS];

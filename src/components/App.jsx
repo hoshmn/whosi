@@ -23,6 +23,7 @@ export default function App() {
 
   const [selectedIso, setIso] = React.useState(null);
   const [chartData, setChartData] = React.useState([]);
+  const [legendData, setLegendData] = React.useState([]);
 
   const [dictionary, setDictionary] = React.useState([]);
   const [countries, setCountries] = React.useState([]);
@@ -47,6 +48,7 @@ export default function App() {
       setCountries(result.countries.filter((c) => c.iso && c.name));
       setHomeCopy(result.homecopy);
       setSiteCopy(_.keyBy(result.sitecopy, "key"));
+      setLegendData(_.groupBy(result.legends, "chart_id"));
 
       setPublications(result.publications);
       setWebinars(result.webinars);
@@ -136,6 +138,7 @@ export default function App() {
           countries={countries}
           selectedIso={selectedIso}
           chartData={chartData}
+          legendData={legendData}
           dashExpanded={dashExpanded}
           toggleDashExpanded={toggleDashExpanded}
         />
