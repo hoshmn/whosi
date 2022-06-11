@@ -1,6 +1,6 @@
 import React from "react";
 import Box from "@mui/material/Box";
-import { Typography } from "@mui/material";
+import { Typography, useTheme } from "@mui/material";
 import { CMS_FIELDS } from "../consts/data";
 import { transformLink } from "../utils/display";
 import { getRC, radColors, themePrimary } from "../consts/colors";
@@ -12,6 +12,7 @@ export const HomePage = ({ homeCopy }) => {
     f.startsWith(CMS_FIELDS.TAP)
   );
 
+  const theme = useTheme();
   const getTapList = (f) => {
     return (
       <Box
@@ -75,7 +76,7 @@ export const HomePage = ({ homeCopy }) => {
       <Box
         sx={{
           // <img class='inserted-img left' src='assets/intro3.jpg' />
-          pt: "calc(72px - 16px)", // TODO constify header height
+          pt: `calc(${theme.spacing(8)} - 16px)`, // TODO constify header height
           "& .images-wrapper": {
             display: { xs: "none", sm: "flex" },
             // width: '100vw',
