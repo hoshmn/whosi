@@ -5,6 +5,15 @@ import { CMS_FIELDS } from "../consts/data";
 import { transformLink } from "../utils/display";
 import { getRC, radColors, themePrimary } from "../consts/colors";
 
+const tap_placeholder = "{{tap_visual}}";
+
+const replaceableIcons = [
+  "NDI_testing_group",
+  "NDI_DSD_group",
+  "NDI_AHD_group",
+  "NDI_virtual_group",
+];
+
 export const HomePage = ({ homeCopy }) => {
   if (!homeCopy || !homeCopy.length) return null; // TODO: spinner
   // console.log(homeCopy, homeCopy && homeCopy[0]);
@@ -84,7 +93,6 @@ export const HomePage = ({ homeCopy }) => {
             position: "relative",
             mt: { lg: -6 },
             mx: { lg: -6 },
-
             "& p": {
               position: "absolute",
               bottom: 8,
@@ -109,6 +117,17 @@ export const HomePage = ({ homeCopy }) => {
           px: 3,
           maxWidth: "900px", // TODO replace with M breakpoint
           m: "auto",
+          "& h1, & h2, & h3, & h4, & h5, & h6": {
+            mb: 0,
+          },
+          "& .flex-wrapper": {
+            display: "flex",
+            gap: theme.spacing(2),
+          },
+          "& .icon": {
+            maxWidth: "160px",
+            height: "100%",
+          },
         }}
       >
         <Box
@@ -119,42 +138,54 @@ export const HomePage = ({ homeCopy }) => {
             },
           }}
         >
-          {homeCopy.map(
-            (row, i) =>
-              !!row[CMS_FIELDS.blurb] && (
-                <Typography
-                  variant="body1"
-                  key={i}
-                  sx={{}}
-                  // sx={{ maxWidth: 600, margin: "auto" }}
-                  pt={1}
-                  // px={3}
-                  dangerouslySetInnerHTML={{
-                    __html: transformLink(row[CMS_FIELDS.blurb]),
-                  }}
-                />
-              )
-          )}
+          {homeCopy.map((row, i) => {
+            let content = row[CMS_FIELDS.blurb];
+            if (!content) return null;
+
+            replaceableIcons.forEach((path) => {
+              content = content.replace(
+                `{{${path}}}`,
+                `<img class="icon" src="assets/${path}.png" />`
+              );
+            });
+
+            if (content.toLowerCase() === tap_placeholder) {
+              if (!tapFields.length) return null;
+              return (
+                <Box pt={2} key={i} className="tap-lists-container">
+                  <Typography
+                    variant="h6"
+                    component="h2"
+                    dangerouslySetInnerHTML={{
+                      __html: "Technical Assistance Providers",
+                    }}
+                  />
+                  <Box
+                    className="tap-lists"
+                    sx={{
+                      display: { sm: "flex" },
+                    }}
+                  >
+                    {tapFields.map((f) => getTapList(f))}
+                  </Box>
+                </Box>
+              );
+            }
+            return (
+              <Typography
+                variant="body1"
+                key={i}
+                sx={{}}
+                // sx={{ maxWidth: 600, margin: "auto" }}
+                pt={1}
+                // px={3}
+                dangerouslySetInnerHTML={{
+                  __html: transformLink(content),
+                }}
+              />
+            );
+          })}
         </Box>
-        {!!tapFields.length && (
-          <Box className="tap-lists-container">
-            <Typography
-              variant="h6"
-              component="h2"
-              dangerouslySetInnerHTML={{
-                __html: "Technical Assistance Providers",
-              }}
-            />
-            <Box
-              className="tap-lists"
-              sx={{
-                display: { sm: "flex" },
-              }}
-            >
-              {tapFields.map((f) => getTapList(f))}
-            </Box>
-          </Box>
-        )}
       </Box>
     </Box>
   );
