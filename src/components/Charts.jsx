@@ -540,7 +540,7 @@ export const Charts = ({
     );
   };
 
-  const getLegend = (chart) => {
+  const getLegend = (chart = {}) => {
     const { chartId, hiddenUntilExpand } = chart;
     const legend = legendData[chartId];
 
@@ -564,6 +564,7 @@ export const Charts = ({
     return (
       <Box
         sx={{
+          my: 1,
           mx: 2,
           mr: "auto",
           // mr: 2,
@@ -595,7 +596,7 @@ export const Charts = ({
           },
         }}
       >
-        <Typography variant="h3">Legend</Typography>
+        {/* <Typography variant="h3">Legend</Typography> */}
         <Box className="legend-sections">
           {sections.map((section, i) => {
             return (
@@ -800,6 +801,7 @@ export const Charts = ({
           <Typography variant="h5" component="h3">
             {name}
           </Typography>
+          {getLegend(chart)}
           {source}
           {getTable(chart)}
         </Box>
@@ -856,6 +858,7 @@ export const Charts = ({
         <Typography variant="h5" component="h3">
           {name}
         </Typography>
+        {getLegend(chart)}
         {source}
         {getLineAreaChart(chart)}
       </Box>
@@ -874,8 +877,8 @@ export const Charts = ({
       {/* TODO: add key */}
       {chartData.map((cd, i) => (
         <>
+          {/* {getLegend(cd)} */}
           {getChart(cd)}
-          {getLegend(cd)}
         </>
       ))}
     </Box>

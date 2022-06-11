@@ -45,13 +45,13 @@ export const Header = ({
               "&.who": {
                 maxWidth: {
                   xs: iconWidthWho,
-                  sm: "unset",
+                  md: "unset",
                 },
                 "& img": {
                   height: { xs: theme.spacing(7) },
                   clipPath: {
                     xs: `polygon(0 0, ${iconWidthWho}px 0, ${iconWidthWho}px 100%, 0 100%)`,
-                    sm: "unset",
+                    md: "unset",
                   },
                 },
               },

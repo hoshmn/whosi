@@ -96,6 +96,7 @@ export const DATA_FIELDS = {
   suppressed: "suppressed",
   Deliverable: "Deliverable",
   Supplier: "Supplier",
+  end_date: "end_date",
 
   REGEX: {
     // match all fields of type "Q1 2022"
