@@ -2,27 +2,24 @@ import React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
-import { useTheme } from "@mui/material";
+import { useTheme, useMediaQuery } from "@mui/material";
 import { CountrySelect } from "./CountrySelect";
 import { getRC, headerColor } from "../consts/colors";
 import { Link } from "@mui/material";
 import { CMS_FIELDS as C } from "../consts/data";
 
-const iconWidthWho = 56;
-const iconWidthTgf = 50;
-
 export const Header = ({
   selectedIso,
   handleCountryChange,
   countries,
-  viewingResources,
   openResources,
   siteCopy,
 }) => {
   const theme = useTheme();
+  const whoIcon = useMediaQuery(theme.breakpoints.down("sm")) ? "assets/who_logo_sm.jpg" : "assets/who_logo.svg";
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar sx={{ position: "fixed", background: getRC(headerColor, 5) }}>
+      <AppBar sx={{ position: "fixed", background: getRC(headerColor, 1) }}>
         <Toolbar
           sx={{
             display: "flex",
@@ -37,36 +34,18 @@ export const Header = ({
               my: "auto",
               "& img": {
                 boxSizing: "border-box",
-                // height: "100%",
                 p: 1,
+                pl: {
+                  xs: 0,
+                  sm: 1,
+                },
                 width: "auto",
               },
-
-              "&.who": {
-                maxWidth: {
-                  xs: iconWidthWho,
-                  md: "unset",
-                },
-                "& img": {
-                  height: { xs: theme.spacing(7) },
-                  clipPath: {
-                    xs: `polygon(0 0, ${iconWidthWho}px 0, ${iconWidthWho}px 100%, 0 100%)`,
-                    md: "unset",
-                  },
-                },
+              "&.tgf img": {
+                  height: { xs: theme.spacing(6.5), sm: theme.spacing(7) },
               },
-              "&.tgf": {
-                maxWidth: {
-                  xs: iconWidthTgf,
-                  md: "unset",
-                },
-                "& img": {
-                  height: { xs: theme.spacing(6.5) },
-                  clipPath: {
-                    xs: `polygon(0 0, ${iconWidthTgf}px 0, ${iconWidthTgf}px 100%, 0 100%)`,
-                    md: "unset",
-                  },
-                },
+              "&.who img": {
+                  height: { xs: theme.spacing(7.5), sm: theme.spacing(7) },
               },
             },
           }}
@@ -78,21 +57,21 @@ export const Header = ({
           />
           <Box className="logo-links">
             <Link
+              title="World Health Organization"
+              className="logo-link who"
+              href={"https://www.who.int/"}
+            >
+              <img src={whoIcon} />
+            </Link>
+            <Link
               title="The Global Fund"
               className="logo-link tgf"
               href={"https://www.theglobalfund.org/en/"}
             >
               <img src="assets/tgf_logo.png" />
             </Link>
-            <Link
-              title="World Health Organization"
-              className="logo-link who"
-              href={"https://www.who.int/"}
-            >
-              <img src="assets/who_logo.svg" />
-            </Link>
           </Box>
-          <Link href={null} onClick={openResources} sx={{ cursor: "pointer" }}>
+          <Link href={null} onClick={openResources} sx={{ cursor: "pointer", textAlign: "center" }}>
             {_.get(siteCopy, [C.resources_title, "value"], "Resources")}
           </Link>
         </Toolbar>
