@@ -25,10 +25,13 @@ export const Header = ({
             display: "flex",
             justifyContent: "space-between",
             height: { xs: theme.spacing(8) },
-            "& .logo-links": {
+            "& .country-select": {
               ml: "auto",
+              pr: 1,
+            },
+            "& .logo-links": {
               display: "flex",
-              px: 1,
+              // px: 1,
             },
             "& .logo-link": {
               my: "auto",
@@ -50,11 +53,6 @@ export const Header = ({
             },
           }}
         >
-          <CountrySelect
-            countries={countries}
-            handleCountryChange={handleCountryChange}
-            selectedIso={selectedIso}
-          />
           <Box className="logo-links">
             <Link
               title="World Health Organization"
@@ -71,6 +69,11 @@ export const Header = ({
               <img src="assets/tgf_logo.png" />
             </Link>
           </Box>
+          <CountrySelect
+            countries={countries}
+            handleCountryChange={handleCountryChange}
+            selectedIso={selectedIso}
+          />
           <Link href={null} onClick={openResources} sx={{ cursor: "pointer", textAlign: "center" }}>
             {_.get(siteCopy, [C.resources_title, "value"], "Resources")}
           </Link>

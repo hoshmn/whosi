@@ -432,7 +432,6 @@ export const Charts = ({
   const getNested = (chart) => {
     const theme = useTheme();
     const isSm = useMediaQuery(theme.breakpoints.down("sm"));
-    const isXl = useMediaQuery(theme.breakpoints.up("md"));
     const { data, elements, colors, elementNameMap } = chart;
     const xl = false;
     // console.log(radColors);

@@ -7,7 +7,7 @@ export const CountrySelect = ({
   countries,
 }) => {
   return (
-    <FormControl sx={{ width: 300, marginTop: 1, marginBottom: 1 }}>
+    <FormControl className="country-select" sx={{ width: 300, marginTop: 1, marginBottom: 1 }}>
       <InputLabel id="country">Country</InputLabel>
       <Select
         labelId="country"
