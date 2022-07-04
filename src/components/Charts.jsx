@@ -573,7 +573,7 @@ export const Charts = ({
             display: { md: "flex" },
             gap: 3,
           },
-          ".legend-section:not(:first-child)": {
+          ".legend-section:not(:first-of-type)": {
             pt: { xs: 1.5, md: "unset" },
           },
           "& .MuiTypography-body1": {
@@ -602,23 +602,25 @@ export const Charts = ({
               <Box className="legend-section" key={i}>
                 <Typography variant="body1">{section.title}</Typography>
                 <Table>
-                  {section.items.map((item, j) => (
-                    <TableRow
-                      className={clsx({ colored: !!item.color })}
-                      key={j}
-                    >
-                      <TableCell
-                        scope="col"
-                        sx={{
-                          backgroundColor: item.color,
-                          textAlign: "center",
-                        }}
+                  <TableBody>
+                    {section.items.map((item, j) => (
+                      <TableRow
+                        className={clsx({ colored: !!item.color })}
+                        key={j}
                       >
-                        {insertNumberIcons(item.heading)}
-                      </TableCell>
-                      <TableCell>{item.text}</TableCell>
-                    </TableRow>
-                  ))}
+                        <TableCell
+                          scope="col"
+                          sx={{
+                            backgroundColor: item.color,
+                            textAlign: "center",
+                          }}
+                        >
+                          {insertNumberIcons(item.heading)}
+                        </TableCell>
+                        <TableCell>{item.text}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
                 </Table>
               </Box>
             );

@@ -93,7 +93,7 @@ export const Login = ({ open, setEntered }) => {
           <Typography variant="body2">
             Contact{" "}
             <Link
-              underline=""
+              underline="none"
               variant="body2"
               href="mailto:pintocl@who.int"
               target="_blank"

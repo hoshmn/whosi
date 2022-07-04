@@ -16,7 +16,9 @@ export const Header = ({
   siteCopy,
 }) => {
   const theme = useTheme();
-  const whoIcon = useMediaQuery(theme.breakpoints.down("sm")) ? "assets/who_logo_sm.jpg" : "assets/who_logo.svg";
+  const whoIcon = useMediaQuery(theme.breakpoints.down("sm"))
+    ? "assets/who_logo_sm.jpg"
+    : "assets/who_logo.svg";
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar sx={{ position: "fixed", background: getRC(headerColor, 1) }}>
@@ -45,10 +47,10 @@ export const Header = ({
                 width: "auto",
               },
               "&.tgf img": {
-                  height: { xs: theme.spacing(6.5), sm: theme.spacing(7) },
+                height: { xs: theme.spacing(6.5), sm: theme.spacing(7) },
               },
               "&.who img": {
-                  height: { xs: theme.spacing(7.5), sm: theme.spacing(7) },
+                height: { xs: theme.spacing(7.5), sm: theme.spacing(7) },
               },
             },
           }}
@@ -61,20 +63,25 @@ export const Header = ({
             >
               <img src={whoIcon} />
             </Link>
-            <Link
+            {/* Note: hide logo until approved by TGF */}
+            {/* <Link
               title="The Global Fund"
               className="logo-link tgf"
               href={"https://www.theglobalfund.org/en/"}
             >
               <img src="assets/tgf_logo.png" />
-            </Link>
+            </Link> */}
           </Box>
           <CountrySelect
             countries={countries}
             handleCountryChange={handleCountryChange}
             selectedIso={selectedIso}
           />
-          <Link href={null} onClick={openResources} sx={{ cursor: "pointer", textAlign: "center" }}>
+          <Link
+            href={null}
+            onClick={openResources}
+            sx={{ cursor: "pointer", textAlign: "center" }}
+          >
             {_.get(siteCopy, [C.resources_title, "value"], "Resources")}
           </Link>
         </Toolbar>

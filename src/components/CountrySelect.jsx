@@ -6,8 +6,16 @@ export const CountrySelect = ({
   selectedIso,
   countries,
 }) => {
+  const unselectedCountry = !countries.length
+    ? "Loading..."
+    : !!selectedIso
+    ? "none"
+    : "Select a country...";
   return (
-    <FormControl className="country-select" sx={{ width: 300, marginTop: 1, marginBottom: 1 }}>
+    <FormControl
+      className="country-select"
+      sx={{ width: 300, marginTop: 1, marginBottom: 1 }}
+    >
       <InputLabel id="country">Country</InputLabel>
       <Select
         labelId="country"
@@ -16,9 +24,7 @@ export const CountrySelect = ({
         label="Country"
         onChange={handleCountryChange}
       >
-        <MenuItem value={"home"}>
-          {!countries.length ? "Loading..." : "Select a country..."}
-        </MenuItem>
+        <MenuItem value={"home"}>{unselectedCountry}</MenuItem>
         {countries.map(({ iso, name }) => (
           <MenuItem key={iso} value={iso}>
             {name}
