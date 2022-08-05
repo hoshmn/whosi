@@ -3,6 +3,8 @@ import { render } from "react-dom";
 import App from "./components/App";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { getRC, themePrimary, themeSecondary } from "./consts/colors";
+import reportWebVitals from "./reportWebVitals";
+import { sendToVercelAnalytics } from "./vitals";
 
 const theme = createTheme({
   palette: {
@@ -70,3 +72,5 @@ function ThemedApp() {
 
 const rootElement = document.getElementById("root");
 render(<ThemedApp />, rootElement);
+
+reportWebVitals(sendToVercelAnalytics);
