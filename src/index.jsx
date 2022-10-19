@@ -63,6 +63,16 @@ const theme = createTheme({
     //   lineHeight: '12px',
     // },
   },
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          outlinedPrimary: {
+            border: "1px solid",
+            borderColor: getRC(themePrimary, 11)
+          },
+        },
+      },
+    },
 });
 
 function ThemedApp() {

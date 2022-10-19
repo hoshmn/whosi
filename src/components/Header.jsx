@@ -2,7 +2,7 @@ import React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
-import { useTheme, useMediaQuery } from "@mui/material";
+import { useTheme, useMediaQuery, Button } from "@mui/material";
 import { CountrySelect } from "./CountrySelect";
 import { getRC, headerColor } from "../consts/colors";
 import { Link } from "@mui/material";
@@ -26,7 +26,7 @@ export const Header = ({
           sx={{
             display: "flex",
             justifyContent: "space-between",
-            height: { xs: theme.spacing(8) },
+            height: { xs: theme.spacing(9) },
             "& .country-select": {
               ml: "auto",
               pr: 1,
@@ -77,12 +77,19 @@ export const Header = ({
             handleCountryChange={handleCountryChange}
             selectedIso={selectedIso}
           />
-          <Link
-            href={null}
+          <Button
             onClick={openResources}
-            sx={{ cursor: "pointer", textAlign: "center" }}
+            variant="outlined"
+            sx={{ lineHeight: 1.2, width: "min-content", flexShrink: 0, mx: 1 }}
           >
             {_.get(siteCopy, [C.resources_title, "value"], "Resources")}
+          </Button>
+          <Link
+            href="https://forms.gle/rHoQxCVRbxkJSGBa6"
+            target="__blank"
+            flexShrink={0}
+          >
+            Feedback
           </Link>
         </Toolbar>
       </AppBar>
