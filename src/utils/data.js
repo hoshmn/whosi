@@ -354,7 +354,7 @@ export const insertNumberIcons = (text) =>
 export const findLeastUpdatedDeliverableCell = (groupData, col) => {
   const { columnName } = col;
   // ordered least to most complete
-  const statuses = ["Delayed", "Planned", "Started", "Ongoing", "Completed"];
+  const statuses = ["delayed", "planned", "started", "ongoing", "completed"];
   let i = 0;
 
   let someCell = {};
@@ -363,7 +363,7 @@ export const findLeastUpdatedDeliverableCell = (groupData, col) => {
     // TODO: refactor for clarity
     groupData.find((r) => {
       someCell = r.values.find((v) => v.sourceColumnName === columnName);
-      if (_.get(someCell, "value") === statuses[i]) {
+      if (_.get(someCell, "value", "").trim().toLowerCase() === statuses[i]) {
         theCell = someCell;
         return true;
       }
