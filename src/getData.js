@@ -255,7 +255,7 @@ function getTableList({
       groupByGroup: _.get(row, groupByField),
       values: colNames.map((cn) => {
         const value = _.get(row, cn);
-        const LCVal = value && value.toLowerCase();
+        const LCVal = value && value.toLowerCase().trim();
 
         let chartWideFieldVal = _.get(chartWideConfig, cn, "");
         chartWideFieldVal =
