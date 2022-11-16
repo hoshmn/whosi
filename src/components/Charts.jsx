@@ -208,6 +208,7 @@ export const Charts = ({
           {elements.map((elem, i) => (
             <ElementComponent
               key={i}
+              connectNulls={true}
               // type="monotone"
               // dataBounds={_.get(elem, [elem + "_bounds"], [])}
               dataKey={elem}
