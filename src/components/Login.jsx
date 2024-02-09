@@ -20,7 +20,7 @@ export const Login = ({ open, setEntered }) => {
 
   const handleSubmit = () => {
     // alert("entered: " + password + " | " + encrypter(password));
-    const correct = encrypter(password) === "130c0b0017001556";
+    const correct = encrypter(password) === "22362b2a302d213624140516100d05085617130d0a03";
     setErrored(!correct);
     setPassword("");
     if (correct) setEntered(true);
@@ -101,7 +101,7 @@ export const Login = ({ open, setEntered }) => {
             >
               Clarice Pinto
             </Link>{" "}
-            for early access.
+            for access.
           </Typography>
         </Box>
       </Paper>

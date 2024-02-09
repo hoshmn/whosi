@@ -15,8 +15,7 @@ import { Resources } from "./Resources";
 const SHOW_COLORS = false;
 
 export default function App() {
-  // PW no longer required
-  const [entered, setEntered] = React.useState(true);
+  const [entered, setEntered] = React.useState(false);
 
   const [viewingResources, setViewingResources] = React.useState(false);
   const closeResources = () => setViewingResources(false);
@@ -79,12 +78,13 @@ export default function App() {
 
   // console.log("*", chartData);
   const loading =
-    !entered ||
     !homeCopy.length ||
     (selectedIso &&
       !_.some(chartData, (c) => c && c.countryIso === selectedIso));
 
   const theme = useTheme();
+
+  if (!entered) return <Login open={true} setEntered={setEntered} />
   return (
     <Paper
       elevation={0}
@@ -100,7 +100,6 @@ export default function App() {
         },
       }}
     >
-      <Login open={!entered} setEntered={setEntered} />
       <Resources
         open={viewingResources}
         close={closeResources}
